@@ -4,7 +4,7 @@
             variant="outlined" class="custom-label" autofocus></v-text-field>
 
         <v-text-field v-model="email" :error-messages="emailError" label="信箱" prepend-icon="mdi-mail" variant="outlined"
-            class="custom-label" @blur="validateField('email')"></v-text-field>
+            class="custom-label"></v-text-field>
 
         <v-text-field v-model="password" :counter="6" :error-messages="passwordError" label="密碼" prepend-icon="mdi-lock"
             variant="outlined" class="custom-label" hint="密碼至少6個字，且須包含英文數字特殊字元!@#$%^&*"
@@ -106,10 +106,12 @@ const schema = yup.object({
         .oneOf([true], '必須接受條款'),
 })
 
-const { handleSubmit, resetForm } = useForm({
+// 初始化表單
+const { handleSubmit, resetForm, errors, validateField, values } = useForm({
     validationSchema: schema, // 綁定 Yup 模式
-
-})
+    validateOnChange: false,  // 禁用 onChange 驗證
+    validateOnBlur: true,     // 啟用 onBlur 驗證
+});
 
 // 定義每個表單欄位
 const { value: name, errorMessage: nameError } = useField('name')
@@ -145,7 +147,7 @@ const submit = handleSubmit(async (values) => {
         formData.append('userCity', values.city)
         formData.append('userDistrict', values.district)
         formData.append('userAddress', values.address)
-        formData.append('userRole', 'ROLE_USER') // 根據需要設置默認角色
+
 
         if (values.avatar) {
             formData.append('userPhoto', values.avatar)
