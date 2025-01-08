@@ -54,6 +54,8 @@
 </template>
 
 <script setup>
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { ref } from 'vue';
 
 const mobileNavActive = ref(false);
@@ -131,5 +133,9 @@ const toggleDeepDropdown = () => {
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+a {
+    text-decoration: none !important;
 }
 </style>

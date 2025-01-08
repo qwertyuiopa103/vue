@@ -1,10 +1,11 @@
 <template>
     <v-container>
-        <v-data-table :headers="headers" :items="users" item-key="userID" class="elevation-1" :loading="loading">
+        <v-data-table :headers="headers" :items="users" item-key="userID" :loading="loading" class="custom-label">
             <!-- 自訂頭貼欄位 -->
             <template #item.avatar="{ item }">
-                <v-avatar size="40">
-                    <img :src="item.userPhoto || '/user/img/user.png'" alt="Avatar" />
+                <v-avatar>
+                    <img :src="item.userPhoto || '/user/img/user.png'" alt="Avatar"
+                        style="width: 100%; height: auto; object-fit: cover;" />
                 </v-avatar>
             </template>
             <!-- 自訂啟用狀態欄位 -->
@@ -154,7 +155,7 @@ onMounted(() => {
 <style scoped>
 @import 'vuetify/styles';
 
-.v-selection-control {
+/* .v-selection-control {
     padding-top: 20px;
-}
+} */
 </style>

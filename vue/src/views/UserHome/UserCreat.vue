@@ -17,8 +17,8 @@
             :type="showConfirmPassword ? 'text' : 'password'"
             @click:append="toggleConfirmPasswordVisibility"></v-text-field>
 
-        <v-text-field v-model="phone" :counter="7" :error-messages="phoneError" label="手機" prepend-icon="mdi-phone-dial"
-            variant="outlined" class="custom-label"></v-text-field>
+        <v-text-field v-model="phone" :counter="10" :error-messages="phoneError" label="手機"
+            prepend-icon="mdi-phone-dial" variant="outlined" class="custom-label"></v-text-field>
 
         <v-autocomplete v-model="city" :error-messages="cityError" :items="cities" label="縣市"
             prepend-icon="mdi-city-variant" variant="outlined" class="custom-label"></v-autocomplete>

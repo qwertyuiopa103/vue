@@ -98,6 +98,7 @@
 
 <script setup>
 // 如果需要在 Footer 中添加 JavaScript 邏輯，可以在這裡添加
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 </script>
-
 <style scoped></style>
