@@ -51,7 +51,6 @@ import * as yup from 'yup'
 import locations from '@/data/locations.json'
 import axios from '@/plugins/axios'
 
-// 定義驗證規則
 const schema = yup.object({
     name: yup.string().required('姓名為必填項目'),
     email: yup
@@ -83,10 +82,10 @@ const schema = yup.object({
         .string()
         .required('手機為必填項目')
         .matches(/^\d{10,11}$/, '手機號碼格式不正確')
-        .test('unique-email', '信箱已被使用', async (value) => {
+        .test('unique-phone', '手機已被使用', async (value) => {
             if (!value) return false;
             try {
-                const response = await axios.get('/userCheck/phoneCheck', { params: { userEmail: value } });
+                const response = await axios.get('/userCheck/phoneCheck', { params: { userPhone: value } });
                 return !response.data;
             } catch (error) {
                 return false;
@@ -135,17 +134,43 @@ const togglePasswordVisibility = () => {
 const toggleConfirmPasswordVisibility = () => {
     showConfirmPassword.value = !showConfirmPassword.value
 }
-
-// 提交表單
 const submit = handleSubmit(async (values) => {
     try {
-        console.log('表單提交成功:', values)
+        // 創建 FormData
+        const formData = new FormData()
+        formData.append('userName', values.name)
+        formData.append('userEmail', values.email)
+        formData.append('userPassword', values.password)
+        formData.append('userPhone', values.phone)
+        formData.append('userCity', values.city)
+        formData.append('userDistrict', values.district)
+        formData.append('userAddress', values.address)
+        formData.append('userRole', 'ROLE_USER') // 根據需要設置默認角色
+
+        if (values.avatar) {
+            formData.append('userPhoto', values.avatar)
+        }
+
         // 發送資料到後端
-        //const response = await axios.post('/submit', values)
-        alert('提交成功！')
+        const response = await axios.post('http://localhost:8080/api/user/register', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+
+        if (response.status === 200) {
+            alert('提交成功！')
+            resetForm()
+        } else {
+            alert(`提交失敗：${response.data}`)
+        }
     } catch (error) {
-        console.error('提交失敗:', error)
-        alert('提交失敗，請稍後再試。')
+        if (error.response && error.response.data) {
+            alert(`提交失敗：${error.response.data}`)
+        } else {
+            console.error('提交失敗:', error)
+            alert('提交失敗，請稍後再試。')
+        }
     }
 })
 

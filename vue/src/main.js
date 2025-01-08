@@ -59,6 +59,10 @@ Object.keys(rules).forEach(ruleName => {
 // 設定語系和全域選項
 configure({
     generateMessage: localize('zh_TW', zhTW), // 設定語系為繁體中文
+    validateOnChange: false,  // 禁用輸入變更時的驗證
+    validateOnBlur: true,     // 啟用失去焦點時的驗證
+    validateOnInput: false,   // 禁用輸入時的驗證
+    validateOnModelUpdate: false, // 禁用模型更新時的驗證
 });
 
 // 全域註冊 vee-validate 組件
