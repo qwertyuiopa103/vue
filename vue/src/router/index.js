@@ -33,6 +33,11 @@ const router = createRouter({
       component: () => import("@/layouts/HomeLayout.vue"),
       children: [
         {
+          name: "default_view", // 預設的子頁面名稱
+          path: "", // 默認子路由，當訪問 `/home` 時自動加載
+          component: () => import("@/views/Home/Home.vue"),
+        },
+        {
           name: "userCreat_view",
           path: "userCreat",
           component: () => import("@/views/UserHome/UserCreat.vue"),
@@ -41,11 +46,18 @@ const router = createRouter({
     },
 
 
-    //   {
-    //     name: "login_layout",
-    //     path: "/login",
-    //     component: () => import("@/layouts/LoginLayout.vue")
-    //   },
+    {
+      name: "register_layout",
+      path: "/register",
+      component: () => import("@/layouts/RegisterLayout.vue")
+    },
+
+
+    {
+      name: "login_layout",
+      path: "/login",
+      component: () => import("@/layouts/LoginLayout.vue")
+    },
 
     //   {
     //     name: "admin_layout",

@@ -9,17 +9,16 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import GLightbox from 'glightbox';
-import 'glightbox/dist/css/glightbox.min.css';
 import PureCounter from '@srexi/purecounterjs';
-import Isotope from 'isotope-layout';
+
+
 
 
 const isLoading = ref(true);
-const showScrollTop = ref(false);
+const showScrollTop = ref(true);
 
 const handleScroll = () => {
-    if (window.scrollY > 300) {
+    if (window.scrollY > 100) {
         showScrollTop.value = true;
     } else {
         showScrollTop.value = false;
@@ -39,16 +38,8 @@ onMounted(() => {
         mirror: false,
     });
 
-    // 初始化 GLightbox
-    const lightbox = GLightbox({
-        selector: '.glightbox',
-    });
-
     // 初始化 PureCounter
     new PureCounter();
-
-    // 初始化 Isotope
-    initIsotope();
 
     // 添加滾動事件監聽器
     window.addEventListener('scroll', handleScroll);
@@ -66,38 +57,6 @@ onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
 });
 
-// 初始化 Isotope
-function initIsotope() {
-    document.querySelectorAll('.isotope-layout').forEach(isotopeItem => {
-        const layout = isotopeItem.getAttribute('data-layout') || 'masonry';
-        const filter = isotopeItem.getAttribute('data-default-filter') || '*';
-        const sort = isotopeItem.getAttribute('data-sort') || 'original-order';
-
-        const container = isotopeItem.querySelector('.isotope-container');
-        if (!container) return;
-
-        const iso = new Isotope(container, {
-            itemSelector: '.isotope-item',
-            layoutMode: layout,
-            filter: filter,
-            sortBy: sort,
-        });
-
-        // 監聽過濾器點擊事件
-        const filters = isotopeItem.querySelectorAll('.isotope-filters li');
-        filters.forEach(filterElem => {
-            filterElem.addEventListener('click', function () {
-                isotopeItem.querySelector('.filter-active').classList.remove('filter-active');
-                this.classList.add('filter-active');
-                iso.arrange({ filter: this.getAttribute('data-filter') });
-
-                // 重新初始化 AOS
-                AOS.refresh();
-            });
-        });
-    });
-}
-
 </script>
 <template>
     <div class="index-page">
@@ -105,7 +64,7 @@ function initIsotope() {
             <div class="progress-bar"></div>
         </div>
         <Header></Header>
-        <main>
+        <main class="main">
             <!--  <Swiper :modules="[Navigation, Pagination]" :loop="true" :pagination="{ clickable: true }"
                 :navigation="true" class="mySwiper">
                 <SwiperSlide>Slide 1</SwiperSlide>
