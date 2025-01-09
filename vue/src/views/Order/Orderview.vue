@@ -1,17 +1,17 @@
 <script setup>
-import{ref,computed} from'vue';
+import { ref, computed } from 'vue';
 //表頭欄位定義
-const allHeaders=[
-    {text:'訂單編號',value:''},
-    {text:'使用者編號',value:''},
-    {text:'使用者姓名',value:''},
-    {text:'看護編號',value:''},
-    {text:'看護姓名',value:''},
-    {text:'建立日期',value:''},
-    {text:'開始日期',value:''},
-    {text:'結束日期',value:''},
-    {text:'',value:''},
-]
+const allHeaders = [
+    { text: '訂單編號', value: '' },
+    { text: '使用者編號', value: '' },
+    { text: '使用者姓名', value: '' },
+    { text: '看護編號', value: '' },
+    { text: '看護姓名', value: '' },
+    { text: '建立日期', value: '' },
+    { text: '開始日期', value: '' },
+    { text: '結束日期', value: '' },
+    { text: '', value: '' },
+]..
 </script>
 
 <template>
