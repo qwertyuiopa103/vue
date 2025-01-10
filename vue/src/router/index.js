@@ -24,6 +24,21 @@ const router = createRouter({
           path: "test",
           component: () => import("@/views/UserAdmin/test.vue"),
         },
+        {
+          name: "reserve_home",
+          path: "reserve",
+          component: () => import("@/views/Reserve/ReserveHome.vue"),
+        },
+        {
+          name: "reserve_search",
+          path: "reserve/search",
+          component: () => import("@/views/Reserve/ReserveSearch.vue"),
+        },
+        {
+          name: "reserve_insert",
+          path: "reserve/insert",
+          component: () => import("@/views/Reserve/ReserveInsert.vue"),
+        },
 
       ]
     },
