@@ -1,13 +1,13 @@
 <!-- 修改 Header.vue -->
 <template>
     <header id="header" class="header d-flex align-items-center sticky-top">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-            <a href="/" class="logo d-flex align-items-center">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center  justify-content-between">
+            <router-link to="/home" class="logo d-flex align-items-center mr-10">
                 <img src="/Home/img/logo.png" alt="Logo">
                 <h1 class="sitename">心護家</h1>
-            </a>
+            </router-link>
 
-            <nav id="navmenu" class="navmenu">
+            <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
                     <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li>
                     <li><router-link to="/about" @click="closeMobileNav">看護功能</router-link></li>
@@ -20,34 +20,34 @@
                         <transition name="fade">
                             <ul v-if="dropdownActive" class="dropdown-active">
                                 <li><a href="#" @click="closeMobileNav">Dropdown 1</a></li>
-                                <li class="dropdown">
-                                    <a href="#" @click.prevent="toggleDeepDropdown"><span>Deep Dropdown</span> <i
-                                            class="bi bi-chevron-down toggle-dropdown"></i></a>
-                                    <transition name="fade">
-                                        <ul v-if="deepDropdownActive" class="dropdown-active">
-                                            <li><a href="#" @click="closeMobileNav">Deep Dropdown 1</a></li>
-                                            <li><a href="#" @click="closeMobileNav">Deep Dropdown 2</a></li>
-                                            <li><a href="#" @click="closeMobileNav">Deep Dropdown 3</a></li>
-                                            <li><a href="#" @click="closeMobileNav">Deep Dropdown 4</a></li>
-                                            <li><a href="#" @click="closeMobileNav">Deep Dropdown 5</a></li>
-                                        </ul>
-                                    </transition>
-                                </li>
                                 <li><a href="#" @click="closeMobileNav">Dropdown 2</a></li>
                                 <li><a href="#" @click="closeMobileNav">Dropdown 3</a></li>
                                 <li><a href="#" @click="closeMobileNav">Dropdown 4</a></li>
                             </ul>
                         </transition>
                     </li>
+
+                    <li class="dropdown" :class="{ 'active': userDropdownActive }">
+                        <a href="#" @click.prevent="toggleUserDropdown">
+                            <img :src="avatarUrl || '/user/img/user.png'" alt="mdo" width="32" height="32"
+                                class="rounded-circle"><i class="bi bi-caret-down-fill"></i>
+                        </a>
+                        <transition name="fade">
+                            <ul v-if="userDropdownActive" class="text-small dropdown-active">
+                                <li><router-link class="dropdown-item" to="/profile">Profile</router-link></li>
+                                <li><router-link class="dropdown-item" to="/settings">Settings</router-link></li>
+                                <li>
+                                    <hr>
+                                </li>
+                                <li><a class="dropdown-item" href="#" @click.prevent="logout">Sign out</a></li>
+                            </ul>
+                        </transition>
+                    </li>
                 </ul>
-                <i class="mobile-nav-toggle d-xl-none bi" :class="mobileNavActive ? 'bi-x' : 'bi-list'"
-                    @click="toggleMobileNav"></i>
-
-
             </nav>
-            <div class="text-end">
-                <button type="button" class="btn btn-outline-dark me-2">登入</button>
-                <button type="button" class="btn btn-outline-warning">註冊</button>
+            <div class="text-end" v-else>
+                <router-link to="/login" class="btn btn-outline-dark me-2">登入</router-link>
+                <router-link to="/register" class="btn btn-outline-warning">註冊</router-link>
             </div>
         </div>
     </header>
@@ -56,11 +56,24 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { ref } from 'vue';
-
+import { ref, watch, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/authStore';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+const router = useRouter();
 const mobileNavActive = ref(false);
 const dropdownActive = ref(false);
-const deepDropdownActive = ref(false);
+const userDropdownActive = ref(false);
+const authStore = useAuthStore();
+// 初始化 Pinia store
+authStore.initialize();
+// 從 localStorage 獲取 id 和 token
+const userId = ref(localStorage.getItem('userId'));
+const token = ref(localStorage.getItem('token'));
+// 用戶頭像的 URL
+const avatarUrl = ref(null);
+// 檢查用戶是否已登錄
+const isAuthenticated = ref(authStore.isAuthenticated);
 
 const toggleMobileNav = () => {
     mobileNavActive.value = !mobileNavActive.value;
@@ -77,17 +90,58 @@ const toggleDropdown = () => {
     dropdownActive.value = !dropdownActive.value;
 };
 
-const toggleDeepDropdown = () => {
-    deepDropdownActive.value = !deepDropdownActive.value;
+const toggleUserDropdown = () => {
+    userDropdownActive.value = !userDropdownActive.value;
+
 };
+const logout = () => {
+    authStore.logout();
+    // 如果需要重定向到登錄頁面，可以在此處添加：
+    location.reload()
+};
+
+// 獲取用戶詳細資訊
+const fetchUserProfile = async () => {
+    if (!token.value) return;
+    try {
+        const response = await axios.get('/user/profile', {
+            headers: {
+                'Authorization': `Bearer ${token.value}`
+            }
+        });
+        if (response.status === 200) {
+            const { avatar } = response.data;
+            if (avatar) {
+                // 假設 avatar 是 Base64 編碼的圖片數據
+                avatarUrl.value = avatar;
+            }
+        }
+    } catch (error) {
+        console.error('獲取用戶頭像失敗:', error);
+    }
+};
+
+// 當用戶登錄狀態改變時，獲取用戶詳細資訊
+watch(
+    () => isAuthenticated.value,
+    (newVal) => {
+        if (newVal) {
+            fetchUserProfile();
+        } else {
+            avatarUrl.value = null;
+        }
+    }
+);
+
+// 在組件掛載時檢查是否已登錄並獲取頭像
+onMounted(() => {
+    if (isAuthenticated.value) {
+        fetchUserProfile();
+    }
+});
 </script>
 
 <style scoped>
-/* Header 相關樣式 */
-.header {
-    /* 添加任何自定義樣式 */
-}
-
 .navmenu ul {
     list-style: none;
     padding: 0;
@@ -115,6 +169,10 @@ const toggleDeepDropdown = () => {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.dropdown li {
+    min-width: 100px !important;
+}
+
 .dropdown.active ul,
 .dropdown .dropdown-active {
     display: block;
@@ -137,5 +195,9 @@ const toggleDeepDropdown = () => {
 
 a {
     text-decoration: none !important;
+}
+
+hr {
+    margin: 0;
 }
 </style>

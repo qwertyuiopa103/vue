@@ -1,48 +1,53 @@
 <template>
-    <form @submit.prevent="submit" class="ma-10">
-        <v-text-field v-model="name" :error-messages="nameError" label="姓名" prepend-icon="mdi-account"
-            variant="outlined" class="custom-label" autofocus></v-text-field>
+    <v-container class="mx-auto" max-width="1000">
+        <form @submit.prevent="submit" class="ma-10">
+            <fieldset>
+                <legend>註冊會員</legend>
+                <v-text-field v-model="name" :error-messages="nameError" label="姓名" prepend-icon="mdi-account"
+                    variant="outlined" class="custom-label" autofocus></v-text-field>
 
-        <v-text-field v-model="email" :error-messages="emailError" label="信箱" prepend-icon="mdi-mail" variant="outlined"
-            class="custom-label"></v-text-field>
+                <v-text-field v-model="email" :error-messages="emailError" label="信箱" prepend-icon="mdi-mail"
+                    variant="outlined" class="custom-label"></v-text-field>
 
-        <v-text-field v-model="password" :counter="6" :error-messages="passwordError" label="密碼" prepend-icon="mdi-lock"
-            variant="outlined" class="custom-label" hint="密碼至少6個字，且須包含英文數字特殊字元!@#$%^&*"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'"
-            @click:append="togglePasswordVisibility"></v-text-field>
+                <v-text-field v-model="password" :counter="6" :error-messages="passwordError" label="密碼"
+                    prepend-icon="mdi-lock" variant="outlined" class="custom-label" hint="密碼至少6個字，且須包含英文數字特殊字元!@#$%^&*"
+                    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" :type="showPassword ? 'text' : 'password'"
+                    @click:append="togglePasswordVisibility"></v-text-field>
 
-        <v-text-field v-model="confirmPassword" :counter="6" :error-messages="confirmPasswordError" label="確認密碼"
-            prepend-icon="mdi-lock-check" variant="outlined" class="custom-label" hint="請再次確認密碼"
-            :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="showConfirmPassword ? 'text' : 'password'"
-            @click:append="toggleConfirmPasswordVisibility"></v-text-field>
+                <v-text-field v-model="confirmPassword" :counter="6" :error-messages="confirmPasswordError" label="確認密碼"
+                    prepend-icon="mdi-lock-check" variant="outlined" class="custom-label" hint="請再次確認密碼"
+                    :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    @click:append="toggleConfirmPasswordVisibility"></v-text-field>
 
-        <v-text-field v-model="phone" :counter="10" :error-messages="phoneError" label="手機"
-            prepend-icon="mdi-phone-dial" variant="outlined" class="custom-label"></v-text-field>
+                <v-text-field v-model="phone" :counter="10" :error-messages="phoneError" label="手機"
+                    prepend-icon="mdi-phone-dial" variant="outlined" class="custom-label"></v-text-field>
 
-        <v-autocomplete v-model="city" :error-messages="cityError" :items="cities" label="縣市"
-            prepend-icon="mdi-city-variant" variant="outlined" class="custom-label"></v-autocomplete>
+                <v-autocomplete v-model="city" :error-messages="cityError" :items="cities" label="縣市"
+                    prepend-icon="mdi-city-variant" variant="outlined" class="custom-label"></v-autocomplete>
 
-        <v-autocomplete v-model="district" :error-messages="districtError" :items="districts" label="鄉鎮區"
-            prepend-icon="mdi-home-city" variant="outlined" class="custom-label"></v-autocomplete>
+                <v-autocomplete v-model="district" :error-messages="districtError" :items="districts" label="鄉鎮區"
+                    prepend-icon="mdi-home-city" variant="outlined" class="custom-label"></v-autocomplete>
 
-        <v-text-field v-model="address" :error-messages="addressError" label="詳細地址" prepend-icon="mdi-home"
-            variant="outlined" class="custom-label"></v-text-field>
+                <v-text-field v-model="address" :error-messages="addressError" label="詳細地址" prepend-icon="mdi-home"
+                    variant="outlined" class="custom-label"></v-text-field>
 
-        <v-file-input v-model="avatar" label="個人圖像(非必填)" prepend-icon="mdi-camera" class="custom-label"
-            variant="outlined" accept="image/*" :error-messages="avatarError"></v-file-input>
+                <v-file-input v-model="avatar" label="個人圖像(非必填)" prepend-icon="mdi-camera" class="custom-label"
+                    variant="outlined" accept="image/*" :error-messages="avatarError"></v-file-input>
 
-        <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="接受條款" type="checkbox"
-            value="1"></v-checkbox>
+                <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="接受條款" type="checkbox"
+                    value="1"></v-checkbox>
 
-        <v-btn class="me-4" type="submit">
-            submit
-        </v-btn>
+                <v-btn class="me-4" type="submit">
+                    submit
+                </v-btn>
 
-        <v-btn @click="handleReset">
-            clear
-        </v-btn>
-    </form>
+                <v-btn @click="handleReset">
+                    clear
+                </v-btn>
+            </fieldset>
+        </form>
+    </v-container>
 </template>
 <script setup>
 import { ref, watch } from 'vue'
@@ -154,7 +159,7 @@ const submit = handleSubmit(async (values) => {
         }
 
         // 發送資料到後端
-        const response = await axios.post('http://localhost:8080/api/user/register', formData, {
+        const response = await axios.post('/noAuth/user/register', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -200,5 +205,19 @@ watch(city, (newCity) => {
 
 .custom-label {
     margin-bottom: 20px;
+}
+
+fieldset {
+    border: 2px solid #ccc;
+    padding: 50px;
+    border-radius: 8px;
+}
+
+legend {
+    width: auto;
+    padding: 0 10px;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
 }
 </style>

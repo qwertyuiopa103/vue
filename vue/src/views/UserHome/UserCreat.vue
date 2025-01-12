@@ -163,6 +163,7 @@ const submit = handleSubmit(async (values) => {
         if (response.status === 200) {
             alert('提交成功！')
             resetForm()
+            router.push('/login');
         } else {
             alert(`提交失敗：${response.data}`)
         }

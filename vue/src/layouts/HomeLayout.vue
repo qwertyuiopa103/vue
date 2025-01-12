@@ -15,14 +15,15 @@ import PureCounter from '@srexi/purecounterjs';
 
 
 const isLoading = ref(true);
-const showScrollTop = ref(true);
+const showScrollTop = ref(false);
 
 const handleScroll = () => {
-    if (window.scrollY > 100) {
-        showScrollTop.value = true;
-    } else {
-        showScrollTop.value = false;
-    }
+    // if (window.scrollY > 1000) {
+    //     showScrollTop.value = true;
+    // } else {
+    //     showScrollTop.value = false;
+    // }
+    showScrollTop.value = window.scrollY > 200;
 };
 
 const scrollToTop = () => {
@@ -43,6 +44,7 @@ onMounted(() => {
 
     // 添加滾動事件監聽器
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
 
     // 模擬預載器延遲
     setTimeout(() => {
@@ -106,25 +108,10 @@ onUnmounted(() => {
 
 /* Scroll Top 按鈕樣式 */
 .scroll-top {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    width: 40px;
-    height: 40px;
-    background-color: #000;
-    color: #fff;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: opacity 0.3s;
-    opacity: 0.7;
 }
 
-.scroll-top:hover {
-    opacity: 1;
-}
+
 
 .progress-bar {
     width: 0%;

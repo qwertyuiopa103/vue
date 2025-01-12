@@ -46,7 +46,7 @@ onMounted(async () => {
 
     // 發送請求獲取會員總數
     try {
-        const response = await axios.get('/user/userCount');
+        const response = await axios.get('/noAuth/user/userCount');
         memberCount.value = response.data;
     } catch (error) {
         console.error('獲取會員總數失敗:', error);
@@ -106,7 +106,7 @@ onMounted(async () => {
                     <div class="col-lg-4 ps-lg-5">
                         <span class="content-subtitle"></span>
                         <!-- <h2 class="content-title">選擇心護家</h2> -->
-                        <strong>專業看護媒合，安心無憂</strong>
+                        <strong>專業媒合，安心無憂</strong>
                         <p class="lead mb-5">
                             我們提供經過審核的專業看護，快速匹配您的需求，讓您輕鬆找到最適合的照護服務。
                         </p>

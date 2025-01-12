@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { useAuthStore } from './stores/authStore';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -72,6 +73,10 @@ app.component('ErrorMessage', ErrorMessage);
 
 app.use(createPinia())
 app.use(router)
+const authStore = useAuthStore();
+console.log('Before initialize:', localStorage.getItem('token'), localStorage.getItem('userId'));
+authStore.initialize();
+console.log('After initialize:', authStore.token, authStore.id);
 app.use(vuetify)
 app.config.globalProperties.$axios = axios;
 app.mount('#app')
