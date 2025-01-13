@@ -31,6 +31,7 @@ const router = createRouter({
         },
 
 
+
       ]
     },
     {
@@ -42,6 +43,11 @@ const router = createRouter({
           name: "userCreat_view",
           path: "userCreat",
           component: () => import("@/views/UserHome/UserCreat.vue"),
+        },
+        {
+          name: "order_Userview",
+          path: "UserOrderView/:userID",
+          component: () => import("@/views/Order/UserOrderView.vue"),
         },
       ]
     },

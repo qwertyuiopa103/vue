@@ -5,33 +5,50 @@
     <!-- 卡片標題，顯示 "訂單管理" 並包含新增訂單按鈕 -->
     <v-card-title class="d-flex justify-space-between align-center">
       <span>訂單管理</span>
+      <div>
+      <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
       <v-btn color="primary" @click="openCreateDialog">新增訂單</v-btn>
+    </div>
     </v-card-title>
 
     <v-card-text>
+      <div class="d-flex align-center mb-4">
+          <v-switch
+            v-model="showNames"
+            :label="showNames ? '顯示名稱' : '顯示編號'"
+            class="mr-4"
+          ></v-switch>
+                 
+      <!-- 搜尋框 -->
+      <v-text-field
+          v-model="search"
+          label="搜尋"
+          clearable
+          outlined
+          dense
+          class="mb-3"
+        />
+      </div>
       <!-- 訂單資料表，顯示訂單列表 -->
       <v-data-table
-        :headers="headers"
-        :items="orders"
-        :items-per-page="10"
-        class="elevation-1"
-      >
+          :headers="headers"
+          :items="filteredOrders"
+          :items-per-page="10"
+          class="elevation-1"
+        >
         <template v-slot:item.actions="{ item }">
           <!-- 訂單操作按鈕：編輯和刪除 -->
           <v-btn
-          color="primary"
-          size="small"
-          class="mr-2"
-          @click="editOrder(item)"  
+           @click="editOrder(item)"  
+           icon
           > 
-            編輯
+          <v-icon>mdi-pencil</v-icon>
           </v-btn>
           <v-btn
-            color="error"
-            size="small"
             @click="deleteOrder(item.orderId)"
+            icon
           >
-            刪除
+          <v-icon>mdi-delete</v-icon>
           </v-btn>
         </template>
       </v-data-table>
@@ -73,11 +90,13 @@
               label="結束日期"
               required
             />
-            <v-text-field
-              v-model="currentOrder.status"
-              label="狀態"
-              required
-            />
+            <v-select
+            v-model="currentOrder.status"
+            :items="['未付款', '進行中', '完成', '取消']"
+            label="狀態"
+            required
+            outlined
+            ></v-select>
             <v-text-field
               v-model="currentOrder.totalPrice"
               label="總金額"
@@ -99,16 +118,19 @@
 
 <script setup>
 // 引入所需的函式和庫
-import { ref, reactive, onMounted } from "vue"; // Composition API
+import { ref, reactive, onMounted,computed } from "vue"; // Composition API
 import axios from "axios"; // 用於發送 HTTP 請求
 import Swal from "sweetalert2"; // 用於顯示彈出式警告
-
+// 搜尋框文字 新增的搜尋變數
+const search = ref(""); 
 // 訂單數據的反應式變數
 const orders = ref([]);
 // 控制 Dialog 顯示與隱藏
 const dialog = ref(false);
 // 控制 Dialog 標題
 const dialogTitle = ref("");
+// 控制是否顯示名稱
+const showNames = ref(false); 
 // 當前正在編輯的訂單數據
 const currentOrder = reactive({
 orderId: null,
@@ -126,17 +148,40 @@ totalPrice: 0
 });
 
 // 資料表的欄位標題
-const headers = [
-{ title: "編號", key: "orderId", align: 'start' },
-{ title: "使用者編號", key: "userID" },
-{ title: "照護人員編號", key: "caregiverNO" },
-{ title: "訂單日期", key: "orderDate" },
-{ title: "開始日期", key: "startDate" },
-{ title: "結束日期", key: "endDate" },
-{ title: "狀態", key: "status" },
-{ title: "總金額", key: "totalPrice" },
-{ title: "操作", key: "actions", sortable: false }
-];
+const headers = computed(() => [
+  { title: "編號", key: "orderId", align: 'start' },
+  { title: showNames.value ? "使用者名稱" : "使用者編號", key: showNames.value ? "userName" : "userID" },
+  { title: showNames.value ? "照護人員名稱" : "照護人員編號", key: showNames.value ? "caregiverName" : "caregiverNO" },
+  { title: "訂單日期", key: "orderDate" },
+  { title: "開始日期", key: "startDate" },
+  { title: "結束日期", key: "endDate" },
+  { title: "狀態", key: "status" },
+  { title: "總金額", key: "totalPrice" },
+  { title: "操作", key: "actions", sortable: false }
+]);
+
+
+// 快速新增訂單功能
+const quickAddOrder = () => {
+  dialogTitle.value = "快速新增訂單";
+  // 預填表單數據
+  Object.assign(currentOrder, {
+    orderId: null,
+    user: {
+      userID: "USR0039"
+    },
+    caregiver: {
+      caregiverNO: "2"
+    },
+    orderDate: "2025-01-13",
+    startDate: "2025-01-13",
+    endDate: "2025-01-13",
+    status: "完成",
+    totalPrice: 114514
+  });
+  
+  dialog.value = true; // 打開對話框
+};
 
 // 格式化日期為本地日期格式
 const formatDateToLocalDate = (dateString) => {
@@ -147,27 +192,13 @@ return date.toISOString().split('T')[0];
 
 // 從後端獲取訂單資料
 const fetchOrders = async () => {
-try {
-  const response = await axios.get("http://localhost:8080/orders/AllOrders");
-  console.log('Raw response:', response.data); // 輸出原始資料
-  
-  // 處理數據，格式化日期
-  orders.value = response.data.map(order => ({
-    orderId: order.orderId,
-    userID: order.user?.userID || '',
-    caregiverNO: order.caregiver?.caregiverNO || '',
-    orderDate: formatDateToLocalDate(order.orderDate),
-    startDate: formatDateToLocalDate(order.startDate),
-    endDate: formatDateToLocalDate(order.endDate),
-    status: order.status || '',
-    totalPrice: order.totalPrice || 0
-  }));
-  
-  console.log('Processed orders:', orders.value); // 輸出處理後的資料
-} catch (error) {
-  console.error('Error fetching orders:', error);
-  Swal.fire("錯誤", "無法載入訂單資料", "error");
-}
+  try {
+    const response = await axios.get("http://localhost:8080/orders/AllOrders");
+    orders.value = response.data; // 直接保存完整的響應數據
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    Swal.fire("錯誤", "無法載入訂單資料", "error");
+  }
 };
 
 // 打開新增訂單的 Dialog
@@ -269,6 +300,41 @@ try {
   Swal.fire("錯誤", error.response?.data?.message || "操作失敗", "error");
 }
 };
+// 合併 processedOrders 和 filteredOrders 的功能
+const filteredOrders = computed(() => {
+  // 首先處理名稱/編號的轉換
+  const processedData = orders.value.map(order => ({
+    orderId: order.orderId,
+    userID: order.user?.userID || '',
+    userName: order.user?.userName || '',
+    caregiverNO: order.caregiver?.caregiverNO || '',
+    caregiverName: order.caregiver?.caregiverName || '',
+    orderDate: formatDateToLocalDate(order.orderDate),
+    startDate: formatDateToLocalDate(order.startDate),
+    endDate: formatDateToLocalDate(order.endDate),
+    status: order.status || '',
+    totalPrice: order.totalPrice || 0
+  }));
+
+  // 然後進行搜尋過濾
+  if (!search.value) return processedData;
+  
+  const searchTerm = search.value.toLowerCase();
+  return processedData.filter(order => {
+    return (
+      order.orderId?.toString().toLowerCase().includes(searchTerm) ||
+      order.userID?.toLowerCase().includes(searchTerm) ||
+      order.userName?.toLowerCase().includes(searchTerm) ||
+      order.caregiverNO?.toString().toLowerCase().includes(searchTerm) ||
+      order.caregiverName?.toLowerCase().includes(searchTerm) ||
+      order.orderDate?.toLowerCase().includes(searchTerm) ||
+      order.startDate?.toLowerCase().includes(searchTerm) ||
+      order.endDate?.toLowerCase().includes(searchTerm) ||
+      order.status?.toLowerCase().includes(searchTerm) ||
+      order.totalPrice?.toString().toLowerCase().includes(searchTerm)
+    );
+  });
+});
 
 // 重置當前訂單數據
 const resetCurrentOrder = () => {
