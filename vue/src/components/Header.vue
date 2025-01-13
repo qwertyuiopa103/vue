@@ -34,7 +34,7 @@
                         </a>
                         <transition name="fade">
                             <ul v-if="userDropdownActive" class="text-small dropdown-active">
-                                <li><router-link class="dropdown-item" to="/profile">Profile</router-link></li>
+                                <li><router-link class="dropdown-item" to="/home/userProfile">Profile</router-link></li>
                                 <li><router-link class="dropdown-item" to="/settings">Settings</router-link></li>
                                 <li>
                                     <hr>
@@ -97,7 +97,9 @@ const toggleUserDropdown = () => {
 const logout = () => {
     authStore.logout();
     // 如果需要重定向到登錄頁面，可以在此處添加：
-    location.reload()
+    router.push("/home").then(() => {
+        window.location.reload();
+    });
 };
 
 // 獲取用戶詳細資訊

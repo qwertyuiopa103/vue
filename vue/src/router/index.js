@@ -46,6 +46,7 @@ const router = createRouter({
           name: "userProfile_view",
           path: "userProfile",
           component: () => import("@/views/UserHome/UserProfile.vue"),
+          meta: { requiresAuth: true },
         },
       ]
     },
@@ -71,5 +72,20 @@ const router = createRouter({
     // },
   ],
 })
+// 添加全局導航守衛
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token');
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // 如果路由需要驗證，檢查 token 是否存在
+    if (!token) {
+      next({ path: '/home' }); // 重定向到首頁
+    } else {
+      next(); // 放行
+    }
+  } else {
+    next(); // 放行
+  }
+});
 
 export default router

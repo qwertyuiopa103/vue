@@ -18,7 +18,7 @@
                     忘記密碼?</router-link>
             </div>
 
-            <v-text-field v-model="userPassword" :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+            <v-text-field v-model="userPassword" :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="visible ? 'text' : 'password'" density="compact" placeholder="請輸入密碼"
                 prepend-inner-icon="mdi-lock-outline" variant="outlined"
                 @click:append-inner="togglePasswordVisibility"></v-text-field>
