@@ -1,66 +1,71 @@
 <!-- http://localhost:5173/#/admin/orderView -->
 <template>
   <v-container>
-  <v-card>
-    <!-- 卡片標題，顯示 "訂單管理" 並包含新增訂單按鈕 -->
-    <v-card-title class="d-flex justify-space-between align-center">
-      <span>訂單管理</span>
-      <div>
-      <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
-      <v-btn color="primary" @click="openCreateDialog">新增訂單</v-btn>
-    </div>
-    </v-card-title>
+    <v-tabs v-model="activeTab" background-color="primary" dark>
+      <v-tab value="orders">訂單管理</v-tab>
+      <v-tab value="analysis">訂單分析</v-tab>
+    </v-tabs>
 
-    <v-card-text>
-      <div class="d-flex align-center mb-4">
-          <v-switch
-            v-model="showNames"
-            :label="showNames ? '顯示名稱' : '顯示編號'"
-            class="mr-4"
-          ></v-switch>
-                 
-      <!-- 搜尋框 -->
-      <v-text-field
-          v-model="search"
-          label="搜尋"
-          clearable
-          outlined
-          dense
-          class="mb-3"
-        />
-      </div>
-      <!-- 訂單資料表，顯示訂單列表 -->
-      <v-data-table
-          :headers="headers"
-          :items="filteredOrders"
-          :items-per-page="10"
-          class="elevation-1"
-        >
-        <template v-slot:item.actions="{ item }">
-          <!-- 訂單操作按鈕：編輯和刪除 -->
-          <v-btn
-           @click="editOrder(item)"  
-           icon
-          > 
-          <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn
-            @click="deleteOrder(item.orderId)"
-            icon
-          >
-          <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
-      </v-data-table>
-    </v-card-text>
-  </v-card>
+    <v-window v-model="activeTab">
+      <!-- 訂單管理頁籤 -->
+      <v-window-item value="orders">
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            
+            <div>
+              <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
+              <v-btn color="primary" @click="openCreateDialog">新增訂單</v-btn>
+            </div>
+          </v-card-title>
 
-  <!-- 編輯或新增訂單的 Dialog 彈窗 -->
-  <v-dialog v-model="dialog" max-width="500px">
+          <v-card-text>
+            <div class="d-flex align-center mb-4">
+              <v-switch
+                v-model="showNames"
+                :label="showNames ? '顯示名稱' : '顯示編號'"
+                class="mr-4"
+              ></v-switch>
+                    
+              <v-text-field
+                v-model="search"
+                label="搜尋"
+                clearable
+                outlined
+                dense
+                class="mb-3"
+              />
+            </div>
+            
+            <v-data-table
+              :headers="headers"
+              :items="filteredOrders"
+              :items-per-page="10"
+              class="elevation-1"
+            >
+              <template v-slot:item.actions="{ item }">
+                <v-btn @click="editOrder(item)" icon>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn @click="deleteOrder(item.orderId)" icon>
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </template>
+            </v-data-table>
+          </v-card-text>
+        </v-card>
+      </v-window-item>
+
+      <!-- 訂單分析頁籤 -->
+      <v-window-item value="analysis">
+        <OrderAnalysis />
+      </v-window-item>
+    </v-window>
+
+    <!-- 編輯或新增訂單的 Dialog 彈窗 -->
+    <v-dialog v-model="dialog" max-width="500px">
       <v-card>
         <v-card-title>{{ dialogTitle }}</v-card-title>
         <v-card-text>
-          <!-- 表單，包含訂單的各項欄位 -->
           <v-form ref="form">
             <v-text-field
               v-model="currentOrder.user.userID"
@@ -91,11 +96,11 @@
               required
             />
             <v-select
-            v-model="currentOrder.status"
-            :items="['未付款', '進行中', '完成', '取消']"
-            label="狀態"
-            required
-            outlined
+              v-model="currentOrder.status"
+              :items="['未付款', '進行中', '完成', '取消']"
+              label="狀態"
+              required
+              outlined
             ></v-select>
             <v-text-field
               v-model="currentOrder.totalPrice"
@@ -107,20 +112,25 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <!-- 儲存和取消按鈕 -->
           <v-btn color="primary" @click="saveOrder">儲存</v-btn>
           <v-btn color="error" @click="closeDialog">取消</v-btn>
         </v-card-actions>
       </v-card>
-  </v-dialog>
+    </v-dialog>
   </v-container>
 </template>
+
 
 <script setup>
 // 引入所需的函式和庫
 import { ref, reactive, onMounted,computed } from "vue"; // Composition API
 import axios from "axios"; // 用於發送 HTTP 請求
 import Swal from "sweetalert2"; // 用於顯示彈出式警告
+import OrderAnalysis from '@/components/Order/OrderData.vue';
+
+
+// 新增頁籤控制變數
+const activeTab = ref('orders');
 // 搜尋框文字 新增的搜尋變數
 const search = ref(""); 
 // 訂單數據的反應式變數
