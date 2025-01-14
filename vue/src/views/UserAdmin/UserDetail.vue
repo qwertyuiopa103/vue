@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-
+import axios from '@/plugins/axios';
 // 1. 取得路由參數
 const route = useRoute()
 const userId = route.params.id
@@ -27,9 +27,11 @@ const user = ref({
 // 3. 在組件掛載時，去呼叫後端 API 取得資料
 onMounted(async () => {
     try {
-        const response = await fetch(`http://localhost:8080/api/user/${userId}`)
-        // 假設後端回傳格式符合 JSON
-        user.value = await response.json()
+        const response = await axios.get(`/UserAdmin/users/${userId}`);
+        if (response.status === 200) {
+            // 假設後端返回的數據格式符合 JSON，直接賦值
+            user.value = response.data;
+        }
     } catch (error) {
         console.error('取得使用者資料失敗', error)
     }
@@ -99,12 +101,12 @@ const formatDate = (date) => {
 <style scoped>
 .custom-label ::v-deep input {
     font-size: 18px;
-    color: #4caf50;
+    /* color: #4caf50;*/
 }
 
 .custom-label ::v-deep .v-label {
     font-size: 18px;
-    color: #4caf50;
+    /* color: #4caf50;*/
     /* 設定標籤字體顏色為綠色 */
 }
 

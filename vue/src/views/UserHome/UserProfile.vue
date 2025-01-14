@@ -59,7 +59,7 @@ watch(
 )
 
 // 預設頭像（若後端沒回來或使用者尚未上傳，就顯示此圖）
-const defaultImageUrl = 'http://bootdey.com/img/Content/avatar/avatar1.png'
+const defaultImageUrl = '/user/img/user3.png'
 const imageSrc = ref(defaultImageUrl)
 
 // Token (假設在 localStorage)

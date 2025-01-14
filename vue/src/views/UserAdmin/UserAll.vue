@@ -4,7 +4,7 @@
             <!-- 自訂頭貼欄位 -->
             <template #item.avatar="{ item }">
                 <v-avatar>
-                    <img :src="item.userPhoto || '/user/img/user.png'" alt="Avatar"
+                    <img :src="item.userPhoto || '/user/img/user3.png'" alt="Avatar"
                         style="width: 100%; height: auto; object-fit: cover;" />
                 </v-avatar>
             </template>
@@ -43,7 +43,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import { VSwitch, VBtn, VIcon, VContainer, VDataTable } from 'vuetify/components'
-
+import axios from '@/plugins/axios';
 const router = useRouter()
 const users = ref([])
 const loading = ref(false)
@@ -65,12 +65,13 @@ const headers = [
 const fetchUsers = async () => {
     loading.value = true
     try {
-        const response = await fetch('http://localhost:8080/api/user')
-        if (!response.ok) {
-            throw new Error('Failed to fetch users')
+        const response = await axios.get('/UserAdmin/users');
+        console.log('API 返回資料:', response.data);
+        if (response.status === 200) {
+            users.value = response.data.filter(user => !user.userDeleted);
+        } else {
+            throw new Error('Failed to fetch users');
         }
-        const data = await response.json()
-        users.value = data.filter(user => !user.userDeleted)
     } catch (error) {
         console.error(error)
         Swal.fire('錯誤', '取得用戶資料失敗', 'error')
@@ -82,18 +83,13 @@ const fetchUsers = async () => {
 // 更新用戶狀態
 const updateUserStatus = async (user) => {
     try {
-        const response = await fetch(`http://localhost:8080/api/user/${user.userID}/status`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userStatus: user.userActive ? 1 : 0 }),
-        })
-
-        if (response.ok) {
-            Swal.fire('成功', '用戶狀態已更新', 'success')
+        const response = await axios.patch(`/UserAdmin/users/${user.userID}/status`, {
+            userStatus: user.userActive ? 1 : 0,
+        });
+        if (response.status === 200) {
+            Swal.fire('成功', '用戶狀態已更新', 'success');
         } else {
-            throw new Error('Failed to update status')
+            throw new Error('Failed to update status');
         }
     } catch (error) {
         console.error(error)
@@ -128,16 +124,14 @@ const deleteUser = async (userID) => {
 
     if (result.isConfirmed) {
         try {
-            const response = await fetch(`http://localhost:8080/api/user/${userID}`, {
-                method: 'DELETE',
-            })
+            const response = await axios.delete(`/UserAdmin/users/${userID}`);
 
-            if (response.ok) {
-                Swal.fire('已刪除!', `${userID} 已成功刪除。`, 'success')
+            if (response.status === 200) {
+                Swal.fire('已刪除!', `${userID} 已成功刪除。`, 'success');
                 // 重新取得用戶資料
-                await fetchUsers()
+                await fetchUsers();
             } else {
-                throw new Error('Failed to delete user')
+                throw new Error('Failed to delete user');
             }
         } catch (error) {
             console.error(error)

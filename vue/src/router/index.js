@@ -19,12 +19,6 @@ const router = createRouter({
           path: "user/:id",
           component: () => import("@/views/UserAdmin/UserDetail.vue"),
         },
-        {
-          name: "post_view",
-          path: "test",
-          component: () => import("@/views/UserAdmin/test.vue"),
-        },
-
       ]
     },
     {
@@ -38,15 +32,20 @@ const router = createRouter({
           component: () => import("@/views/Home/Home.vue"),
         },
         {
-          name: "userCreat_view",
-          path: "userCreat",
-          component: () => import("@/views/UserHome/UserCreat.vue"),
-        },
-        {
           name: "userProfile_view",
           path: "userProfile",
           component: () => import("@/views/UserHome/UserProfile.vue"),
           meta: { requiresAuth: true },
+        },
+        {
+          name: "userRegister_view",
+          path: "userRegister",
+          component: () => import("@/views/UserHome/UserRegister.vue"),
+        },
+        {
+          name: "userLogin_view",
+          path: "userLogin",
+          component: () => import("@/views/UserHome/UserLogin.vue"),
         },
       ]
     },
@@ -65,11 +64,11 @@ const router = createRouter({
       component: () => import("@/layouts/LoginLayout.vue")
     },
 
-    //   {
-    //     name: "admin_layout",
-    //     path: "/admin",
-    //     component: () => import("@/layouts/AdminLayout.vue")
-    // },
+    {
+      name: "adminlogin_layout",
+      path: "/adminlogin",
+      component: () => import("@/layouts/AdminLoginLayout.vue")
+    },
   ],
 })
 // 添加全局導航守衛

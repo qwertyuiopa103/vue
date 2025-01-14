@@ -4,17 +4,17 @@
         <div class="container-fluid container-xl position-relative d-flex align-items-center  justify-content-between">
             <router-link to="/home" class="logo d-flex align-items-center mr-10">
                 <img src="/Home/img/logo.png" alt="Logo">
-                <h1 class="sitename">心護家</h1>
+                <h1 class="sitename mt-1" style="font-size: 35px; font-weight: bolder;">心護家</h1>
             </router-link>
 
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
-                    <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li>
+                    <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
                     <li><router-link to="/about" @click="closeMobileNav">看護功能</router-link></li>
                     <li><router-link to="/services" @click="closeMobileNav">預約功能</router-link></li>
                     <li><router-link to="/portfolio" @click="closeMobileNav">訂單功能</router-link></li>
                     <li><router-link to="/team" @click="closeMobileNav">活動功能</router-link></li>
-                    <li class="dropdown" :class="{ 'active': dropdownActive }">
+                    <!-- <li class="dropdown" :class="{ 'active': dropdownActive }">
                         <a href="#" @click.prevent="toggleDropdown"><span>Dropdown</span> <i
                                 class="bi bi-chevron-down toggle-dropdown"></i></a>
                         <transition name="fade">
@@ -25,29 +25,32 @@
                                 <li><a href="#" @click="closeMobileNav">Dropdown 4</a></li>
                             </ul>
                         </transition>
-                    </li>
+                    </li> -->
 
+                    <div class="mr-2">歡迎，<strong>{{ username }}</strong></div>
                     <li class="dropdown" :class="{ 'active': userDropdownActive }">
                         <a href="#" @click.prevent="toggleUserDropdown">
-                            <img :src="avatarUrl || '/user/img/user.png'" alt="mdo" width="32" height="32"
+                            <img :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="40" height="40"
                                 class="rounded-circle"><i class="bi bi-caret-down-fill"></i>
                         </a>
                         <transition name="fade">
                             <ul v-if="userDropdownActive" class="text-small dropdown-active">
-                                <li><router-link class="dropdown-item" to="/home/userProfile">Profile</router-link></li>
-                                <li><router-link class="dropdown-item" to="/settings">Settings</router-link></li>
+                                <li><router-link class="dropdown-item" to="/home/userProfile">個人資料</router-link></li>
+                                <li v-if="userAdmin"><router-link class="dropdown-item" to="/admin">後台系統</router-link>
+                                </li>
                                 <li>
                                     <hr>
                                 </li>
-                                <li><a class="dropdown-item" href="#" @click.prevent="logout">Sign out</a></li>
+                                <li><a class="dropdown-item" href="#" @click.prevent="logout"><v-icon
+                                            icon="mdi-logout"></v-icon>登出</a></li>
                             </ul>
                         </transition>
                     </li>
                 </ul>
             </nav>
             <div class="text-end" v-else>
-                <router-link to="/login" class="btn btn-outline-dark me-2">登入</router-link>
-                <router-link to="/register" class="btn btn-outline-warning">註冊</router-link>
+                <router-link to="/home/userLogin" class="btn btn-outline-dark me-2">登入</router-link>
+                <router-link to="/home/userRegister" class="btn btn-outline-warning">註冊</router-link>
             </div>
         </div>
     </header>
@@ -70,10 +73,19 @@ authStore.initialize();
 // 從 localStorage 獲取 id 和 token
 const userId = ref(localStorage.getItem('userId'));
 const token = ref(localStorage.getItem('token'));
+const role = ref(localStorage.getItem('userRole'));
 // 用戶頭像的 URL
 const avatarUrl = ref(null);
+const username = ref(null);
 // 檢查用戶是否已登錄
 const isAuthenticated = ref(authStore.isAuthenticated);
+const userAdmin = ref(false);
+const checkAdminRole = () => {
+    // userAdmin.value = role.value === 'ROLE_ADMIN';
+    console.log('Current role:', role.value);
+    userAdmin.value = role.value === 'ROLE_ADMIN';
+    console.log('Is admin:', userAdmin.value);
+};
 
 const toggleMobileNav = () => {
     mobileNavActive.value = !mobileNavActive.value;
@@ -112,7 +124,8 @@ const fetchUserProfile = async () => {
             }
         });
         if (response.status === 200) {
-            const { avatar } = response.data;
+            const { avatar, name } = response.data;
+            username.value = name;
             if (avatar) {
                 // 假設 avatar 是 Base64 編碼的圖片數據
                 avatarUrl.value = avatar;
@@ -139,6 +152,7 @@ watch(
 onMounted(() => {
     if (isAuthenticated.value) {
         fetchUserProfile();
+        checkAdminRole();
     }
 });
 </script>
@@ -149,16 +163,19 @@ onMounted(() => {
     padding: 0;
     margin: 0;
     display: flex;
+
 }
 
 .navmenu li {
     position: relative;
     margin-right: 20px;
+
 }
 
 .navmenu a {
     text-decoration: none;
     color: #000;
+    font-size: 20px !important;
 }
 
 .dropdown ul {
@@ -173,6 +190,7 @@ onMounted(() => {
 
 .dropdown li {
     min-width: 100px !important;
+
 }
 
 .dropdown.active ul,
@@ -201,5 +219,10 @@ a {
 
 hr {
     margin: 0;
+}
+
+.header .logo img {
+    max-height: 60px !important;
+
 }
 </style>

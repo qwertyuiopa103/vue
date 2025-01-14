@@ -1,7 +1,7 @@
 <template>
     <footer id="footer" class="footer light-background">
         <div class="container">
-            <div class="row g-2">
+            <div class="row g-0">
                 <div class="col-md-6 col-lg-3 mb-3 mb-md-0">
                     <div class="widget">
                         <strong class="widget-heading">訂閱我們</strong>
@@ -15,7 +15,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4 ps-lg-5 mb-3 mb-md-0">
+                <div class="col-md-6 col-lg-3  mb-3  mx-3">
                     <div class="widget">
                         <strong class="widget-heading">聯絡我們</strong>
                         <hr>

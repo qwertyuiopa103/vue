@@ -24,12 +24,16 @@
 
             <!-- 右側功能按鈕 -->
             <template #append>
+                <div class="mr-2">歡迎，<strong>{{ username }}</strong></div>
                 <VBtn class="text-none me-2" height="48" icon slim>
-                    <VAvatar color="surface-light" image="https://cdn.vuetifyjs.com/images/john.png" size="32" />
+                    <VAvatar>
+                        <img :src="avatarUrl || '/user/img/user3.png'" alt="Avatar"
+                            style="width: 100%; height: auto; object-fit: cover;" />
+                    </VAvatar>
                     <VMenu activator="parent">
                         <VList density="compact" nav>
-                            <VListItem append-icon="mdi-cog-outline" link title="Settings" />
-                            <VListItem append-icon="mdi-logout" link title="Logout" />
+                            <VListItem append-icon="mdi-home-account" link title="前台" @click.prevent="home" />
+                            <VListItem append-icon="mdi-logout" link title="登出" @click.prevent="logout" />
                         </VList>
                     </VMenu>
                 </VBtn>
@@ -46,8 +50,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
+import { ref, onMounted } from 'vue';
+import axios from '@/plugins/axios';
+import { useAuthStore } from '@/stores/authStore';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const authStore = useAuthStore();
+const avatarUrl = ref(null);
+const username = ref(null);
 const drawer = ref(true)
 const items = ref([
     {
@@ -76,5 +86,35 @@ const items = ref([
         link: true,
     },
 ])
+const fetchUserAvatar = async () => {
+
+    try {
+        const response = await axios.get('/UserAdmin/users/avatar');
+        if (response.status === 200) {
+            const { avatar, name } = response.data;
+            username.value = name;
+            if (avatar) {
+                // 假設 avatar 是 Base64 編碼的圖片數據
+                avatarUrl.value = avatar;
+            }// 设置头像
+        }
+    } catch (error) {
+        console.error('获取用户头像失败:', error);
+    }
+};
+
+// 组件挂载时请求头像
+onMounted(() => {
+    fetchUserAvatar();
+});
+const logout = () => {
+    authStore.logout();
+    // 如果需要重定向到登錄頁面，可以在此處添加：
+    router.push("/adminlogin")
+};
+
+const home = () => {
+    router.push("/home")
+}
 </script>
 <style scoped></style>
