@@ -1,5 +1,5 @@
 <template>
-    <v-container class="d-flex align-center justify-center" style="height: 100vh;">
+    <v-container class="d-flex align-center justify-center">
         <form @submit.prevent="submit" style="width: 2500px;">
             <fieldset>
                 <legend>註冊會員</legend>
@@ -46,6 +46,11 @@
 
                         <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="接受條款" type="checkbox"
                             value="1" class=""></v-checkbox>
+                        <div class=" text-end mb-3">
+                            <v-btn prepend-icon="mdi-draw-pen" @click="edit">
+                                一鍵輸入
+                            </v-btn>
+                        </div>
                         <div class=" text-end">
                             <v-btn @click="handleReset" class="me-3" prepend-icon="mdi-cached">
                                 重置
@@ -62,12 +67,16 @@
     </v-container>
 </template>
 <script setup>
+import Swal from 'sweetalert2'
 import { ref, watch } from 'vue'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import locations from '@/data/locations.json'
 import axios from '@/plugins/axios'
-
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
+const userStore = useUserStore();
+const router = useRouter();
 const defaultImageUrl = '/user/img/user3.png'
 const imageSrc = ref(defaultImageUrl)
 
@@ -181,9 +190,20 @@ const submit = handleSubmit(async (values) => {
         })
 
         if (response.status === 200) {
-            alert('提交成功！')
-            imageSrc.value = defaultImageUrl;
-            resetForm()
+            // alert('提交成功！')
+            // Swal.fire({
+            //     icon: 'success',
+            //     title: '即將跳轉至驗證信箱頁面',
+            //     timer: 1500, // 自動關閉時間，單位毫秒
+            //     timerProgressBar: true, // 顯示進度條
+            //     showConfirmButton: false, // 隱藏確認按鈕
+            // }).then(() => {
+            router.push({ name: 'userMail_view' });
+            userStore.setEmail(values.email);
+            // imageSrc.value = defaultImageUrl;
+            // resetForm()
+            // });
+
         } else {
             alert(`提交失敗：${response.data}`)
         }
@@ -225,6 +245,17 @@ function handleFileChange(event) {
     }
     reader.readAsDataURL(file)
 }
+const edit = () => {
+    name.value = '周杰倫';
+    email.value = 'qwertyuiopa106@gmail.com';
+    password.value = 'aaa123@';
+    confirmPassword.value = 'aaa123@';
+    phone.value = '0912345678';
+    city.value = '桃園市';
+    district.value = '中壢區';
+    address.value = '新生路二段421號';
+    checkbox.value = "1";
+};
 </script>
 
 <style scoped>
@@ -250,6 +281,7 @@ legend {
     font-size: 22px;
     font-weight: bold;
     text-align: center;
+    float: none !important;
 }
 
 .circular-image {

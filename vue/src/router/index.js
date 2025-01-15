@@ -19,6 +19,11 @@ const router = createRouter({
           path: "user/:id",
           component: () => import("@/views/UserAdmin/UserDetail.vue"),
         },
+        {
+          name: "user_view",
+          path: "userOne/:id",
+          component: () => import("@/views/UserAdmin/User.vue"),
+        },
       ]
     },
     {
@@ -46,6 +51,11 @@ const router = createRouter({
           name: "userLogin_view",
           path: "userLogin",
           component: () => import("@/views/UserHome/UserLogin.vue"),
+        },
+        {
+          name: "userMail_view",
+          path: "userMail",
+          component: () => import("@/views/UserHome/UserMail.vue"),
         },
       ]
     },

@@ -44,7 +44,7 @@
                 prepend-icon='mdi-google'>Google</v-btn>
             <v-card-text class="text-center">
                 <span class="mr-2">還不是會員 ?</span>
-                <router-link to="/register" class="text-blue text-decoration-none">
+                <router-link to="/home/userRegister" class="text-blue text-decoration-none">
                     註冊會員<v-icon class="mb-1" icon="mdi-chevron-right"></v-icon>
                 </router-link>
             </v-card-text>
@@ -79,8 +79,11 @@ const handleLogin = async () => {
         if (response.status === 200) {
             const { id, token, role } = response.data;
             authStore.login(id, token, role);
-            router.push('/home');
+            router.push("/home").then(() => {
+                window.location.reload();
+            });
         }
+
     } catch (error) {
         console.error('登錄失敗:', error);
         if (error.response && error.response.data) {

@@ -101,7 +101,7 @@ const updateUserStatus = async (user) => {
 
 // 跳轉到詳細資料頁面
 const goToDetails = (userID) => {
-    router.push(`/admin/user/${userID}`)
+    router.push(`/admin/userOne/${userID}`)
 }
 
 // 跳轉到編輯用戶頁面
