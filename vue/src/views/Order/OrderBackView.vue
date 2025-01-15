@@ -49,6 +49,15 @@
                 <v-btn @click="deleteOrder(item.orderId)" icon>
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
+                <!-- 前往付款按鈕 -->
+                <v-btn
+                v-if="item.status === '未付款'" 
+                @click="goToPayment(item)" 
+                color="green" 
+                icon
+                >
+                <v-icon>mdi-cash</v-icon>
+                </v-btn>
               </template>
             </v-data-table>
           </v-card-text>
@@ -127,7 +136,9 @@ import { ref, reactive, onMounted,computed } from "vue"; // Composition API
 import axios from "axios"; // 用於發送 HTTP 請求
 import Swal from "sweetalert2"; // 用於顯示彈出式警告
 import OrderAnalysis from '@/components/Order/OrderData.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 
 // 新增頁籤控制變數
 const activeTab = ref('orders');
@@ -156,6 +167,17 @@ endDate: null,
 status: "",
 totalPrice: 0
 });
+// 跳轉到付款頁面，並傳遞訂單資料
+const goToPayment = (item) => {
+  // 可以根據需要做一些資料傳遞或處理
+  // 例如將訂單資訊保存在 localStorage 或 Vuex 中，並跳轉到付款頁面
+  console.log("抓取的訂單資料:", item);
+  setTimeout(() => {
+    localStorage.setItem('orderToPay', JSON.stringify(item)); // 儲存訂單資料
+    router.push({ name: 'order_Pay_admin' });  // 跳轉頁面
+  }, 500); // 延遲 500 毫秒
+};
+
 
 // 資料表的欄位標題
 const headers = computed(() => [

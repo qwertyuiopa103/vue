@@ -29,6 +29,11 @@ const router = createRouter({
           path: "orderView",
           component: () => import("@/views/Order/OrderBackView.vue"),
         },
+        {
+          name: "order_Pay_admin",
+          path: "order/pay",
+          component: () => import("@/views/Order/OrderPay.vue"),
+        },
 
 
 
@@ -48,6 +53,11 @@ const router = createRouter({
           name: "order_Userview",
           path: "UserOrderView/:userID",
           component: () => import("@/views/Order/UserOrderView.vue"),
+        },
+        {
+          name: "order_Pay_Home",
+          path: "order/pay",
+          component: () => import("@/views/Order/OrderPay.vue"),
         },
       ]
     },
