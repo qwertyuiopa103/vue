@@ -55,8 +55,9 @@
                             <v-btn @click="handleReset" class="me-3" prepend-icon="mdi-cached">
                                 重置
                             </v-btn>
-                            <v-btn type="submit" prepend-icon="mdi-check-circle">
-                                註冊
+                            <v-btn type="submit" prepend-icon="mdi-check-circle" :disabled="loading">
+                                <span v-if="loading">處理中...</span>
+                                <span v-else>註冊</span>
                             </v-btn>
 
                         </div>
@@ -79,7 +80,7 @@ const userStore = useUserStore();
 const router = useRouter();
 const defaultImageUrl = '/user/img/user3.png'
 const imageSrc = ref(defaultImageUrl)
-
+const loading = ref(false);
 const schema = yup.object({
     name: yup.string().required('姓名為必填項目'),
     email: yup
@@ -167,6 +168,7 @@ const togglePasswordVisibility2 = () => {
 };
 const submit = handleSubmit(async (values) => {
     try {
+        loading.value = true;
         // 創建 FormData
         const formData = new FormData()
         formData.append('userName', values.name)
@@ -206,6 +208,7 @@ const submit = handleSubmit(async (values) => {
 
         } else {
             alert(`提交失敗：${response.data}`)
+            loading.value = false;
         }
     } catch (error) {
         if (error.response && error.response.data) {
@@ -214,6 +217,7 @@ const submit = handleSubmit(async (values) => {
             console.error('提交失敗:', error)
             alert('提交失敗，請稍後再試。')
         }
+        loading.value = false;
     }
 })
 

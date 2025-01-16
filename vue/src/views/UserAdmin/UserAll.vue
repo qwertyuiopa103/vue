@@ -152,4 +152,7 @@ onMounted(() => {
 /* .v-selection-control {
     padding-top: 20px;
 } */
+hr {
+    margin: 0 !important;
+}
 </style>

@@ -2,8 +2,8 @@
     <div>
 
         <v-card class="mx-auto pa-4 pb-8 my-6" elevation="8" max-width="448" rounded="lg">
-            <v-img class="mx-auto my-2" max-width="100" src="/Home/img/logo.png"></v-img>
-            <div class="text-center">
+            <!-- <v-img class="mx-auto my-2" max-width="100" src="/Home/img/logo.png"></v-img> -->
+            <div class="text-center  mt-3">
                 <h3>歡迎回來</h3>
             </div>
             <div class="text-subtitle-1 text-medium-emphasis">帳號</div>
@@ -14,7 +14,7 @@
             <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
                 密碼
 
-                <router-link to="/register" class="text-caption text-decoration-none text-blue">
+                <router-link to="/home/userPassword" class="text-caption text-decoration-none text-blue">
                     忘記密碼?</router-link>
             </div>
 

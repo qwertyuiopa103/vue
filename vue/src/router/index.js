@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-
+import { useAuthStore } from '@/stores/authStore';
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
@@ -13,11 +13,6 @@ const router = createRouter({
           name: "userAll_view",
           path: "user",
           component: () => import("@/views/UserAdmin/UserAll.vue"),
-        },
-        {
-          name: "userDetail_view",
-          path: "user/:id",
-          component: () => import("@/views/UserAdmin/UserDetail.vue"),
         },
         {
           name: "user_view",
@@ -57,21 +52,17 @@ const router = createRouter({
           path: "userMail",
           component: () => import("@/views/UserHome/UserMail.vue"),
         },
+        {
+          name: "userPassword_view",
+          path: "userPassword",
+          component: () => import("@/views/UserHome/UserPassword.vue"),
+        },
+        {
+          name: "userChangePassword_view",
+          path: "userChangePassword/:token",
+          component: () => import("@/views/UserHome/UserChangePassword.vue"),
+        },
       ]
-    },
-
-
-    {
-      name: "register_layout",
-      path: "/register",
-      component: () => import("@/layouts/RegisterLayout.vue")
-    },
-
-
-    {
-      name: "login_layout",
-      path: "/login",
-      component: () => import("@/layouts/LoginLayout.vue")
     },
 
     {
@@ -81,20 +72,37 @@ const router = createRouter({
     },
   ],
 })
-// 添加全局導航守衛
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    // 如果路由需要驗證，檢查 token 是否存在
-    if (!token) {
-      next({ path: '/home' }); // 重定向到首頁
-    } else {
-      next(); // 放行
-    }
-  } else {
-    next(); // 放行
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const token = localStorage.getItem('token');
+  if (to.path === '/adminlogin') {
+    return next();
   }
+
+  // 如果進入 admin 區域，檢查角色
+  if (to.path.startsWith('/admin')) {
+    if (!token) {
+      // 如果沒有 token，重定向到後台登錄頁
+      return next({ path: '/adminlogin' });
+    }
+
+    // 如果有 token，但角色不是 admin
+    if (authStore.role !== 'ROLE_ADMIN') {
+      return next({ path: '/adminlogin' });
+    }
+  }
+
+  // 檢查需要身份驗證的路由
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!token) {
+      return next({ path: '/home' }); // 沒有 token，跳轉到首頁
+    }
+  }
+
+  // 預設放行
+  next();
 });
 
 export default router

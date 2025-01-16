@@ -30,7 +30,8 @@ const user = ref({
     userLockoutEnd: '',
     userFailedLoginAttempts: 0,
     userVerified: false,
-    userActive: false
+    userActive: false,
+    userPasswordChanged: null,
 })
 // 格式化使用者資料的 computed
 const formattedUser = computed(() => ({
@@ -38,6 +39,7 @@ const formattedUser = computed(() => ({
     userLogin: user.value.userLogin || '尚未登入',
     userUpdated: user.value.userUpdated || '尚未更新',
     userLockoutEnd: user.value.userLockoutEnd || '未被鎖定',
+    userPasswordChanged: user.value.userPasswordChanged || '未被更改密碼',
     userVerified: user.value.userVerified ? '已驗證' : '未驗證',
     userActive: user.value.userActive ? '啟用' : '禁用',
 }));
@@ -154,25 +156,31 @@ onMounted(async () => {
                                         <input class="form-control" readonly v-model="formattedUser.userLogin">
                                     </div> <!-- end row -->
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="form-group">
                                         <label class="mb-1">更新時間</label>
                                         <input class="form-control" readonly v-model="formattedUser.userUpdated">
                                     </div> <!-- end row -->
                                 </div>
-
+                                <div class="row mb-3">
+                                    <div class="form-group">
+                                        <label class="mb-1">密碼更改時間</label>
+                                        <input class="form-control" readonly
+                                            v-model="formattedUser.userPasswordChanged">
+                                    </div> <!-- end row -->
+                                </div>
 
                                 <h5 class="mb-3 bg-light p-2" style="font-weight:bold;"> <i
                                         class="mdi mdi-shield-lock mr-1"></i>安全控制</h5>
                                 <div class="row mb-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="mb-1">鎖定次數</label>
                                             <input class="form-control" readonly
                                                 v-model="formattedUser.userFailedLoginAttempts">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-9">
                                         <div class="form-group">
                                             <label class="mb-1">鎖定時間</label>
                                             <input class="form-control" readonly v-model="formattedUser.userLockoutEnd">
@@ -241,7 +249,8 @@ body {
 .nav-pills .nav-link.active,
 .nav-pills .show>.nav-link {
     color: #fff;
-    background-color: #1abc9c;
+    background-color: #8E8E8E;
+    /* background-color: #1abc9c; */
 }
 
 .nav-pills .nav-link {
@@ -274,5 +283,10 @@ body {
 
 .m-0 {
     margin: 0 !important;
+}
+
+.bg-light {
+    background-color: #E0E0E0 !important;
+    border-radius: .25rem;
 }
 </style>
