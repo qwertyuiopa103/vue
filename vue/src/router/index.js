@@ -39,6 +39,7 @@ const router = createRouter({
           path: "reserve/insert",
           component: () => import("@/views/Reserve/ReserveInsert.vue"),
         },
+        
 
       ]
     },
@@ -51,6 +52,16 @@ const router = createRouter({
           name: "userCreat_view",
           path: "userCreat",
           component: () => import("@/views/UserHome/UserCreat.vue"),
+        },
+        {
+          name: "reserve_calendar",
+          path: "reserve/calendar",
+          component: () => import("@/views/Reserve/ReserveCalendar.vue"),
+        },
+        {
+          name: "caregiver_calendar",
+          path: "caregiver/calendar",
+          component: () => import("@/views/Reserve/CaregiverCalendar.vue"),
         },
       ]
     },

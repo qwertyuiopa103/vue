@@ -31,13 +31,16 @@ import { localize } from '@vee-validate/i18n';
 import zhTW from '@vee-validate/i18n/dist/locale/zh_TW.json';
 
 import axios from './plugins/axios'; // 導入自定義配置的 Axios
-
-
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faXmark } from '@fortawesome/free-solid-svg-icons'; 
+library.add(faXmark);
 import App from './App.vue'
 import router from './router'
-
+// import { VCalendar } from 'vuetify/labs/VCalendar'
+// import { VSheet, VSelect } from 'vuetify/components';
 const app = createApp(App)
-
+app.component('font-awesome-icon', FontAwesomeIcon);
 const vuetify = createVuetify({
     components,
     directives,
