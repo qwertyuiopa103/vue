@@ -1,4 +1,5 @@
 <!-- http://localhost:5173/#/admin/orderView -->
+<!-- http://localhost:5173/#/admin/orderView -->
 <template>
   <v-container>
     <v-tabs v-model="activeTab" background-color="primary" dark>
@@ -56,7 +57,7 @@
                 color="green" 
                 icon
                 >
-                <v-icon>mdi-cash</v-icon>
+                <v-icon>mdi-credit-card-outline</v-icon>
                 </v-btn>
               </template>
             </v-data-table>
@@ -106,10 +107,17 @@
             />
             <v-select
               v-model="currentOrder.status"
-              :items="['未付款', '進行中', '完成', '取消']"
+              :items="['待確認','未付款', '付款完成','付款失敗', '已取消']"
               label="狀態"
               required
               outlined
+            ></v-select>
+            <v-select
+            v-model="currentOrder.paymentMethod"
+            :items="['','現金', '信用卡', '網路ATM', 'ATM櫃員機', '超商代碼', 'Apple Pay']"
+            label="付款方式"
+            required
+            outlined
             ></v-select>
             <v-text-field
               v-model="currentOrder.totalPrice"
@@ -165,6 +173,7 @@ orderDate: null,
 startDate: null,
 endDate: null,
 status: "",
+paymentMethod: "",
 totalPrice: 0
 });
 // 跳轉到付款頁面，並傳遞訂單資料
@@ -188,6 +197,7 @@ const headers = computed(() => [
   { title: "開始日期", key: "startDate" },
   { title: "結束日期", key: "endDate" },
   { title: "狀態", key: "status" },
+  { title: "付款方式", key: "paymentMethod" },
   { title: "總金額", key: "totalPrice" },
   { title: "操作", key: "actions", sortable: false }
 ]);
@@ -264,6 +274,7 @@ try {
     startDate: formatDateToLocalDate(item.startDate),
     endDate: formatDateToLocalDate(item.endDate),
     status: item.status || '',
+    paymentMethod: item.paymentMethod || '',
     totalPrice: item.totalPrice || 0
   });
   
@@ -311,13 +322,14 @@ try {
     startDate: formatDateToLocalDate(currentOrder.startDate),
     endDate: formatDateToLocalDate(currentOrder.endDate),
     status: currentOrder.status,
+    paymentMethod: currentOrder.paymentMethod,
     totalPrice: Number(currentOrder.totalPrice)
   };
 
   // 判斷是新增還是更新訂單
   if (currentOrder.orderId) {
-    await axios.put(
-      `http://localhost:8080/orders/UpdateOrder/${currentOrder.orderId}`,
+    await axios.put(`
+      http://localhost:8080/orders/UpdateOrder/${currentOrder.orderId}`,
       orderData
     );
     Swal.fire("成功", "訂單已更新", "success");
@@ -345,6 +357,7 @@ const filteredOrders = computed(() => {
     startDate: formatDateToLocalDate(order.startDate),
     endDate: formatDateToLocalDate(order.endDate),
     status: order.status || '',
+    paymentMethod: order.paymentMethod || '',
     totalPrice: order.totalPrice || 0
   }));
 

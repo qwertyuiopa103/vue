@@ -11,7 +11,7 @@
           <p><strong>總金額:</strong> {{ order.totalPrice || '0' }}</p>
         </div>
 
-        <!-- 付款方式 -->
+        <!-- 付款方式下拉選單 -->
         <v-select
           v-model="paymentMethod"
           :items="paymentMethods"
@@ -20,10 +20,11 @@
           label="選擇付款方式"
           required
         ></v-select>
+
         <v-btn
           @click="processPayment"
           color="green"
-          :disabled="!paymentMethod"
+          :disabled="!paymentMethod || isProcessing"
           :loading="isProcessing"
         >
           付款
@@ -42,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
 const order = ref(null);
@@ -50,14 +51,14 @@ const paymentMethod = ref(null);
 const isProcessing = ref(false);
 const ecpayFormContainer = ref(null);
 
-// 定義付款方式選項
-const paymentMethods = [
-  { label: '信用卡', value: 'Credit' },
-  { label: '網路ATM', value: 'WebATM' },
-  { label: 'ATM櫃員機', value: 'ATM' },
-  { label: '超商代碼', value: 'CVS' },
-  { label: 'Apple Pay', value: 'ApplePay' }
-];
+// 設定付款方式選項
+const paymentMethods = ref([
+  { label: '信用卡', value: 'credit_card' },
+  { label: '網路ATM', value: 'atm' },
+  { label: 'ATM櫃員機', value: 'atm_machine' },
+  { label: '超商代碼', value: 'convenience_store' },
+  { label: 'Apple Pay', value: 'apple_pay' }
+]);
 
 const isValidOrder = computed(() => {
   return order.value &&
@@ -65,6 +66,7 @@ const isValidOrder = computed(() => {
          order.value.orderId;
 });
 
+// 初始化訂單資料
 try {
   const orderData = localStorage.getItem('orderToPay');
   if (orderData) {
@@ -76,6 +78,7 @@ try {
   console.error('解析訂單資料時發生錯誤:', error);
 }
 
+// 付款處理邏輯
 async function processPayment() {
   if (!isValidOrder.value || !paymentMethod.value) {
     console.error("訂單資料無效或未選擇付款方式");
@@ -85,32 +88,26 @@ async function processPayment() {
   try {
     isProcessing.value = true;
 
-    // 使用環境變數中的 API 基本 URL
+    // 假設後端需要訂單ID、總金額和選擇的付款方式
     const response = await axios.post(
-  `${import.meta.env.VITE_API_BASE_URL}/payment/ecpay/create`,
-  {
-    orderId: order.value.orderId,
-    totalPrice: order.value.totalPrice,
-    paymentMethod: paymentMethod.value,
-    MerchantID:'3002607',
-     ReturnURL: 'http://localhost:5173/#/admin/orderView'
-  },
-  {
-    headers: {
-      'Content-Type': 'application/json',  // 設定 Content-Type
-      'Authorization': 'Bearer yourTokenHere'  
-    }
-  }
-);
+      `${import.meta.env.VITE_API_BASE_URL}/payment/ecpay/create`,
+      {
+        orderId: order.value.orderId,
+        totalPrice: order.value.totalPrice,
+        paymentMethod: paymentMethod.value
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer yourTokenHere'
+        }
+      }
+    );
 
-    // 取得綠界回傳的表單 HTML
     const { formHtml } = response.data;
 
-    // 將綠界表單插入隱藏區域
     if (ecpayFormContainer.value) {
       ecpayFormContainer.value.innerHTML = formHtml;
-
-      // 自動提交表單至綠界
       const form = ecpayFormContainer.value.querySelector('form');
       if (form) {
         form.submit();
@@ -118,10 +115,14 @@ async function processPayment() {
     }
   } catch (error) {
     console.error('處理付款時發生錯誤:', error);
-    // 這裡可以加入錯誤提示
   } finally {
     isProcessing.value = false;
   }
 }
 
+// 組件初始化
+onMounted(() => {
+  // 這裡可以根據需要從後端載入付款方式
+  // 目前已經用靜態數據填充了 paymentMethods
+});
 </script>
