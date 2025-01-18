@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore';
+import jwtDecode from 'jwt-decode';
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
@@ -77,32 +78,48 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const token = localStorage.getItem('token');
+
   if (to.path === '/adminlogin') {
     return next();
+  }
+
+  // 如果有 Token，檢查是否過期
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000); // 當前時間（秒）
+
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        console.log('Token 已過期');
+        authStore.logout(); // 執行登出操作
+        return next({ path: '/home' }); // 重定向到登入頁
+      }
+    } catch (error) {
+      console.error('Token 解碼失敗:', error);
+      authStore.logout(); // 執行登出操作
+      return next({ path: '/home' }); // 重定向到登入頁
+    }
   }
 
   // 如果進入 admin 區域，檢查角色
   if (to.path.startsWith('/admin')) {
     if (!token) {
-      // 如果沒有 token，重定向到後台登錄頁
-      return next({ path: '/adminlogin' });
+      return next({ path: '/adminlogin' }); // 沒有 Token，重定向
     }
 
-    // 如果有 token，但角色不是 admin
     if (authStore.role !== 'ROLE_ADMIN') {
-      return next({ path: '/adminlogin' });
+      return next({ path: '/adminlogin' }); // 角色不符，重定向
     }
   }
 
   // 檢查需要身份驗證的路由
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!token) {
-      return next({ path: '/home' }); // 沒有 token，跳轉到首頁
+      return next({ path: '/home' }); // 沒有 Token，跳轉到首頁
     }
   }
 
   // 預設放行
   next();
 });
-
 export default router

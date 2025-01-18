@@ -140,6 +140,43 @@ onMounted(async () => {
                         <div v-if="currentTab === 'settings'" class="tab-pane"
                             :class="{ active: currentTab === 'settings' }">
                             <form>
+                                <h5 class="mb-3  bg-light p-2" style="font-weight:bold;"><i class="mdi 
+                                    mdi-account-cog mr-1"></i>
+                                    帳號狀態
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label class="mb-1">驗證狀態</label>
+                                            <input class="form-control" readonly v-model="formattedUser.userVerified">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="mb-1">啟用狀態</label>
+                                            <input class="form-control" readonly v-model="formattedUser.userActive">
+                                        </div>
+                                    </div> <!-- end col -->
+                                </div> <!-- end row -->
+                                <h5 class="mb-3 bg-light p-2" style="font-weight:bold;"> <i
+                                        class="mdi mdi-shield-lock mr-1"></i>安全控制</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label class="mb-1">鎖定次數</label>
+                                            <input class="form-control" readonly
+                                                v-model="formattedUser.userFailedLoginAttempts">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="form-group">
+                                            <label class="mb-1">鎖定時間</label>
+                                            <input class="form-control" readonly v-model="formattedUser.userLockoutEnd">
+                                        </div>
+                                    </div> <!-- end col -->
+                                </div> <!-- end row -->
+
+
                                 <h5 class="mb-3 bg-light p-2" style="font-weight:bold;"><i
                                         class=" mdi mdi-clock-time-eight mr-1"></i>
                                     時間紀錄</h5>
@@ -169,43 +206,6 @@ onMounted(async () => {
                                             v-model="formattedUser.userPasswordChanged">
                                     </div> <!-- end row -->
                                 </div>
-
-                                <h5 class="mb-3 bg-light p-2" style="font-weight:bold;"> <i
-                                        class="mdi mdi-shield-lock mr-1"></i>安全控制</h5>
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="mb-1">鎖定次數</label>
-                                            <input class="form-control" readonly
-                                                v-model="formattedUser.userFailedLoginAttempts">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="form-group">
-                                            <label class="mb-1">鎖定時間</label>
-                                            <input class="form-control" readonly v-model="formattedUser.userLockoutEnd">
-                                        </div>
-                                    </div> <!-- end col -->
-                                </div> <!-- end row -->
-
-                                <h5 class="mb-3  bg-light p-2" style="font-weight:bold;"><i class="mdi 
-                                    mdi-account-cog mr-1"></i>
-                                    帳號狀態
-                                </h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="mb-1">驗證狀態</label>
-                                            <input class="form-control" readonly v-model="formattedUser.userVerified">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="mb-1">啟用狀態</label>
-                                            <input class="form-control" readonly v-model="formattedUser.userActive">
-                                        </div>
-                                    </div> <!-- end col -->
-                                </div> <!-- end row -->
 
 
                             </form>
@@ -288,5 +288,9 @@ body {
 .bg-light {
     background-color: #E0E0E0 !important;
     border-radius: .25rem;
+}
+
+label {
+    font-weight: bold;
 }
 </style>

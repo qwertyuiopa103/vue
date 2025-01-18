@@ -23,12 +23,39 @@
                 prepend-inner-icon="mdi-lock-outline" variant="outlined"
                 @click:append-inner="togglePasswordVisibility"></v-text-field>
 
-            <v-card class="mb-12" color="surface-variant" variant="tonal">
+            <v-card class="mb-3" color="surface-variant" variant="tonal">
                 <v-card-text v-if="errorMessage" class="text-medium-emphasis text-caption">
                     {{ errorMessage }}
                 </v-card-text>
             </v-card>
-
+            <v-row class="">
+                <v-col>
+                    <v-btn prepend-icon="mdi-account" @click="nomal" color="secondary" size="large" variant="tonal"
+                        block rounded="xl">
+                        正常帳號
+                    </v-btn>
+                </v-col>
+                <v-col>
+                    <v-btn prepend-icon="mdi-autorenew" @click="change" color="secondary" size="large" variant="tonal"
+                        block rounded="xl">
+                        修改密碼
+                    </v-btn>
+                </v-col>
+            </v-row>
+            <v-row class="mb-2">
+                <v-col>
+                    <v-btn prepend-icon="mdi-account-hard-hat" @click="admin" color="secondary" size="large"
+                        variant="tonal" block rounded="xl">
+                        管理員
+                    </v-btn>
+                </v-col>
+                <v-col>
+                    <v-btn prepend-icon="mdi-account-heart" @click="care" color="secondary" size="large" variant="tonal"
+                        block rounded="xl">
+                        看護員
+                    </v-btn>
+                </v-col>
+            </v-row>
             <v-btn class="mb-2" color="blue" size="large" variant="tonal" block rounded="xl"
                 prepend-icon='mdi-login-variant' @click="handleLogin">
                 登入會員
@@ -94,7 +121,15 @@ const handleLogin = async () => {
         }
     }
 };
+const nomal = () => {
+    userAccount.value = 'qwertyuiopa106@gmail.com';
+    userPassword.value = 'aaa123@';
+};
 
+const change = () => {
+    userAccount.value = 'qwertyuiopa106@gmail.com';
+    userPassword.value = 'aa123@';
+};
 
 </script>
 <style scoped>

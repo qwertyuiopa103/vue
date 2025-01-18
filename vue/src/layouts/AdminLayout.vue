@@ -20,7 +20,9 @@
             <!-- 小螢幕時出現的按鈕，用於切換抽屜 -->
             <VAppBarNavIcon icon="mdi-menu" @click="drawer = !drawer" />
 
-            <VAppBarTitle style="font-weight:bold;">後台管理</VAppBarTitle>
+            <VAppBarTitle class="title">
+                <RouterLink to="/admin">後台管理</RouterLink>
+            </VAppBarTitle>
 
             <!-- 右側功能按鈕 -->
             <template #append>
@@ -117,4 +119,10 @@ const home = () => {
     router.push("/home")
 }
 </script>
-<style scoped></style>
+<style scoped>
+a {
+    font-weight: bold;
+    text-decoration: none !important;
+    color: #000;
+}
+</style>

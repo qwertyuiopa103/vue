@@ -27,7 +27,7 @@ axios.interceptors.response.use(
             const { status, config } = error.response;
 
             // 如果是 401 且不是登錄請求，處理 Token 過期
-            if (status === 401 && config.url !== '/auth/login' && config.url !== '/auth/adminlogin') {
+            if (status === 401 && config.url !== '/LoginController/login' && config.url !== '/LoginController/adminlogin') {
                 Swal.fire({
                     title: '登入逾時',
                     text: '您的登入已過期，請重新登入',

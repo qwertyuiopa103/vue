@@ -10,10 +10,10 @@
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
                     <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
-                    <li><router-link to="/about" @click="closeMobileNav">看護功能</router-link></li>
-                    <li><router-link to="/services" @click="closeMobileNav">預約功能</router-link></li>
-                    <li><router-link to="/portfolio" @click="closeMobileNav">訂單功能</router-link></li>
-                    <li><router-link to="/team" @click="closeMobileNav">活動功能</router-link></li>
+                    <li><router-link to="/about" @click="closeMobileNav">尋找看護</router-link></li>
+                    <li><router-link to="/services" @click="closeMobileNav">預約查詢</router-link></li>
+                    <li><router-link to="/portfolio" @click="closeMobileNav">訂單查詢</router-link></li>
+                    <li><router-link to="/team" @click="closeMobileNav">活動總覽</router-link></li>
                     <!-- <li class="dropdown" :class="{ 'active': dropdownActive }">
                         <a href="#" @click.prevent="toggleDropdown"><span>Dropdown</span> <i
                                 class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -176,6 +176,7 @@ onMounted(() => {
     text-decoration: none;
     color: #000;
     font-size: 20px !important;
+    font-weight: bold;
 }
 
 .dropdown ul {
