@@ -20,6 +20,21 @@ const router = createRouter({
           path: "userOne/:id",
           component: () => import("@/views/UserAdmin/User.vue"),
         },
+        {
+          name: "order_view",
+          path: "orderView",
+          component: () => import("@/views/Order/OrderBackView.vue"),
+        },
+        {
+          name: "order_Pay_admin",
+          path: "order/pay",
+          component: () => import("@/views/Order/OrderPay.vue"),
+        },
+        {
+          name: "order_Pay_return",
+          path: "order/return",
+          component: () => import("@/views/Order/Return.vue"),
+        },
       ]
     },
     {
@@ -62,6 +77,16 @@ const router = createRouter({
           name: "userChangePassword_view",
           path: "userChangePassword/:token",
           component: () => import("@/views/UserHome/UserChangePassword.vue"),
+        },
+        {
+          name: "order_Userview",
+          path: "UserOrderView/:userID",
+          component: () => import("@/views/Order/UserOrderView.vue"),
+        },
+        {
+          name: "order_Pay_Home",
+          path: "order/pay",
+          component: () => import("@/views/Order/OrderPay.vue"),
         },
       ]
     },
