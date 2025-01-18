@@ -35,6 +35,23 @@ const router = createRouter({
           path: "order/return",
           component: () => import("@/views/Order/Return.vue"),
         },
+        {
+          name: "reserve_home",
+          path: "reserve",
+          component: () => import("@/views/Reserve/ReserveHome.vue"),
+        },
+        {
+          name: "reserve_search",
+          path: "reserve/search",
+          component: () => import("@/views/Reserve/ReserveSearch.vue"),
+        },
+        {
+          name: "reserve_insert",
+          path: "reserve/insert",
+          component: () => import("@/views/Reserve/ReserveInsert.vue"),
+        },
+
+
       ]
     },
     {
@@ -87,6 +104,16 @@ const router = createRouter({
           name: "order_Pay_Home",
           path: "order/pay",
           component: () => import("@/views/Order/OrderPay.vue"),
+        },
+        {
+          name: "reserve_calendar",
+          path: "reserve/calendar",
+          component: () => import("@/views/Reserve/ReserveCalendar.vue"),
+        },
+        {
+          name: "caregiver_calendar",
+          path: "caregiver/calendar",
+          component: () => import("@/views/Reserve/CaregiverCalendar.vue"),
         },
       ]
     },
