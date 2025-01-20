@@ -75,7 +75,7 @@ const items = ref([
     {
         title: '預約管理',
         prependIcon: 'mdi-calendar',
-        link: '/admin/reserve',
+        link: '/admin/reserve/search',
     },
     {
         title: '訂單管理',

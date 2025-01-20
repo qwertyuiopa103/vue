@@ -117,7 +117,7 @@ export default {
   methods: {
     fetchReservations() {
       axios
-        .get('http://localhost:8080/reserve')
+        .get('http://localhost:8080/api/ReserveAdmin')
         .then((response) => {
           this.reservations = response.data;
         })
@@ -129,7 +129,7 @@ export default {
       this.dialog = true;
     },
     addNewReservation() {
-      axios.post('http://localhost:8080/reserve', this.newReservation)
+      axios.post('http://localhost:8080/api/ReserveAdmin', this.newReservation)
         .then(() => {
           Swal.fire('成功!', '新增資料成功', 'success');
           this.dialog = false;
@@ -140,7 +140,7 @@ export default {
         });
     },
     updateReserve(item) {
-      axios.put('http://localhost:8080/reserve', item)
+      axios.put('http://localhost:8080/api/ReserveAdmin', item)
         .then(() => {
           Swal.fire('成功!', '資料已更新', 'success');
           this.fetchReservations();
@@ -150,7 +150,7 @@ export default {
         });
     },
     deleteReserve(reserveId) {
-      axios.delete(`http://localhost:8080/reserve/${reserveId}`)
+      axios.delete(`http://localhost:8080/api/ReserveAdmin/${reserveId}`)
         .then(() => {
           Swal.fire('成功!', '資料已刪除', 'success');
           this.fetchReservations();
