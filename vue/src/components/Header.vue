@@ -76,7 +76,7 @@ const token = ref(localStorage.getItem('token'));
 const role = ref(localStorage.getItem('userRole'));
 // 用戶頭像的 URL
 const avatarUrl = ref(null);
-const username = ref(null);
+const username = ref('');
 // 檢查用戶是否已登錄
 const isAuthenticated = ref(authStore.isAuthenticated);
 const userAdmin = ref(false);
@@ -124,12 +124,23 @@ const fetchUserProfile = async () => {
             }
         });
         if (response.status === 200) {
-            const { avatar, name } = response.data;
-            username.value = name;
-            if (avatar) {
-                // 假設 avatar 是 Base64 編碼的圖片數據
-                avatarUrl.value = avatar;
-            }
+            // 後端回傳資料: { id, role, name, avatar, ... }
+            const { id: userIdFromApi, role: roleFromApi, name, avatar } = response.data;
+
+            // 顯示: 頭像 & 用戶名
+            username.value = name || '用戶';
+            avatarUrl.value = avatar || null;
+
+            // 同步 Pinia => login(後端拿到 id, 目前 token, 後端拿到的 role)
+            authStore.login(userIdFromApi, authStore.token, roleFromApi);
+
+            // 更新本地 token / id / role
+            token.value = authStore.token;
+            userId.value = authStore.id;
+            role.value = authStore.role;
+
+            // 檢查管理員
+            checkAdminRole();
         }
     } catch (error) {
         console.error('獲取用戶頭像失敗:', error);
@@ -148,13 +159,37 @@ watch(
     }
 );
 
-// 在組件掛載時檢查是否已登錄並獲取頭像
+
+// onMounted: 手動解析 "#/home?token=xxx&id=xxx&role=xxx"
 onMounted(() => {
-    if (isAuthenticated.value) {
-        fetchUserProfile();
-        checkAdminRole();
+    const hash = window.location.hash // e.g. "#/home?token=xxx"
+    const splitted = hash.split('?')
+    if (splitted.length > 1) {
+        const queryPart = splitted[1] // "token=xxx"
+        const params = new URLSearchParams(queryPart)
+        const tokenFromUrl = params.get('token')
+        if (tokenFromUrl) {
+            // 1) 先用 Pinia login => (id=null, token=..., role=null)
+            authStore.login(null, tokenFromUrl, null)
+            token.value = tokenFromUrl
+            isAuthenticated.value = true
+
+            // 2) 清理 URL => router.replace("/home")
+            router.replace("/home").then(() => {
+                // 3) 呼叫 fetchUserProfile => 後端回傳 id, role, name, avatar
+                fetchUserProfile()
+            })
+            return
+        }
     }
-});
+
+    // 如果 store 本身就登錄 => 直接抓資料
+    if (authStore.isAuthenticated) {
+        fetchUserProfile()
+        checkAdminRole()
+    }
+})
+
 </script>
 
 <style scoped>

@@ -32,6 +32,8 @@ const user = ref({
     userVerified: false,
     userActive: false,
     userPasswordChanged: null,
+    userDeleted: false,
+    userRole: '',
 })
 // 格式化使用者資料的 computed
 const formattedUser = computed(() => ({
@@ -39,10 +41,17 @@ const formattedUser = computed(() => ({
     userLogin: user.value.userLogin || '尚未登入',
     userUpdated: user.value.userUpdated || '尚未更新',
     userLockoutEnd: user.value.userLockoutEnd || '未被鎖定',
-    userPasswordChanged: user.value.userPasswordChanged || '未被更改密碼',
+    userPasswordChanged: user.value.userPasswordChanged || '未更改密碼',
     userVerified: user.value.userVerified ? '已驗證' : '未驗證',
     userActive: user.value.userActive ? '啟用' : '禁用',
+    userDeleted: user.value.userDeleted ? '已刪除' : '未刪除',
+    userRole: roleMap[user.value.userRole] || '未知角色',
 }));
+const roleMap = {
+    ROLE_ADMIN: '管理員',
+    ROLE_USER: '使用者',
+    //moderator: '版主',
+};
 
 // 3. 在組件掛載時，去呼叫後端 API 取得資料
 onMounted(async () => {
@@ -145,7 +154,7 @@ onMounted(async () => {
                                     帳號狀態
                                 </h5>
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-6 mb-2">
                                         <div class="form-group">
                                             <label class="mb-1">驗證狀態</label>
                                             <input class="form-control" readonly v-model="formattedUser.userVerified">
@@ -155,6 +164,20 @@ onMounted(async () => {
                                         <div class="form-group">
                                             <label class="mb-1">啟用狀態</label>
                                             <input class="form-control" readonly v-model="formattedUser.userActive">
+                                        </div>
+                                    </div> <!-- end col -->
+                                </div> <!-- end row -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-group">
+                                            <label class="mb-1">刪除狀態</label>
+                                            <input class="form-control" readonly v-model="formattedUser.userDeleted">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="mb-1">角色狀態</label>
+                                            <input class="form-control" readonly v-model="formattedUser.userRole">
                                         </div>
                                     </div> <!-- end col -->
                                 </div> <!-- end row -->

@@ -2,9 +2,13 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
+import { useAuthStore } from '@/stores/authStore';
 // 匯入縣市、鄉鎮區資料
 import locationsData from '@/data/locations.json'
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const isSubmissionSuccessful = ref(false);
+const authStore = useAuthStore();
 // ----- 1. 定義「原始資料」和「表單資料」 -----
 const originalUser = ref({
     id: '',
@@ -203,6 +207,51 @@ async function updateProfile() {
     }
 }
 
+
+const deleteUser = async () => {
+    const result = await Swal.fire({
+        title: '確認刪除?',
+        text: `您確定要刪除會員嗎?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        cancelButtonText: '取消',
+        confirmButtonText: '刪除',
+    })
+
+    if (result.isConfirmed) {
+        try {
+
+            const response = await axios.delete(`/user/users/${formData.value.id}`);
+
+            isSubmissionSuccessful.value = true;
+            if (response.status === 200) {
+                Swal.fire({
+                    title: '刪除成功！',
+                    text: '即將導向首頁',
+                    icon: 'success',
+                    confirmButtonColor: '#E0E0E0',
+                    confirmButtonText: '確定',
+                }).then(() => {
+                    // 按下確定後跳轉至登入頁面
+                    isSubmissionSuccessful.value = false;
+                    authStore.logout();
+                    router.push('/home').then(() => {
+                        window.location.reload();
+                    }); // 假設登入頁路由為 "/login"
+                });
+            } else {
+                throw new Error('Failed to delete user');
+            }
+        } catch (error) {
+            console.error(error)
+            Swal.fire('錯誤', '刪除用戶失敗', 'error')
+        }
+    }
+}
+
+
 // 頁面載入後，嘗試撈取使用者資料 (若已登入)
 onMounted(() => {
     if (token) {
@@ -286,11 +335,17 @@ onMounted(() => {
                                 <span v-if="errors.address" class="text-danger">{{ errors.address }}</span>
                             </div>
                             <!-- Save changes button-->
-                            <button class="btn btn-outline-success mr-5" type="reset"
-                                @click.prevent="resetForm">重置</button>
-                            <button class="btn btn-outline-danger" type="submit"
-                                @click.prevent="confirmAndUpdate">修改</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button class="btn btn-outline-success mr-5" type="reset"
+                                        @click.prevent="resetForm">重置</button>
+                                    <button class="btn btn-outline-primary" type="submit"
+                                        @click.prevent="confirmAndUpdate">修改</button>
+                                </div>
+                                <button class="btn btn-outline-danger" type="button"
+                                    @click.prevent="deleteUser">刪除會員</button>
 
+                            </div>
                         </form>
                     </div>
                 </div>
