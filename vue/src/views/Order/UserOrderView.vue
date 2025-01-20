@@ -38,10 +38,13 @@
                   <v-col cols="1.5" class="d-flex justify-start">
                     <!-- 如果是未付款的訂單顯示操作按鈕 -->
                     <template v-if="order.status === '未付款'">
-                      <v-btn color="green" @click="goToPaymentPage(order)">
-                        <v-icon>mdi-credit-card-outline</v-icon>
+                      <v-btn color="green" @click="goToPaymentPage(order)" class="circle-btn">
+                      <v-icon>mdi-credit-card-outline</v-icon>
                       </v-btn>
-                      <v-btn color="red" @click="cancelOrder(order)">取消訂單</v-btn>
+                      <v-btn @click="cancelOrder(order)" class="circle-btn" >
+                      <v-icon>mdi-cancel</v-icon>
+                      </v-btn>
+
                     </template>
                     <template v-else>
                       <!-- 其他狀態不顯示操作按鈕 -->
@@ -78,10 +81,11 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useRoute, useRouter } from 'vue-router';
 import Timeline from '@/components/Order/Timeline.vue';
-
+//接入UserID
 const route = useRoute();
-const router = useRouter();
 const userID = route.params.userID;
+
+const router = useRouter();
 const currentTab = ref('all');
 const orders = ref([]);
 
@@ -170,3 +174,20 @@ const cancelOrder = (order) => {
 
 onMounted(fetchOrders);
 </script>
+<style>
+.circle-btn {
+  width: 40px; /* 設定寬度 */
+  height: 40px; /* 設定高度 */
+  border-radius: 50% !important; /* 強制設置為圓形 */
+  padding: 0; /* 去除內邊距 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 45px; /* 確保不會過小 */
+}
+
+.v-btn .v-icon {
+  font-size: 24px; /* 設定圖標大小 */
+}
+
+</style>
