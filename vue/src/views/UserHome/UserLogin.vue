@@ -106,6 +106,9 @@ const handleLogin = async () => {
         if (response.status === 200) {
             const { id, token, role } = response.data;
             authStore.login(id, token, role);
+            localStorage.setItem('userId', id);
+            localStorage.setItem('token', token);
+            localStorage.setItem('userRole', role);
             router.push("/home").then(() => {
                 window.location.reload();
             });

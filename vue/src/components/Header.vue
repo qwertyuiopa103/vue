@@ -59,7 +59,7 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { ref, watch, onMounted } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
@@ -75,10 +75,10 @@ const userId = ref(localStorage.getItem('userId'));
 const token = ref(localStorage.getItem('token'));
 const role = ref(localStorage.getItem('userRole'));
 // 用戶頭像的 URL
-const avatarUrl = ref(null);
-const username = ref('');
+const username = computed(() => authStore.name);
+const avatarUrl = computed(() => authStore.avatar);
 // 檢查用戶是否已登錄
-const isAuthenticated = ref(authStore.isAuthenticated);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userAdmin = ref(false);
 const checkAdminRole = () => {
     // userAdmin.value = role.value === 'ROLE_ADMIN';
@@ -109,9 +109,7 @@ const toggleUserDropdown = () => {
 const logout = () => {
     authStore.logout();
     // 如果需要重定向到登錄頁面，可以在此處添加：
-    router.push("/home").then(() => {
-        window.location.reload();
-    });
+    router.push("/home")
 };
 
 // 獲取用戶詳細資訊
@@ -133,6 +131,8 @@ const fetchUserProfile = async () => {
 
             // 同步 Pinia => login(後端拿到 id, 目前 token, 後端拿到的 role)
             authStore.login(userIdFromApi, authStore.token, roleFromApi);
+            authStore.name = name || '用戶';
+            authStore.avatar = avatar || '/user/img/user3.png';
 
             // 更新本地 token / id / role
             token.value = authStore.token;
@@ -161,7 +161,7 @@ watch(
 
 
 // onMounted: 手動解析 "#/home?token=xxx&id=xxx&role=xxx"
-onMounted(() => {
+onMounted(async () => {
     const hash = window.location.hash // e.g. "#/home?token=xxx"
     const splitted = hash.split('?')
     if (splitted.length > 1) {
@@ -183,12 +183,23 @@ onMounted(() => {
         }
     }
 
-    // 如果 store 本身就登錄 => 直接抓資料
-    if (authStore.isAuthenticated) {
-        fetchUserProfile()
-        checkAdminRole()
+    // 如果已經登入，嘗試從 `authStore` 或本地儲存初始化
+    const tokenFromStorage = localStorage.getItem('token');
+    const idFromStorage = localStorage.getItem('userId');
+    const roleFromStorage = localStorage.getItem('userRole');
+
+    if (tokenFromStorage && idFromStorage && roleFromStorage) {
+        // 初始化 Pinia 狀態
+        authStore.login(idFromStorage, tokenFromStorage, roleFromStorage);
+
+        // 確保加載用戶詳細資料
+        await fetchUserProfile();
+        checkAdminRole();
+    } else {
+        // 未登入狀態，清空資料
+        authStore.logout();
     }
-})
+});
 
 </script>
 
