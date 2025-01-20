@@ -22,8 +22,8 @@
       <div class="reserve-items">
         <div v-for="(reserve, index) in reserves" :key="index" class="reserve-item">
           <p>使用者: {{ reserve.userBean.userName }}</p>
-          <p>開始時間: {{ formatDate(reserve.startTime) }}</p>
-          <p>結束時間: {{ formatDate(reserve.endTime) }}</p>
+          <p>開始時間: {{ formatDate(reserve.startDate) }}</p>
+          <p>結束時間: {{ formatDate(reserve.endDate) }}</p>
           <!-- 每一筆預約有獨立的新增與刪除按鈕 -->
           <div class="reserve-actions">
             <v-btn color="primary" @click="createOrder(reserve)">新增</v-btn>
@@ -122,8 +122,8 @@ export default {
       reserves.forEach(reserve => {
         const userName = reserve.userBean ? reserve.userBean.userName : "Unknown User";
 
-        const startDate = new Date(reserve.startTime);
-        const endDate = new Date(reserve.endTime);
+        const startDate = new Date(reserve.startDate);
+        const endDate = new Date(reserve.endDate);
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
@@ -157,9 +157,9 @@ export default {
           user: reserve.userBean,
           caregiver: reserve.caregiverBean,
           orderDate: reserve.orderDate,
-          startDate: reserve.startTime,
-          endDate: reserve.endTime,
-          status: "Pending",
+          startDate: reserve.startDate,
+          endDate: reserve.endDate,
+          status: "進行中",
           totalPrice: 0,
         };
 
@@ -175,8 +175,8 @@ export default {
             this.reserves = this.reserves.filter(reserve => reserve.reserveId !== reserveId);
 
             // 4. 更新行事曆事件
-            const startTime = new Date(reserve.startTime).toISOString();
-            const endTime = new Date(reserve.endTime).toISOString();
+            const startDate = new Date(reserve.startDate).toISOString();
+            const endDate = new Date(reserve.endDate).toISOString();
 
             this.events = this.events.map(event => {
               const eventStart = new Date(event.start).toISOString();
@@ -185,8 +185,8 @@ export default {
               if (
                 event.color === "yellow" && // 確保是黃色事件
                 event.title === reserve.userBean.userName &&
-                eventStart >= startTime &&
-                eventEnd <= endTime
+                eventStart >= startDate &&
+                eventEnd <= endDate
               ) {
                 return {
                   ...event,
@@ -252,8 +252,8 @@ export default {
                 // 從 reserves 陣列中移除該預約
                 this.reserves.splice(index, 1);
                 // 從 events 陣列中移除對應的事件
-                const startTime = new Date(reserve.startTime).toISOString();
-                const endTime = new Date(reserve.endTime).toISOString();
+                const startDate = new Date(reserve.startDate).toISOString();
+                const endDate = new Date(reserve.endDate).toISOString();
 
                 this.events = this.events.filter(event => {
                   const eventStart = new Date(event.start).toISOString();
@@ -262,8 +262,8 @@ export default {
                   return !(
                     isYellowEvent && // 確保只刪除黃色事件
                     event.title === reserve.userBean.userName &&
-                    eventStart >= startTime &&
-                    eventEnd <= endTime
+                    eventStart >= startDate &&
+                    eventEnd <= endDate
                   );
                 });
 
