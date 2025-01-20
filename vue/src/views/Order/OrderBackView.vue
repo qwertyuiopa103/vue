@@ -1,4 +1,4 @@
-<!-- http://localhost:5173/#/admin/orderView -->
+
 <!-- http://localhost:5173/#/admin/orderView -->
 <template>
   <v-container>
@@ -179,7 +179,7 @@ totalPrice: 0
 // 跳轉到付款頁面，並傳遞訂單資料
 const goToPayment = (item) => {
   // 可以根據需要做一些資料傳遞或處理
-  // 例如將訂單資訊保存在 localStorage 或 Vuex 中，並跳轉到付款頁面
+  
   console.log("抓取的訂單資料:", item);
   setTimeout(() => {
     localStorage.setItem('orderToPay', JSON.stringify(item)); // 儲存訂單資料
@@ -206,18 +206,19 @@ const headers = computed(() => [
 // 快速新增訂單功能
 const quickAddOrder = () => {
   dialogTitle.value = "快速新增訂單";
+  const currentDate = new Date().toISOString().split('T')[0];
   // 預填表單數據
   Object.assign(currentOrder, {
     orderId: null,
     user: {
-      userID: "USR0039"
+      userID: "USR00014"
     },
     caregiver: {
       caregiverNO: "2"
     },
-    orderDate: "2025-01-13",
-    startDate: "2025-01-13",
-    endDate: "2025-01-13",
+    orderDate: currentDate,  // 當前日期
+    startDate: currentDate,  
+    endDate: currentDate,
     status: "完成",
     totalPrice: 114514
   });
@@ -344,7 +345,7 @@ try {
   Swal.fire("錯誤", error.response?.data?.message || "操作失敗", "error");
 }
 };
-// 合併 processedOrders 和 filteredOrders 的功能
+
 const filteredOrders = computed(() => {
   // 首先處理名稱/編號的轉換
   const processedData = orders.value.map(order => ({
@@ -358,7 +359,7 @@ const filteredOrders = computed(() => {
     endDate: formatDateToLocalDate(order.endDate),
     status: order.status || '',
     paymentMethod: order.paymentMethod || '',
-    totalPrice: order.totalPrice || 0
+    totalPrice: order.totalPrice ? order.totalPrice.toLocaleString() : '0'
   }));
 
   // 然後進行搜尋過濾
