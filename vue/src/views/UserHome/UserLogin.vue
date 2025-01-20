@@ -68,7 +68,7 @@
                 </div>
             </v-card-text>
             <v-btn class="mb-2" color="red-lighten-1" size="large" variant="tonal" block rounded="xl"
-                prepend-icon='mdi-google'>Google</v-btn>
+                prepend-icon='mdi-google' :href="googleLoginUrl">Google</v-btn>
             <v-card-text class="text-center">
                 <span class="mr-2">還不是會員 ?</span>
                 <router-link to="/home/userRegister" class="text-blue text-decoration-none">
@@ -94,7 +94,7 @@ const errorMessage = ref('');
 const togglePasswordVisibility = () => {
     visible.value = !visible.value;
 };
-
+const googleLoginUrl = 'http://localhost:8080/oauth2/authorization/google'
 const handleLogin = async () => {
     errorMessage.value = '';
     try {
@@ -106,6 +106,9 @@ const handleLogin = async () => {
         if (response.status === 200) {
             const { id, token, role } = response.data;
             authStore.login(id, token, role);
+            localStorage.setItem('userId', id);
+            localStorage.setItem('token', token);
+            localStorage.setItem('userRole', role);
             router.push("/home").then(() => {
                 window.location.reload();
             });

@@ -18,7 +18,7 @@
                     </v-col>
                 </v-row>
                 <v-data-table :headers="headers" :items="filteredUsers" item-key="userID" :loading="loading"
-                    class="custom-label">
+                    class="custom-label fixed-table" style="white-space: nowrap;">
                     <!-- 自訂頭貼欄位 -->
                     <template #item.avatar="{ item }">
                         <v-avatar>
@@ -31,7 +31,13 @@
                         <VSwitch v-model="item.userActive" @change="() => updateUserStatus(item)"
                             :label="item.userActive ? '啟用' : '停用'" hide-details inset />
                     </template>
-
+                    <template #item.userDeleted="{ item }">
+                        <span>{{ item.userDeleted }}</span>
+                    </template>
+                    <!-- 角色 -->
+                    <template #item.userRole="{ item }">
+                        <span>{{ item.userRoleDisplay }}</span>
+                    </template>
                     <!-- 自訂詳細資料按鈕 -->
                     <template #item.details="{ item }">
                         <v-btn icon @click="goToDetails(item.userID)">
@@ -78,20 +84,27 @@ const searchFields = [
     { text: '編號', value: 'userID' },
     { text: '姓名', value: 'userName' },
     { text: '信箱', value: 'userEmail' },
-    { text: '手機', value: 'userPhone' }
+    { text: '手機', value: 'userPhone' },
+    { text: '角色', value: 'userRole' }
 ]; // 可供選擇的搜尋欄位/ 可供選擇的搜尋欄位
 const headers = [
-    { title: '頭貼', key: 'avatar', align: 'center', sortable: false },
-    { title: '編號', key: 'userID', align: 'center' },
-    { title: '姓名', key: 'userName', align: 'center' },
-    { title: '信箱', key: 'userEmail', align: 'center' },
-    { title: '手機', key: 'userPhone', align: 'center' },
-    { title: '啟用狀態', key: 'userActive', align: 'center' },
-    { title: '詳細資料', key: 'details', align: 'center', sortable: false },
+    { title: '頭貼', key: 'avatar', align: 'center', sortable: false, width: '50px ' },
+    { title: '編號', key: 'userID', align: 'center', width: '80px ' },
+    { title: '姓名', key: 'userName', width: '60px ' },
+    { title: '信箱', key: 'userEmail', align: 'center', width: '200px ' },
+    { title: '手機', key: 'userPhone', align: 'center', width: '100px ' },
+    { title: '啟用狀態', key: 'userActive', align: 'center', width: '110px ' },
+    { title: '刪除', key: 'userDeleted', width: '40px' },
+    { title: '角色', key: 'userRole', align: 'center', width: '80px' },
+    { title: '詳細資料', key: 'details', align: 'center', sortable: false, width: '60px' },
     // { title: '修改', key: 'edit', align: 'center', sortable: false },
-    { title: '刪除', key: 'delete', align: 'center', sortable: false },
+    { title: '刪除', key: 'delete', align: 'center', sortable: false, width: '60px' },
 ]
-
+const roleMap = {
+    ROLE_ADMIN: '管理員',
+    ROLE_USER: '使用者',
+    //moderator: '版主',
+};
 // 取得用戶資料
 const fetchUsers = async () => {
     loading.value = true
@@ -99,7 +112,8 @@ const fetchUsers = async () => {
         const response = await axios.get('/UserAdmin/users');
         console.log('API 返回資料:', response.data);
         if (response.status === 200) {
-            users.value = response.data.filter(user => !user.userDeleted);
+            // users.value = response.data.filter(user => !user.userDeleted);
+            users.value = response.data;
         } else {
             throw new Error('Failed to fetch users');
         }
@@ -170,18 +184,26 @@ const deleteUser = async (userID) => {
         }
     }
 }
-
 const filteredUsers = computed(() => {
+    // 格式化用戶數據
+    const formattedUsers = users.value.map(user => ({
+        ...user,
+        userRoleDisplay: roleMap[user.userRole] || '未知角色', // 格式化角色顯示名稱
+        userDeleted: user.userDeleted ? '是' : '否',          // 格式化刪除狀態
+    }));
+
+    // 如果沒有搜尋條件，返回全部用戶
     if (!search.value || !searchField.value) {
-        return users.value; // 若無搜尋條件，返回全部用戶
+        return formattedUsers;
     }
 
-    return users.value.filter((user) => {
-        const fieldKey = searchField.value; // 搜尋的欄位
-        const fieldValue = user[fieldKey]; // 取得用戶的欄位值
+    // 根據搜尋條件進行篩選
+    return formattedUsers.filter(user => {
+        const fieldKey = searchField.value; // 搜尋欄位
+        const fieldValue = fieldKey === 'userRole' ? user.userRoleDisplay : user[fieldKey]; // 使用顯示名稱
 
         if (!fieldValue) {
-            return false; // 若欄位不存在，過濾掉
+            return false;
         }
 
         return fieldValue.toString().toLowerCase().includes(search.value.toLowerCase());
@@ -212,5 +234,11 @@ hr {
 
 ::v-deep(.v-select) {
     font-size: larger;
+}
+
+.fixed-table ::v-deep table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    /* 確保表格寬度佔滿 */
 }
 </style>

@@ -9,7 +9,7 @@
                             variant="outlined" class="custom-label" autofocus></v-text-field>
 
                         <v-text-field v-model="email" :error-messages="emailError" label="信箱" prepend-icon="mdi-mail"
-                            variant="outlined" class="custom-label"></v-text-field>
+                            variant="outlined" class="custom-label" :readonly="isOAuth"></v-text-field>
 
                         <v-text-field v-model="password" :error-messages="passwordError" label="密碼"
                             prepend-icon="mdi-lock" variant="outlined" class="custom-label"
@@ -47,8 +47,11 @@
                         <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="接受條款" type="checkbox"
                             value="1" class=""></v-checkbox>
                         <div class=" text-end mb-3">
-                            <v-btn prepend-icon="mdi-draw-pen" @click="edit">
+                            <v-btn prepend-icon="mdi-draw-pen" class="mr-5" @click="edit">
                                 一鍵輸入
+                            </v-btn>
+                            <v-btn prepend-icon="mdi-google" @click="google">
+                                第三方
                             </v-btn>
                         </div>
                         <div class=" text-end">
@@ -69,13 +72,14 @@
 </template>
 <script setup>
 import Swal from 'sweetalert2'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import locations from '@/data/locations.json'
 import axios from '@/plugins/axios'
 import { useUserStore } from '@/stores/userStore';
 import { useRouter } from 'vue-router';
+const isOAuth = ref(false)
 const userStore = useUserStore();
 const router = useRouter();
 const defaultImageUrl = '/user/img/user3.png'
@@ -178,7 +182,7 @@ const submit = handleSubmit(async (values) => {
         formData.append('userCity', values.city)
         formData.append('userDistrict', values.district)
         formData.append('userAddress', values.address)
-
+        formData.append('isOAuth', isOAuth.value)
 
         if (values.avatar) {
             formData.append('userPhoto', values.avatar)
@@ -192,20 +196,12 @@ const submit = handleSubmit(async (values) => {
         })
 
         if (response.status === 200) {
-            // alert('提交成功！')
-            // Swal.fire({
-            //     icon: 'success',
-            //     title: '即將跳轉至驗證信箱頁面',
-            //     timer: 1500, // 自動關閉時間，單位毫秒
-            //     timerProgressBar: true, // 顯示進度條
-            //     showConfirmButton: false, // 隱藏確認按鈕
-            // }).then(() => {
-            router.push({ name: 'userMail_view' });
-            userStore.setEmail(values.email);
-            // imageSrc.value = defaultImageUrl;
-            // resetForm()
-            // });
-
+            if (isOAuth.value) {
+                router.push('/home/userLogin')
+            } else {
+                router.push({ name: 'userMail_view' });
+                userStore.setEmail(values.email);
+            }
         } else {
             alert(`提交失敗：${response.data}`)
             loading.value = false;
@@ -260,6 +256,27 @@ const edit = () => {
     address.value = '新生路二段421號';
     checkbox.value = "1";
 };
+const google = () => {
+    password.value = 'aaa123@';
+    confirmPassword.value = 'aaa123@';
+    phone.value = '0987654321';
+    city.value = '台北市';
+    district.value = '信義區';
+    address.value = '信義路五段7號89樓';
+    checkbox.value = "1";
+};
+onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const paramName = decodeURIComponent(urlParams.get('name') || '');
+    const paramEmail = decodeURIComponent(urlParams.get('email') || '');
+
+    if (paramName) name.value = paramName;
+    if (paramEmail) email.value = paramEmail;
+
+    if (paramName || paramEmail) {
+        isOAuth.value = true; // 標記是第三方登入流程
+    }
+});
 </script>
 
 <style scoped>

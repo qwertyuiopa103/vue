@@ -59,7 +59,7 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { ref, watch, onMounted } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
@@ -75,10 +75,10 @@ const userId = ref(localStorage.getItem('userId'));
 const token = ref(localStorage.getItem('token'));
 const role = ref(localStorage.getItem('userRole'));
 // 用戶頭像的 URL
-const avatarUrl = ref(null);
-const username = ref(null);
+const username = computed(() => authStore.name);
+const avatarUrl = computed(() => authStore.avatar);
 // 檢查用戶是否已登錄
-const isAuthenticated = ref(authStore.isAuthenticated);
+const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userAdmin = ref(false);
 const checkAdminRole = () => {
     // userAdmin.value = role.value === 'ROLE_ADMIN';
@@ -109,9 +109,7 @@ const toggleUserDropdown = () => {
 const logout = () => {
     authStore.logout();
     // 如果需要重定向到登錄頁面，可以在此處添加：
-    router.push("/home").then(() => {
-        window.location.reload();
-    });
+    router.push("/home")
 };
 
 // 獲取用戶詳細資訊
@@ -124,12 +122,25 @@ const fetchUserProfile = async () => {
             }
         });
         if (response.status === 200) {
-            const { avatar, name } = response.data;
-            username.value = name;
-            if (avatar) {
-                // 假設 avatar 是 Base64 編碼的圖片數據
-                avatarUrl.value = avatar;
-            }
+            // 後端回傳資料: { id, role, name, avatar, ... }
+            const { id: userIdFromApi, role: roleFromApi, name, avatar } = response.data;
+
+            // 顯示: 頭像 & 用戶名
+            username.value = name || '用戶';
+            avatarUrl.value = avatar || null;
+
+            // 同步 Pinia => login(後端拿到 id, 目前 token, 後端拿到的 role)
+            authStore.login(userIdFromApi, authStore.token, roleFromApi);
+            authStore.name = name || '用戶';
+            authStore.avatar = avatar || '/user/img/user3.png';
+
+            // 更新本地 token / id / role
+            token.value = authStore.token;
+            userId.value = authStore.id;
+            role.value = authStore.role;
+
+            // 檢查管理員
+            checkAdminRole();
         }
     } catch (error) {
         console.error('獲取用戶頭像失敗:', error);
@@ -148,13 +159,48 @@ watch(
     }
 );
 
-// 在組件掛載時檢查是否已登錄並獲取頭像
-onMounted(() => {
-    if (isAuthenticated.value) {
-        fetchUserProfile();
+
+// onMounted: 手動解析 "#/home?token=xxx&id=xxx&role=xxx"
+onMounted(async () => {
+    const hash = window.location.hash // e.g. "#/home?token=xxx"
+    const splitted = hash.split('?')
+    if (splitted.length > 1) {
+        const queryPart = splitted[1] // "token=xxx"
+        const params = new URLSearchParams(queryPart)
+        const tokenFromUrl = params.get('token')
+        if (tokenFromUrl) {
+            // 1) 先用 Pinia login => (id=null, token=..., role=null)
+            authStore.login(null, tokenFromUrl, null)
+            token.value = tokenFromUrl
+            isAuthenticated.value = true
+
+            // 2) 清理 URL => router.replace("/home")
+            router.replace("/home").then(() => {
+                // 3) 呼叫 fetchUserProfile => 後端回傳 id, role, name, avatar
+                fetchUserProfile()
+            })
+            return
+        }
+    }
+
+    // 如果已經登入，嘗試從 `authStore` 或本地儲存初始化
+    const tokenFromStorage = localStorage.getItem('token');
+    const idFromStorage = localStorage.getItem('userId');
+    const roleFromStorage = localStorage.getItem('userRole');
+
+    if (tokenFromStorage && idFromStorage && roleFromStorage) {
+        // 初始化 Pinia 狀態
+        authStore.login(idFromStorage, tokenFromStorage, roleFromStorage);
+
+        // 確保加載用戶詳細資料
+        await fetchUserProfile();
         checkAdminRole();
+    } else {
+        // 未登入狀態，清空資料
+        authStore.logout();
     }
 });
+
 </script>
 
 <style scoped>

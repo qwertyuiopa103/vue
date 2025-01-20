@@ -68,7 +68,8 @@ const fetchUsers = async () => {
         const response = await axios.get('/UserAdmin/users');
         console.log('API 返回資料:', response.data);
         if (response.status === 200) {
-            users.value = response.data.filter(user => !user.userDeleted);
+            //users.value = response.data.filter(user => !user.userDeleted);
+            users.value = response.data;
             processData();
             initializeCharts();
         } else {
