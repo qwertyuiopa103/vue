@@ -80,7 +80,7 @@ const items = ref([
     {
         title: '訂單管理',
         prependIcon: 'mdi-text-box-edit-outline',
-        link: true,
+        link: '/admin/orderView',
     },
     {
         title: '活動管理',

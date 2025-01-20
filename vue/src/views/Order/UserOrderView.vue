@@ -3,7 +3,7 @@
   <v-container>
     <v-card>
       <v-card-title>我的訂單</v-card-title>
-      
+
       <v-card-text>
         <v-tabs v-model="currentTab" color="primary" align-tabs="center">
           <v-tab value="all">全部</v-tab>
@@ -39,10 +39,10 @@
                     <!-- 如果是未付款的訂單顯示操作按鈕 -->
                     <template v-if="order.status === '未付款'">
                       <v-btn color="green" @click="goToPaymentPage(order)" class="circle-btn">
-                      <v-icon>mdi-credit-card-outline</v-icon>
+                        <v-icon>mdi-credit-card-outline</v-icon>
                       </v-btn>
-                      <v-btn @click="cancelOrder(order)" class="circle-btn" >
-                      <v-icon>mdi-cancel</v-icon>
+                      <v-btn @click="cancelOrder(order)" class="circle-btn">
+                        <v-icon>mdi-cancel</v-icon>
                       </v-btn>
 
                     </template>
@@ -52,7 +52,7 @@
                   </v-col>
                 </v-row>
               </v-expansion-panel-title>
-              
+
               <v-expansion-panel-text>
                 <v-card flat>
                   <v-card-text>
@@ -97,11 +97,11 @@ const filteredOrders = computed(() => {
     'failed': '付款失敗',
     'cancelled': '已取消'
   };
-  
+
   if (currentTab.value === 'all') {
     return orders.value;
   }
-  
+
   return orders.value.filter(order => order.status === statusMap[currentTab.value]);
 });
 
@@ -130,7 +130,7 @@ const formatPrice = (price) => {
 
 const fetchOrders = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/orders/OrderByUser/${userID}`);
+    const response = await axios.get(`http://localhost:8080/orders/OrderByUser`);
     orders.value = response.data;
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -146,9 +146,9 @@ const goToPaymentPage = (order) => {
   console.log("抓取的訂單資料:", order);
   setTimeout(() => {
     // 儲存訂單資料到 localStorage
-    localStorage.setItem('orderToPay', JSON.stringify(order)); 
+    localStorage.setItem('orderToPay', JSON.stringify(order));
     // 跳轉到付款頁面
-    router.push({ name: 'order_Pay_admin' }); 
+    router.push({ name: 'order_Pay_Home' });
   }, 500); // 延遲500毫秒
 };
 
@@ -176,18 +176,23 @@ onMounted(fetchOrders);
 </script>
 <style>
 .circle-btn {
-  width: 40px; /* 設定寬度 */
-  height: 40px; /* 設定高度 */
-  border-radius: 50% !important; /* 強制設置為圓形 */
-  padding: 0; /* 去除內邊距 */
+  width: 40px;
+  /* 設定寬度 */
+  height: 40px;
+  /* 設定高度 */
+  border-radius: 50% !important;
+  /* 強制設置為圓形 */
+  padding: 0;
+  /* 去除內邊距 */
   display: flex;
   justify-content: center;
   align-items: center;
-  min-width: 45px; /* 確保不會過小 */
+  min-width: 45px;
+  /* 確保不會過小 */
 }
 
 .v-btn .v-icon {
-  font-size: 24px; /* 設定圖標大小 */
+  font-size: 24px;
+  /* 設定圖標大小 */
 }
-
 </style>

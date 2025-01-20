@@ -12,7 +12,7 @@
                     <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
                     <li><router-link to="/about" @click="closeMobileNav">尋找看護</router-link></li>
                     <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
-                    <li><router-link to="/portfolio" @click="closeMobileNav">訂單查詢</router-link></li>
+                    <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/team" @click="closeMobileNav">活動總覽</router-link></li>
                     <!-- <li class="dropdown" :class="{ 'active': dropdownActive }">
                         <a href="#" @click.prevent="toggleDropdown"><span>Dropdown</span> <i

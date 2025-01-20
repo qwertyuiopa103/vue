@@ -98,7 +98,7 @@ const router = createRouter({
         },
         {
           name: "order_Userview",
-          path: "UserOrderView/:userID",
+          path: "UserOrderView",
           component: () => import("@/views/Order/UserOrderView.vue"),
         },
         {
@@ -106,6 +106,7 @@ const router = createRouter({
           path: "order/pay",
           component: () => import("@/views/Order/OrderPay.vue"),
         },
+
         {
           name: "reserve_calendar",
           path: "reserve/calendar",

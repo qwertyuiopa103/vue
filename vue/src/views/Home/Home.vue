@@ -30,7 +30,7 @@ const swiperOptions = {
 };
 
 const memberCount = ref(0);
-
+const OrderCount = ref(0);
 onMounted(async () => {
     // 確保 DOM 完全渲染
     await nextTick();
@@ -48,6 +48,13 @@ onMounted(async () => {
     try {
         const response = await axios.get('/UserNoAuth/user/userCount');
         memberCount.value = response.data;
+    } catch (error) {
+        console.error('獲取會員總數失敗:', error);
+    }
+
+    try {
+        const response = await axios.get('/OrderNoAuth/Count');
+        OrderCount.value = response.data;
     } catch (error) {
         console.error('獲取會員總數失敗:', error);
     }
@@ -138,7 +145,7 @@ onMounted(async () => {
                             <!-- Start Stats Item -->
                             <div class="col-4 counter" data-aos="fade-up" data-aos-delay="300">
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
-                                    data-purecounter-end="1914" data-purecounter-duration="1"
+                                    :data-purecounter-end="OrderCount" data-purecounter-duration="1"
                                     class="purecounter number"></span>
                                 <span class="d-block">媒合案件</span>
                             </div>
