@@ -85,7 +85,7 @@ const items = ref([
     {
         title: '活動管理',
         prependIcon: 'mdi-palette',
-        link: true,
+        link: '/admin/event/detail',
     },
 ])
 const fetchUserAvatar = async () => {
