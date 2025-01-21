@@ -80,13 +80,14 @@ const username = computed(() => authStore.name);
 const avatarUrl = computed(() => authStore.avatar);
 // 檢查用戶是否已登錄
 const isAuthenticated = computed(() => authStore.isAuthenticated);
-const userAdmin = ref(false);
-const checkAdminRole = () => {
-    // userAdmin.value = role.value === 'ROLE_ADMIN';
-    console.log('Current role:', role.value);
-    userAdmin.value = role.value === 'ROLE_ADMIN';
-    console.log('Is admin:', userAdmin.value);
-};
+//const userAdmin = ref(false);
+const userAdmin = computed(() => authStore.role === 'ROLE_ADMIN');
+// const checkAdminRole = () => {
+//     // userAdmin.value = role.value === 'ROLE_ADMIN';
+//     console.log('Current role:', role.value);
+//     userAdmin.value = role.value === 'ROLE_ADMIN';
+//     console.log('Is admin:', userAdmin.value);
+// };
 
 const toggleMobileNav = () => {
     mobileNavActive.value = !mobileNavActive.value;
@@ -141,7 +142,7 @@ const fetchUserProfile = async () => {
             role.value = authStore.role;
 
             // 檢查管理員
-            checkAdminRole();
+            // checkAdminRole();
         }
     } catch (error) {
         console.error('獲取用戶頭像失敗:', error);
