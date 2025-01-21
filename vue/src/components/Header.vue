@@ -36,7 +36,8 @@
                         <transition name="fade">
                             <ul v-if="userDropdownActive" class="text-small dropdown-active">
                                 <li><router-link class="dropdown-item" to="/home/userProfile">個人資料</router-link></li>
-                                <li v-if="userAdmin"><router-link class="dropdown-item" to="/admin">後台系統</router-link>
+                                <li v-if="userAdmin"><router-link class="dropdown-item"
+                                        to="/admin/user">後台系統</router-link>
                                 </li>
                                 <li>
                                     <hr>
@@ -204,6 +205,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+h1 {
+    color: #FF5757 !important;
+}
+
 .navmenu ul {
     list-style: none;
     padding: 0;
@@ -220,7 +225,7 @@ onMounted(async () => {
 
 .navmenu a {
     text-decoration: none;
-    color: #000;
+    color: #FF7575;
     font-size: 20px !important;
     font-weight: bold;
 }
@@ -262,6 +267,11 @@ onMounted(async () => {
 
 a {
     text-decoration: none !important;
+}
+
+.navmenu li:hover>a {
+    color: #EA0000 !important;
+    text-decoration: underline !important;
 }
 
 hr {

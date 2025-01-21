@@ -5,27 +5,38 @@
                 <legend>註冊會員</legend>
                 <v-row no-gutters>
                     <v-col class="pa-2 ma-2">
-                        <v-text-field v-model="name" :error-messages="nameError" label="姓名" prepend-icon="mdi-account"
-                            variant="outlined" class="custom-label" autofocus></v-text-field>
+                        <v-text-field v-model="name" :error="nameMeta.touched && !!nameError"
+                            :error-messages="nameMeta.touched ? nameError : []" label="姓名" prepend-icon="mdi-account"
+                            variant="outlined" class="custom-label" autofocus @blur="nameBlur"></v-text-field>
 
-                        <v-text-field v-model="email" :error-messages="emailError" label="信箱" prepend-icon="mdi-mail"
-                            variant="outlined" class="custom-label" :readonly="isOAuth"></v-text-field>
+                        <v-text-field v-model="email" :error="emailMeta.touched && (!!emailError || !!emailErrorCustom)"
+                            :error-messages="emailMeta.touched
+                                ? [emailError, emailErrorCustom].filter(Boolean)
+                                : []
+                                " label="信箱" prepend-icon="mdi-mail" variant="outlined" class="custom-label"
+                            :readonly="isOAuth" @blur="emailBlurHandler"></v-text-field>
 
-                        <v-text-field v-model="password" :error-messages="passwordError" label="密碼"
+                        <v-text-field v-model="password" :error="passwordMeta.touched && !!passwordError"
+                            :error-messages="passwordMeta.touched ? passwordError : []" label="密碼"
                             prepend-icon="mdi-lock" variant="outlined" class="custom-label"
                             hint="密碼至少6個字，且須包含英文數字特殊字元!@#$%^&*" :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
-                            :type="visible ? 'text' : 'password'"
-                            @click:append-inner="togglePasswordVisibility"></v-text-field>
+                            :type="visible ? 'text' : 'password'" @click:append-inner="togglePasswordVisibility"
+                            @blur="passwordBlur"></v-text-field>
 
-                        <v-text-field v-model="confirmPassword" :error-messages="confirmPasswordError" label="確認密碼"
+                        <v-text-field v-model="confirmPassword"
+                            :error="confirmPasswordMeta.touched && !!confirmPasswordError"
+                            :error-messages="confirmPasswordMeta.touched ? confirmPasswordError : []" label="確認密碼"
                             prepend-icon="mdi-lock-check" variant="outlined" class="custom-label" hint="請再次確認密碼"
                             :append-inner-icon="visible2 ? 'mdi-eye' : 'mdi-eye-off'"
-                            :type="visible2 ? 'text' : 'password'"
-                            @click:append-inner="togglePasswordVisibility2"></v-text-field>
+                            :type="visible2 ? 'text' : 'password'" @click:append-inner="togglePasswordVisibility2"
+                            @blur="confirmPasswordBlur"></v-text-field>
                     </v-col>
                     <v-col class="pa-2 ma-2">
-                        <v-text-field v-model="phone" :counter="10" :error-messages="phoneError" label="手機"
-                            prepend-icon="mdi-phone-dial" variant="outlined" class="custom-label"></v-text-field>
+                        <v-text-field v-model="phone" :counter="10"
+                            :error="phoneMeta.touched && (!!phoneError || !!phoneErrorCustom)" :error-messages="phoneMeta.touched
+                                ? [phoneError, phoneErrorCustom].filter(Boolean)
+                                : []" label=" 手機" prepend-icon="mdi-phone-dial" variant="outlined" class="custom-label"
+                            @blur="phoneBlurHandler"></v-text-field>
 
                         <v-autocomplete v-model="city" :error-messages="cityError" :items="cities" label="縣市"
                             prepend-icon="mdi-city-variant" variant="outlined" class="custom-label"></v-autocomplete>
@@ -34,8 +45,10 @@
                             label="鄉鎮區" prepend-icon="mdi-home-city" variant="outlined"
                             class="custom-label"></v-autocomplete>
 
-                        <v-text-field v-model="address" :error-messages="addressError" label="詳細地址"
-                            prepend-icon="mdi-home" variant="outlined" class="custom-label"></v-text-field>
+                        <v-text-field v-model="address" :error="addressMeta.touched && !!addressError"
+                            :error-messages="addressMeta.touched ? addressError : []" label="詳細地址"
+                            prepend-icon="mdi-home" variant="outlined" class="custom-label"
+                            @blur="addressBlur"></v-text-field>
                     </v-col>
                     <v-col class="pa-2 ma-2">
                         <v-img class="mb-8 mx-auto circular-image" :width="180" :height="180" cover
@@ -73,7 +86,7 @@
 <script setup>
 import Swal from 'sweetalert2'
 import { ref, watch, onMounted } from 'vue'
-import { useForm, useField } from 'vee-validate'
+import { useForm, useField, } from 'vee-validate'
 import * as yup from 'yup'
 import locations from '@/data/locations.json'
 import axios from '@/plugins/axios'
@@ -90,16 +103,16 @@ const schema = yup.object({
     email: yup
         .string()
         .required('信箱為必填項目')
-        .email('信箱格式不正確')
-        .test('unique-email', '信箱已被使用', async (value) => {
-            if (!value) return false;
-            try {
-                const response = await axios.get('/UserNoAuth/user/emailCheck', { params: { userEmail: value } });
-                return !response.data;
-            } catch (error) {
-                return false;
-            }
-        }),
+        .email('信箱格式不正確'),
+    // .test('unique-email', '信箱已被使用', async (value) => {
+    //     if (!value) return false;
+    //     try {
+    //         const response = await axios.get('/UserNoAuth/user/emailCheck', { params: { userEmail: value } });
+    //         return !response.data;
+    //     } catch (error) {
+    //         return false;
+    //     }
+    // }),
     password: yup
         .string()
         .required('密碼為必填項目')
@@ -115,16 +128,16 @@ const schema = yup.object({
     phone: yup
         .string()
         .required('手機為必填項目')
-        .matches(/^\d{10,11}$/, '手機號碼格式不正確')
-        .test('unique-phone', '手機已被使用', async (value) => {
-            if (!value) return false;
-            try {
-                const response = await axios.get('/UserNoAuth/user/phoneCheck', { params: { userPhone: value } });
-                return !response.data;
-            } catch (error) {
-                return false;
-            }
-        }),
+        .matches(/^\d{10,11}$/, '手機號碼格式不正確'),
+    // .test('unique-phone', '手機已被使用', async (value) => {
+    //     if (!value) return false;
+    //     try {
+    //         const response = await axios.get('/UserNoAuth/user/phoneCheck', { params: { userPhone: value } });
+    //         return !response.data;
+    //     } catch (error) {
+    //         return false;
+    //     }
+    // }),
     city: yup.string().required('縣市為必填項目'),
     district: yup.string().required('鄉鎮區為必填項目'),
     address: yup.string().required('詳細地址為必填項目'),
@@ -137,6 +150,7 @@ const schema = yup.object({
         }),
     checkbox: yup
         .boolean()
+        .required('必須接受條款')
         .oneOf([true], '必須接受條款'),
 })
 
@@ -148,16 +162,76 @@ const { handleSubmit, resetForm, errors, validateField, values } = useForm({
 });
 
 // 定義每個表單欄位
-const { value: name, errorMessage: nameError } = useField('name')
-const { value: email, errorMessage: emailError } = useField('email')
-const { value: password, errorMessage: passwordError } = useField('password')
-const { value: confirmPassword, errorMessage: confirmPasswordError } = useField('confirmPassword')
-const { value: phone, errorMessage: phoneError } = useField('phone')
+const { value: name, errorMessage: nameError, handleBlur: nameBlur, meta: nameMeta } = useField('name')
+const { value: email, errorMessage: emailError, handleBlur: emailBlur, meta: emailMeta } = useField('email')
+const { value: password, errorMessage: passwordError, handleBlur: passwordBlur, meta: passwordMeta } = useField('password')
+const { value: confirmPassword, errorMessage: confirmPasswordError, handleBlur: confirmPasswordBlur, meta: confirmPasswordMeta } = useField('confirmPassword')
+const { value: phone, errorMessage: phoneError, handleBlur: phoneBlur, meta: phoneMeta } = useField('phone')
 const { value: city, errorMessage: cityError } = useField('city')
 const { value: district, errorMessage: districtError } = useField('district')
-const { value: address, errorMessage: addressError } = useField('address')
+const { value: address, errorMessage: addressError, handleBlur: addressBlur, meta: addressMeta } = useField('address')
 const { value: avatar, errorMessage: avatarError } = useField('avatar')
 const { value: checkbox, errorMessage: checkboxError } = useField('checkbox')
+
+const emailErrorCustom = ref('');
+// 自訂 email 失焦事件
+const emailBlurHandler = async (event) => {
+    // 1. 先執行 vee-validate 的失焦驗證（必填、格式）
+    emailBlur(event)
+
+    // 2. 驗證本地規則是否通過
+    const result = await validateField('email')
+    if (!result.valid) {
+        // 如果本地驗證不通過，直接 return
+        return
+    }
+
+    // 3. 若本地通過，再發送後端查詢唯一性
+    try {
+        const response = await axios.get('/UserNoAuth/user/emailCheck', {
+            params: { userEmail: email.value }
+        })
+        if (response.data === true) {
+            emailErrorCustom.value = '信箱已被使用';
+        } else {
+            emailErrorCustom.value = '';
+        }
+    } catch (error) {
+        console.error('查詢信箱失敗', error);
+        emailErrorCustom.value = '伺服器錯誤，請稍後再試';
+    }
+};
+
+const phoneErrorCustom = ref('');
+// 自訂 email 失焦事件
+const phoneBlurHandler = async (event) => {
+    // 1. 先執行 vee-validate 的失焦驗證（必填、格式）
+    phoneBlur(event)
+
+    // 2. 驗證本地規則是否通過
+    const result = await validateField('phone')
+    if (!result.valid) {
+        // 如果本地驗證不通過，直接 return
+        return
+    }
+
+    // 3. 若本地通過，再發送後端查詢唯一性
+    try {
+        const response = await axios.get('/UserNoAuth/user/phoneCheck', {
+            params: { userPhone: phone.value }
+        })
+        if (response.data === true) {
+            phoneErrorCustom.value = '手機已被使用';
+        } else {
+            phoneErrorCustom.value = '';
+        }
+    } catch (error) {
+        console.error('查詢手機失敗', error);
+        phoneErrorCustom.value = '伺服器錯誤，請稍後再試';
+    }
+};
+
+
 
 const visible = ref(false);
 
@@ -260,7 +334,7 @@ const google = () => {
     password.value = 'aaa123@';
     confirmPassword.value = 'aaa123@';
     phone.value = '0987654321';
-    city.value = '台北市';
+    city.value = '臺北市';
     district.value = '信義區';
     address.value = '信義路五段7號89樓';
     checkbox.value = "1";

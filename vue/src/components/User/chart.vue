@@ -397,8 +397,8 @@ watch(selectedCounty, () => {
                 <canvas id="lineChart"></canvas>
             </div>
         </div>
-        <div class="filters">
-            <div class="filter ">
+        <div class="filters mt-5">
+            <div class="filter2">
                 <v-autocomplete label="選擇縣市" v-model="selectedCounty" :items="counties"
                     :menu-props="{ maxHeight: '400' }" @change="updateDistrictChart"></v-autocomplete>
             </div>
@@ -419,13 +419,22 @@ watch(selectedCounty, () => {
 </template>
 
 <style scoped>
-.filters {
+/* .filters {
     display: flex;
-}
+} */
 
 .filter {
     display: flex;
-    flex-direction: column;
+
+    /* flex-direction: column; */
+    width: 200px;
+    /* 設置固定寬度以確保一致性 */
+}
+
+.filter2 {
+    display: flex;
+    margin-left: 730px;
+    /* flex-direction: column; */
     width: 200px;
     /* 設置固定寬度以確保一致性 */
 }

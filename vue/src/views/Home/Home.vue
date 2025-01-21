@@ -18,7 +18,7 @@ const swiperOptions = {
     loop: true,
     pagination: { clickable: true },
     navigation: false,
-    autoplay: { delay: 1500 },
+    autoplay: { delay: 1800 },
     on: {
         init: () => {
             AOS.refresh(); // Swiper 初始化後刷新 AOS
@@ -76,11 +76,11 @@ onMounted(async () => {
                         <div class="swiper">
                             <div class="swiper-wrapper">
                                 <Swiper v-bind="swiperOptions" class="mySwiper">
-                                    <SwiperSlide><img src="/Home/img/img_h_6.jpg" alt="Image" class="img-fluid" />
+                                    <SwiperSlide><img src="/Home/img/home3.jpg" alt="Image" class="img-fluid" />
                                     </SwiperSlide>
-                                    <SwiperSlide><img src="/Home/img/img_h_7.jpg" alt="Image" class="img-fluid" />
+                                    <SwiperSlide><img src="/Home/img/home1.jpg" alt="Image" class="img-fluid" />
                                     </SwiperSlide>
-                                    <SwiperSlide><img src="/Home/img/img_h_8.jpg" alt="Image" class="img-fluid" />
+                                    <SwiperSlide><img src="/Home/img/home4.jpg" alt="Image" class="img-fluid" />
                                     </SwiperSlide>
                                 </Swiper>
                             </div>
@@ -163,4 +163,8 @@ onMounted(async () => {
 </template>
 
 
-<style lang="css" scoped></style>
+<style lang="css" scoped>
+h1 {
+    color: #FF9797 !important;
+}
+</style>

@@ -106,14 +106,11 @@ const handleLogin = async () => {
         if (response.status === 200) {
             const { id, token, role } = response.data;
             authStore.login(id, token, role);
-            localStorage.setItem('userId', id);
-            localStorage.setItem('token', token);
-            localStorage.setItem('userRole', role);
-            router.push("/home").then(() => {
-                window.location.reload();
-            });
-        }
 
+            // 最後再導航或刷新
+            window.location.href = '/#/home';
+
+        }
     } catch (error) {
         console.error('登錄失敗:', error);
         if (error.response && error.response.data) {
@@ -132,6 +129,10 @@ const nomal = () => {
 const change = () => {
     userAccount.value = 'qwertyuiopa106@gmail.com';
     userPassword.value = 'aa123@';
+};
+const admin = () => {
+    userAccount.value = 'monique4434@gmail.com';
+    userPassword.value = 'aaa123@';
 };
 
 </script>

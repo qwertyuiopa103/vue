@@ -23,7 +23,8 @@
   /* Background color for the entire website, including individual sections */
   --default-color: #212529;
   /* Default color used for the majority of the text content across the entire website */
-  --heading-color: #2d465e;
+  /* --heading-color: #2d465e; */
+  --heading-color: #212529;
   /* Color for headings, subheadings and title throughout the website */
   --accent-color: #34bf49;
   /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
