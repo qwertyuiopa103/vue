@@ -45,6 +45,11 @@ export const useAuthStore = defineStore('auth', {
                 this.fetchUserProfile();
             }
         },
+        getters: {
+            isAdmin: (state) => state.role === 'ROLE_ADMIN',
+            isCaregiver: (state) => state.role === 'ROLE_CAREGIVER',
+            isUser: (state) => state.role === 'ROLE_USER',
+        },
 
         async fetchUserProfile() {
             if (!this.token) {

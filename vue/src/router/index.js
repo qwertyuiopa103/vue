@@ -55,6 +55,21 @@ const router = createRouter({
           path: "event/detail",
           component: () => import("@/views/EventAdmin/EventDetails.vue"),
         },
+        {
+          name: "caregiver_view",
+          path: "caregiver",
+          component: () => import("@/views/Caregiver/CaregiverView.vue"),
+        },
+        {
+          name: "caregiver_insert",
+          path: "caregiver/insert",
+          component: () => import("@/views/Caregiver/CaregiverInsert.vue"),
+        },
+        {
+          name: "role_management",
+          path: "caregiver/role/management",
+          component: () => import("@/views/Caregiver/RoleManagement.vue"),
+        },
 
       ]
     },
@@ -130,6 +145,23 @@ const router = createRouter({
           path: "event",
           component: () => import("@/views/EventHome/EventGet.vue"),
         },
+        {
+          name: "caregiver_management",
+          path: "caregiver/management",
+          component: () => import("@/views/Caregiver/CaregiverManagement.vue"),
+        },
+        {
+          name: "caregiver_setting",
+          path: "caregiver/setting",
+          component: () => import("@/views/Caregiver/CaregiverSetting.vue"),
+
+        },
+        {
+          name: "caregiver_become",
+          path: "caregiver/become",
+          component: () => import("@/views/Caregiver/BecomeCaregiver.vue"),
+
+        },
       ]
     },
 
@@ -183,6 +215,17 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!token) {
       return next({ path: '/home' }); // 沒有 Token，跳轉到首頁
+    }
+  }
+
+  // 檢查是否需要看護權限
+  if (to.matched.some(record => record.meta.requiresCaregiverAuth)) {
+    if (!token) {
+      return next({ path: '/home/userLogin' });
+    }
+
+    if (authStore.role !== 'ROLE_CAREGIVER') {
+      return next({ path: '/home' }); // 非看護身分重定向到首頁
     }
   }
 
