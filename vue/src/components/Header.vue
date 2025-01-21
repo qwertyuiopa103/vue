@@ -10,7 +10,8 @@
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
                     <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
-                    <li><router-link to="/about" @click="closeMobileNav">尋找看護</router-link></li>
+                    <!-- 新增看護選項 -->
+                    <li v-if="userCaregiver"><router-link class="dropdown-item" to="home/caregiver/Management">尋找看護</router-link></li>
                     <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>
@@ -81,11 +82,18 @@ const avatarUrl = computed(() => authStore.avatar);
 // 檢查用戶是否已登錄
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const userAdmin = ref(false);
+const userCaregiver = ref(false); // 新增看護身分參考
 const checkAdminRole = () => {
     // userAdmin.value = role.value === 'ROLE_ADMIN';
     console.log('Current role:', role.value);
     userAdmin.value = role.value === 'ROLE_ADMIN';
     console.log('Is admin:', userAdmin.value);
+};
+const checkCaregiverRole = () => {
+    // userAdmin.value = role.value === 'ROLE_ADMIN';
+    console.log('Current role:', role.value);
+    userCaregiver.value = role.value === 'ROLE_CAREGIVER'; // 新增看護身分檢查
+    console.log('Is caregiver:', userCaregiver.value);
 };
 
 const toggleMobileNav = () => {
@@ -199,6 +207,14 @@ onMounted(async () => {
     } else {
         // 未登入狀態，清空資料
         authStore.logout();
+    }
+});
+
+// 在 onMounted 中執行角色檢查
+onMounted(() => {
+    if (isAuthenticated.value) {
+        fetchUserProfile();
+        checkCaregiverRole();
     }
 });
 
