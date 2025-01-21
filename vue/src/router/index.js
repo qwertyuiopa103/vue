@@ -50,8 +50,11 @@ const router = createRouter({
           path: "reserve/insert",
           component: () => import("@/views/Reserve/ReserveInsert.vue"),
         },
-
-
+        {
+          name: "eventDetail_view",
+          path: "event/detail",
+          component: () => import("@/views/EventAdmin/EventDetails.vue"),
+        },
 
       ]
     },
@@ -116,6 +119,16 @@ const router = createRouter({
           name: "caregiver_calendar",
           path: "caregiver/calendar",
           component: () => import("@/views/Reserve/CaregiverCalendar.vue"),
+        },
+        {
+          name: "eventAll_view",
+          path: "events",
+          component: () => import("@/views/EventHome/EventAll.vue"),
+        },
+        {
+          name: "event_view",
+          path: "event",
+          component: () => import("@/views/EventHome/EventGet.vue"),
         },
       ]
     },
