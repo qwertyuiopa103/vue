@@ -11,7 +11,8 @@
                 <ul>
                     <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
                     <!-- 新增看護選項 -->
-                    <li v-if="userCaregiver"><router-link class="dropdown-item" to="home/caregiver/Management">尋找看護</router-link></li>
+                    <li><router-link to="/home/caregiver/Management" @click="closeMobileNav">尋找看護</router-link></li>
+                    <li><router-link to="/home/caregiver/Become" @click="closeMobileNav">成為看護</router-link></li>
                     <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>

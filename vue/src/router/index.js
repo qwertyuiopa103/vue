@@ -65,6 +65,11 @@ const router = createRouter({
           path: "caregiver/insert",
           component: () => import("@/views/Caregiver/CaregiverInsert.vue"),
         },
+        {
+          name: "role_management",
+          path: "caregiver/role/management",
+          component: () => import("@/views/Caregiver/RoleManagement.vue"),
+        },
 
       ]
     },
