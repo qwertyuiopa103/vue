@@ -70,7 +70,7 @@ const items = ref([
     {
         title: '看護管理',
         prependIcon: 'mdi-doctor',
-        link: '/admin/test',
+        link: '/admin/caregiver',
     },
     {
         title: '預約管理',
