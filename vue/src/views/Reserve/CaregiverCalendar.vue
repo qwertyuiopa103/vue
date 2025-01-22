@@ -5,8 +5,18 @@
       <v-calendar ref="calendar" v-model="focus" :events="events" color="primary" type="month">
         <!-- 使用插槽自定義事件顯示 -->
         <template v-slot:event="{ event }">
-          <div v-if="event" class="event-btn"
-            :style="event.color === 'blue' ? { backgroundColor: '#A3C8FF' } : { backgroundColor: '#FFF4A3' }">
+          <div v-if="event" class="event-btn" :style="{
+            backgroundColor:
+              event.color === 'blue'
+                ? '#A3C8FF'      // 淺藍色（進行中）
+                : event.color === 'red'
+                  ? '#FFA3A3'      // 淺紅色（已取消）
+                  : event.color === 'yellow'
+                    ? '#FFF4A3'      // 淺黃色（即將開始的預約）
+                    : event.color === 'gray'
+                      ? '#D3D3D3'      // 淺灰色（已完成）
+                      : '#FFFFFF'      // 其他顏色為白色
+          }">
             <span>{{ event.title }}</span> <!-- 顯示 caregiverName 或 userName -->
           </div>
         </template>
@@ -24,6 +34,7 @@
           <p>使用者: {{ reserve.userBean.userName }}</p>
           <p>開始時間: {{ formatDate(reserve.startDate) }}</p>
           <p>結束時間: {{ formatDate(reserve.endDate) }}</p>
+          <p>訂單總金額: {{ reserve.totalPrice }}</p>
           <!-- 每一筆預約有獨立的新增與刪除按鈕 -->
           <div class="reserve-actions">
             <v-btn color="primary" @click="createOrder(reserve)">新增</v-btn>
@@ -53,6 +64,7 @@ export default {
     focus: [new Date()], // 當前焦點日期
     events: [],          // 儲存事件的陣列 (訂單與預約)
     reserves: [],        // 預約資料 (右邊的預約列表)
+    orders: [],
     caregiverNO: 1,      // 預設的看護師 ID (caregiverNO)
   }),
 
@@ -62,7 +74,6 @@ export default {
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
     this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth }); // 用於行事曆的訂單資料
     this.fetchReservesByCaregiver(this.caregiverNO); // 用於右邊預約列表的資料
-    console.log(this.reserves);
   },
 
   methods: {
@@ -73,6 +84,7 @@ export default {
           `http://localhost:8080/orders/OrderByCaregiver/${this.caregiverNO}`
         );
         this.orders = response.data; // 儲存完整訂單資料
+
         this.mapOrdersToEvents(this.orders); // 將數據映射為事件
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -85,8 +97,12 @@ export default {
         const response = await axios.get(
           `http://localhost:8080/reserve/search/${caregiverId}`
         );
-        this.reserves = response.data; // 儲存預約資料
-        this.mapReservesToEvents(this.reserves); // 將預約資料映射到行事曆事件
+
+        // 篩選出 status 為 "待確認" 的預約
+        this.reserves = response.data.filter(reserve => reserve.status === "待確認");
+
+        // 將篩選後的預約資料映射到行事曆事件
+        this.mapReservesToEvents(this.reserves);
       } catch (error) {
         console.error("Error fetching reserves:", error);
       }
@@ -102,11 +118,26 @@ export default {
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
+          let eventColor = 'blue'; // 預設為藍色（進行中）
+
+          // 如果訂單被取消，改為紅色
+          if (order.cancellation && order.cancellation.cancellationId !== null) {
+            eventColor = 'red';
+          }
+          // 如果已經完成，設為灰色
+          else if (endDate < new Date()) {
+            eventColor = 'gray';
+          }
+          // 如果結束日期大於今天，表示進行中，保持藍色
+          else if (endDate >= new Date()) {
+            eventColor = 'blue';
+          }
+
           this.events.push({
             title: caregiverName,         // 事件的標題顯示看護師名字
             start: new Date(currentDate), // 事件的開始日期
             end: new Date(currentDate),   // 事件的結束日期
-            color: "blue",                // 訂單的顏色設定為淡藍色
+            color: eventColor,            // 根據邏輯設定顏色
             allDay: true,                 // 全日事件
             type: "order"                 // 標識這個事件為訂單
           });
@@ -156,6 +187,7 @@ export default {
           orderId: 0, // 由後端自動生成
           user: reserve.userBean,
           caregiver: reserve.caregiverBean,
+          cancellationId:null,
           orderDate: reserve.orderDate,
           startDate: reserve.startDate,
           endDate: reserve.endDate,
