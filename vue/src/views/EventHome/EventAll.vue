@@ -186,14 +186,24 @@
     text-transform: uppercase;
   }
   
-  .event-time li {
-    display: inline-block;
-    margin-right: 20px;
-  }
+  .event-time {
+  display: flex; /* 使用 flexbox 將列表項目排成一行 */
+  justify-content: flex-start; /* 靠左對齊 */
+  align-items: center; /* 垂直置中 */
+  gap: 20px; /* 每個項目間距 */
+  padding: 0; /* 移除多餘內邊距 */
+  list-style: none; /* 移除列表符號 */
+}
+
+.event-time li {
+  display: flex; /* 保持單項目的內容為水平排列 */
+  align-items: center; /* 垂直置中圖標與文字 */
+  margin: 0; /* 移除 margin */
+}
+.event-time li i {
+  margin-right: 8px; /* 調整圖標和文字之間的間距 */
+}
   
-  .event-time li:last-child {
-    margin-right: 0;
-  }
   
   .event-time li i {
     color: #59c17a;
