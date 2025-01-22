@@ -142,8 +142,9 @@ const router = createRouter({
         },
         {
           name: "event_view",
-          path: "event",
+          path: "event/:id",
           component: () => import("@/views/EventHome/EventGet.vue"),
+
         },
         {
           name: "caregiver_management",

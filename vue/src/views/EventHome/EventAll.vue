@@ -60,13 +60,14 @@
   <script>
   import { ref, onMounted, onUnmounted } from 'vue'
   import axios from 'axios'
+  import { useRouter } from 'vue-router';
   
   export default {
     name: 'EventList',
     setup() {
       const events = ref([])
       const showBackToTop = ref(false)
-  
+      const router = useRouter();  // 在 setup 中獲取路由實例
       // 格式化日期
       const formatDate = (date, format) => {
         const d = new Date(date)
@@ -90,8 +91,10 @@
   
       // 顯示活動詳情
       const showEventDetails = (event) => {
-        console.log('顯示活動詳情:', event)
-      }
+      router.push({
+        path: `/home/event/${event.eventID}`, // 使用動態路徑
+      });
+    }
   
       // 處理滾動事件
       const handleScroll = () => {
