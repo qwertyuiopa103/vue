@@ -124,7 +124,8 @@ const goToPayment = (item) => {
   console.log("抓取的訂單資料:", item);
   setTimeout(() => {
     localStorage.setItem('orderToPay', JSON.stringify(item)); // 儲存訂單資料
-    router.push({ name: 'order_Pay_admin' });  // 跳轉頁面
+    
+    router.push({ name: 'order_Pay_Home' });  // 跳轉頁面
   }, 500); // 延遲 500 毫秒
 };
 
@@ -160,8 +161,8 @@ const quickAddOrder = () => {
     orderDate: currentDate,  // 當前日期
     startDate: currentDate,
     endDate: currentDate,
-    status: "完成",
-    totalPrice: 114514
+    status: "付款完成",
+    totalPrice: 114
   });
 
   dialog.value = true; // 打開對話框
@@ -293,7 +294,7 @@ const filteredOrders = computed(() => {
     userID: order.user?.userID || '',
     userName: order.user?.userName || '',
     caregiverNO: order.caregiver?.caregiverNO || '',
-    caregiverName: order.caregiver?.caregiverName || '',
+    caregiverName: order.caregiver?.user.userName || '',
     orderDate: formatDateToLocalDate(order.orderDate),
     startDate: formatDateToLocalDate(order.startDate),
     endDate: formatDateToLocalDate(order.endDate),

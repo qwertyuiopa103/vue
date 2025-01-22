@@ -5,8 +5,8 @@
       <v-card-text>
         <div>
           <p><strong>訂單編號:</strong> {{ order.orderId }}</p>
-          <p><strong>使用者名稱:</strong> {{ order.user?.userName || '未提供' }}</p>
-          <p><strong>照護人員名稱:</strong> {{ order.caregiver?.user?.userName || '未提供' }}</p>
+          <p><strong>使用者名稱:</strong> {{ order.userName || '未提供' }}</p>
+          <p><strong>照護人員名稱:</strong> {{ order.caregiverName|| '未提供' }}</p>
           <p><strong>狀態:</strong> {{ order.status || '未提供' }}</p>
           <p><strong>總金額:</strong> {{ order.totalPrice || '0' }}</p>
         </div>

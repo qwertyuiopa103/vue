@@ -1,4 +1,3 @@
-<!-- http://localhost:5173/#/home/UserOrderView/USR0001 -->
 <template>
   <v-container>
     <v-card>
@@ -30,25 +29,23 @@
               <v-expansion-panel-title>
                 <v-row no-gutters>
                   <v-col cols="1.5" class="text-subtitle-1">{{ order.orderId }}</v-col>
-                  <v-col cols="1.5" class="text-subtitle-1">{{ order.caregiver.caregiverName }}</v-col>
+                  <v-col cols="1.5" class="text-subtitle-1">{{ order.caregiver.user.userName }}</v-col>
                   <v-col cols="1.5" class="text-subtitle-1">{{ formatDate(order.orderDate) }}</v-col>
                   <v-col cols="1.5" class="text-subtitle-1">{{ order.paymentMethod }}</v-col>
                   <v-col cols="1.5" class="text-subtitle-1">${{ formatPrice(order.totalPrice) }}</v-col>
                   <v-col cols="1.5" class="text-subtitle-1">{{ order.status }}</v-col>
                   <v-col cols="1.5" class="d-flex justify-start">
-                    <!-- 如果是未付款的訂單顯示操作按鈕 -->
+                    <!-- 按鍵-->
                     <template v-if="order.status === '未付款'">
-                      <v-btn color="green" @click="goToPaymentPage(order)" class="circle-btn">
-                        <v-icon>mdi-credit-card-outline</v-icon>
-                      </v-btn>
-                      <v-btn @click="cancelOrder(order)" class="circle-btn">
-                        <v-icon>mdi-cancel</v-icon>
-                      </v-btn>
-
-                    </template>
-                    <template v-else>
-                      <!-- 其他狀態不顯示操作按鈕 -->
-                    </template>
+                        <v-btn color="green" @click.stop="goToPaymentPage(order)" class="circle-btn">
+                          <v-icon>mdi-credit-card-outline</v-icon>
+                        </v-btn>
+                      </template>
+                      <template v-if="order.status !== '已取消'">
+                        <v-btn @click.stop="openCancelDialog(order)" class="circle-btn ml-2">
+                          <v-icon>mdi-cancel</v-icon>
+                        </v-btn>
+                      </template>
                   </v-col>
                 </v-row>
               </v-expansion-panel-title>
@@ -71,9 +68,12 @@
       </v-card-text>
     </v-card>
   </v-container>
+
+  <CancelOrderForm 
+    ref="cancelOrderForm" 
+    @order-cancelled="fetchOrders"
+  />
 </template>
-
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
@@ -81,15 +81,18 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useRoute, useRouter } from 'vue-router';
 import Timeline from '@/components/Order/Timeline.vue';
-//接入UserID
+import CancelOrderForm from '@/components/Order/CancelOrderForm.vue';  
+
 const route = useRoute();
 const userID = route.params.userID;
-
 const router = useRouter();
 const currentTab = ref('all');
 const orders = ref([]);
+const cancelOrderForm = ref(null);
+
 
 const filteredOrders = computed(() => {
+  if (!orders.value) return [];
   const statusMap = {
     'unconfirmed': '待確認',
     'unpaid': '未付款',
@@ -127,13 +130,19 @@ const formatDate = (dateString) => {
 const formatPrice = (price) => {
   return new Intl.NumberFormat('zh-TW').format(price);
 };
-
+const openCancelDialog = (selectedOrder) => {
+  console.log("Opening cancel dialog for order:", selectedOrder);
+  if (cancelOrderForm.value) {
+    cancelOrderForm.value.openDialog(selectedOrder);
+      }
+};
 const fetchOrders = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/orders/OrderByUser`);
-    orders.value = response.data;
+    orders.value = response.data || [];
   } catch (error) {
     console.error('Error fetching orders:', error);
+    orders.value = [];
     Swal.fire({
       title: '錯誤',
       text: '無法載入訂單資料',
@@ -143,37 +152,16 @@ const fetchOrders = async () => {
 };
 
 const goToPaymentPage = (order) => {
-  console.log("抓取的訂單資料:", order);
   setTimeout(() => {
-    // 儲存訂單資料到 localStorage
     localStorage.setItem('orderToPay', JSON.stringify(order));
-    // 跳轉到付款頁面
-    router.push({ name: 'order_Pay_Home' });
-  }, 500); // 延遲500毫秒
+    router.push({ name: 'order_Pay_User' });
+  }, 500);
 };
 
-const cancelOrder = (order) => {
-  Swal.fire({
-    title: '確定要取消訂單嗎?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: '確定',
-    cancelButtonText: '取消'
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        await axios.put(`http://localhost:8080/orders/${order.orderId}/cancel`);
-        fetchOrders();  // 重新載入訂單資料
-        Swal.fire('訂單已取消', '', 'success');
-      } catch (error) {
-        Swal.fire('取消失敗', '無法取消訂單', 'error');
-      }
-    }
-  });
-};
 
 onMounted(fetchOrders);
 </script>
+
 <style>
 .circle-btn {
   width: 40px;

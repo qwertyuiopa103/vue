@@ -121,6 +121,11 @@ const router = createRouter({
         },
         {
           name: "order_Pay_Home",
+          path: "order/payAdmin",
+          component: () => import("@/views/Order/OrderPayAdmin.vue"),
+        },
+        {
+          name: "order_Pay_User",
           path: "order/pay",
           component: () => import("@/views/Order/OrderPay.vue"),
         },
