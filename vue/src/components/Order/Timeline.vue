@@ -4,7 +4,7 @@
       <!-- 顯示步驟 -->
       <div v-for="(step, index) in timelineSteps" :key="index" class="timeline-step">
         <div class="timeline-icon">
-          <v-icon :color="step.completed ? 'success' : 'grey'">mdi-check-circle</v-icon>
+          <v-icon :color="getStepColor(step)">mdi-check-circle</v-icon>
         </div>
         <div class="timeline-content">
           <div class="timeline-title">{{ step.title }}</div>
@@ -14,7 +14,7 @@
         <div
           v-if="index < timelineSteps.length - 1"
           class="timeline-connector"
-          :class="{ completed: step.completed }"
+          :class="{ completed: step.completed && isPaid }"
         ></div>
       </div>
     </div>
@@ -29,8 +29,13 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  Status: {  // 接收付款狀態
+    type: String,
+    required: true,
+  },
 });
 
+// 格式化日期顯示
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -38,8 +43,43 @@ const formatDate = (dateString) => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    
   });
+};
+
+// 根據付款狀態和時間判斷顏色
+const getStepColor = (step) => {
+  const currentTime = new Date();
+  
+  // 從 step 物件中獲取訂單的開始與結束時間
+  const startDate = new Date(step.startDate);  // 訂單的開始時間
+  const endDate = new Date(step.endDate); // 訂單的結束時間
+  
+  // 加入除錯信息，檢查 startDate 和 endDate
+  console.log('startDate:', startDate);
+  console.log('endDate:', endDate);
+  console.log('currentTime:', currentTime);
+  
+  // 檢查日期是否正確解析
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    console.error('日期格式錯誤：', step.startDate, step.endDate);
+    return 'grey'; // 如果解析出錯，顯示灰色
+  }
+
+  // 判斷付款狀態
+  if (props.Status === 'paid') {
+    return 'success';  // 付款完成，顯示綠色
+  }
+
+  // 判斷當前時間與訂單時間的關係
+  if (currentTime >= startDate && currentTime <= endDate) {
+    return 'success';  // 當前時間在訂單範圍內，顯示綠色
+  }
+
+  if (currentTime > endDate) {
+    return 'success';  // 訂單已結束，顯示綠色
+  }
+
+  return 'grey';  // 默認顯示灰色
 };
 </script>
 
