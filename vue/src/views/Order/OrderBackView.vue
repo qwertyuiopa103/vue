@@ -117,7 +117,7 @@ const dialog = ref(false);
 const dialogTitle = ref("");
 // 控制是否顯示名稱
 const showNames = ref(false);
-
+const router = useRouter();
 // 查看取消訂單詳情
 const cancelOrder = (item) => {
   selectedOrderId.value = item.orderId;
@@ -151,7 +151,7 @@ const goToPayment = (item) => {
   setTimeout(() => {
     localStorage.setItem('orderToPay', JSON.stringify(item)); // 儲存訂單資料
     
-    router.push({ name: 'order_Pay_Home' });  // 跳轉頁面
+    router.push({ name: 'order_Pay_admin' });  // 跳轉頁面
   }, 500); // 延遲 500 毫秒
 };
 
