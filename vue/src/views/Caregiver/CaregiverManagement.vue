@@ -162,7 +162,7 @@ data() {
     caregivers: [],
     searchKeyword: '',
     currentPage: 1,
-    itemsPerPage: 9,
+    itemsPerPage: 100,
     selectedGender: [],
     selectedSalaryRanges: [],
     selectedExperience: [],

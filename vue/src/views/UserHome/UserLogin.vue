@@ -122,12 +122,12 @@ const handleLogin = async () => {
     }
 };
 const nomal = () => {
-    userAccount.value = 'qwertyuiopa106@gmail.com';
+    userAccount.value = 'eeit190@gmail.com';
     userPassword.value = 'aaa123@';
 };
 
 const change = () => {
-    userAccount.value = 'qwertyuiopa106@gmail.com';
+    userAccount.value = 'eeit190@gmail.com';
     userPassword.value = 'aa123@';
 };
 const admin = () => {
@@ -135,6 +135,10 @@ const admin = () => {
     userPassword.value = 'aaa123@';
 };
 
+const care = () => {
+    userAccount.value = 'caregivereeit90@gmail.com';
+    userPassword.value = 'aaa123@';
+};
 </script>
 <style scoped>
 .container {
