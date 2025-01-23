@@ -37,6 +37,15 @@
                 <v-btn v-if="item.status === '未付款'" @click="goToPayment(item)" color="green" icon>
                   <v-icon>mdi-credit-card-outline</v-icon>
                 </v-btn>
+                <!-- 新增取消細節按鈕，只在狀態為可取消時顯示 -->
+                <v-btn 
+                v-if="item.status === '已取消'" 
+                @click="cancelOrder(item)" 
+                icon
+                >
+                <v-icon>mdi-file-cancel</v-icon>
+                </v-btn>
+
               </template>
             </v-data-table>
           </v-card-text>
@@ -75,6 +84,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- 當 showCancelDetail 為 true 時顯示 CancelOrderDetail 組件，並將選中的訂單 ID 傳遞給它 -->
+
+    <CancelOrderDetail 
+    v-if="showCancelDetail" 
+   :orderId="selectedOrderId"
+    @close="showCancelDetail = false"
+      />
   </v-container>
 </template>
 
@@ -86,6 +102,7 @@ import axios from "axios"; // 用於發送 HTTP 請求
 import Swal from "sweetalert2"; // 用於顯示彈出式警告
 import OrderAnalysis from '@/components/Order/OrderData.vue';
 import { useRouter } from 'vue-router';
+import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
 
 const router = useRouter();
 
@@ -101,6 +118,16 @@ const dialog = ref(false);
 const dialogTitle = ref("");
 // 控制是否顯示名稱
 const showNames = ref(false);
+
+// 查看取消訂單詳情
+const cancelOrder = (item) => {
+  selectedOrderId.value = item.orderId;
+  showCancelDetail.value = true;
+};
+const showCancelDetail = ref(false);
+const selectedOrderId = ref(null);
+
+
 // 當前正在編輯的訂單數據
 const currentOrder = reactive({
   orderId: null,

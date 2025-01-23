@@ -46,6 +46,11 @@
                           <v-icon>mdi-cancel</v-icon>
                         </v-btn>
                       </template>
+                      <template v-if="order.status === '已取消'">
+                      <v-btn @click="cancelOrder(order)" icon class="ml-2">
+                        <v-icon>mdi-file-cancel</v-icon>
+                      </v-btn>
+                    </template>
                   </v-col>
                 </v-row>
               </v-expansion-panel-title>
@@ -67,6 +72,13 @@
         </div>
       </v-card-text>
     </v-card>
+    <!-- 當 showCancelDetail 為 true 時顯示 CancelOrderDetail 組件，並將選中的訂單 ID 傳遞給它 -->
+
+    <CancelOrderDetail 
+    v-if="showCancelDetail" 
+   :orderId="selectedOrderId"
+    @close="showCancelDetail = false"
+      />
   </v-container>
 
   <CancelOrderForm 
@@ -82,6 +94,7 @@ import Swal from 'sweetalert2';
 import { useRoute, useRouter } from 'vue-router';
 import Timeline from '@/components/Order/Timeline.vue';
 import CancelOrderForm from '@/components/Order/CancelOrderForm.vue';  
+import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
 
 const route = useRoute();
 const userID = route.params.userID;
@@ -89,6 +102,14 @@ const router = useRouter();
 const currentTab = ref('all');
 const orders = ref([]);
 const cancelOrderForm = ref(null);
+
+// 查看取消訂單詳情
+const cancelOrder = (item) => {
+  selectedOrderId.value = item.orderId;
+  showCancelDetail.value = true;
+};
+const showCancelDetail = ref(false);
+const selectedOrderId = ref(null);
 
 
 const filteredOrders = computed(() => {

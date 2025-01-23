@@ -142,6 +142,15 @@ const formatPrice = (price) => {
   return new Intl.NumberFormat('zh-TW').format(price);
 };
 
+const formatDate = (date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
 const openDialog = (order) => {
   formData.value = {
     orderId: order.orderId,
@@ -160,9 +169,9 @@ const closeDialog = () => {
 
 const handleCancel = async () => {
   try {
-    // 1. 首先建立取消訂單記錄
+    // 1. 首先建立取消訂單記錄，這裡使用 formatDate 函數，只傳遞年月日
     const cancelData = {
-      cancelDate: new Date().toISOString(),
+      cancelDate: formatDate(new Date()), // 只傳遞年月日
       cancellationReason: formData.value.cancelReason,
       refundAmount: calculatedRefund.value,
       reason: formData.value.cancelReason === 'A' ? '關你屁事' : '家裡死人',
@@ -171,7 +180,7 @@ const handleCancel = async () => {
 
     console.log('Creating cancellation record:', cancelData);
 
-    const cancelResponse = await axios.post('http://localhost:8080/ordercancel/createcancel', cancelData);
+    const cancelResponse = await axios.post('http://localhost:8080/api/ordercancel/createcancel', cancelData);
     console.log('Cancellation response:', cancelResponse);
     
     if (cancelResponse.status === 201) {
@@ -187,7 +196,7 @@ const handleCancel = async () => {
       console.log('Updating order with data:', updateOrderData);
 
       const orderResponse = await axios.put(
-        `http://localhost:8080/orders/updateStatus/${formData.value.orderId}`,
+        `http://localhost:8080/api/ordersAdmin/updateStatus/${formData.value.orderId}`,
         updateOrderData
       );
 
