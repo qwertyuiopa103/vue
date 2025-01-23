@@ -130,13 +130,29 @@ const filteredOrders = computed(() => {
 });
 
 const getTimelineSteps = (order) => {
+  const currentTime = new Date();
+
   const steps = [
-    { title: '訂單建立', date: order.orderDate, completed: new Date(order.orderDate) <= new Date() },
-    { title: '服務開始', date: order.startDate, completed: new Date(order.startDate) <= new Date() },
-    { title: '服務結束', date: order.endDate, completed: new Date(order.endDate) <= new Date() },
+    { 
+      title: '訂單建立', 
+      date: order.orderDate, 
+      completed: new Date(order.orderDate) <= currentTime
+    },
+    { 
+      title: '服務開始', 
+      date: order.startDate, 
+      completed: new Date(order.startDate) <= currentTime
+    },
+    { 
+      title: '服務結束', 
+      date: order.endDate, 
+      completed: new Date(order.endDate) <= currentTime
+    },
   ];
+
   return steps;
 };
+
 
 const formatDate = (dateString) => {
   if (!dateString) return '';

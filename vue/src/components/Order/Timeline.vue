@@ -4,11 +4,11 @@
       <!-- 顯示步驟 -->
       <div v-for="(step, index) in timelineSteps" :key="index" class="timeline-step">
         <div class="timeline-icon">
-          <v-icon :color="step.completed ? 'success' : 'grey'">mdi-check-circle</v-icon>
+          <v-icon :color="getStepColor(step)">mdi-check-circle</v-icon>
         </div>
         <div class="timeline-content">
           <div class="timeline-title">{{ step.title }}</div>
-          <div class="timeline-date">{{ formatDate(step.date) }}</div>
+          <div class="timeline-date">{{ formatTimelineDate(step.date) }}</div>
         </div>
         <!-- 顯示步驟之間的連接線（橫線） -->
         <div
@@ -31,15 +31,27 @@ const props = defineProps({
   },
 });
 
-const formatDate = (dateString) => {
-  if (!dateString) return '';
+// 格式化日期
+const formatTimelineDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString('zh-TW', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    
+    hour: '2-digit',
+    minute: '2-digit',
   });
+};
+
+// 判斷步驟顏色
+const getStepColor = (step) => {
+  if (!step.completed && new Date(step.date) > new Date()) {
+    return 'grey'; // 當前時間小於日期，灰色
+  }
+  if (step.completed) {
+    return 'success'; // 完成的步驟，綠色
+  }
+  return 'grey'; // 預設為灰色
 };
 </script>
 

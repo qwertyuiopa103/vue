@@ -14,7 +14,8 @@
 
             <div>
               <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
-              <v-btn color="primary" @click="openCreateDialog">新增訂單</v-btn>
+              <v-btn color="primary" @click="openCreateDialog" class="mr-2">新增訂單</v-btn>
+              
             </div>
           </v-card-title>
 
@@ -103,8 +104,6 @@ import Swal from "sweetalert2"; // 用於顯示彈出式警告
 import OrderAnalysis from '@/components/Order/OrderData.vue';
 import { useRouter } from 'vue-router';
 import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
-
-const router = useRouter();
 
 // 新增頁籤控制變數
 const activeTab = ref('orders');

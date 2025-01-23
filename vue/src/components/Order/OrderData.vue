@@ -1,4 +1,3 @@
-<!-- http://localhost:5173/#/home/UserOrderView/USR0037 -->
 <template>
   <v-container>
     <v-card>
@@ -53,6 +52,11 @@
             </v-card>
           </v-col>
         </v-row>
+
+        <!-- 匯出 CSV 按鈕 -->
+        <v-btn class="mt-4" color="secondary" @click="exportToCSV">
+          匯出 CSV
+        </v-btn>
       </v-card-text>
     </v-card>
   </v-container>
@@ -67,18 +71,7 @@ const chart = ref(null);
 const orders = ref([]);
 const selectedYear = ref(new Date().getFullYear()); // 預設為當前年份
 const monthLabels = [
-  "1月",
-  "2月",
-  "3月",
-  "4月",
-  "5月",
-  "6月",
-  "7月",
-  "8月",
-  "9月",
-  "10月",
-  "11月",
-  "12月",
+  "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月",
 ];
 
 // 獲取訂單資料
@@ -186,6 +179,58 @@ const updateChart = () => {
       },
     },
   });
+};
+
+// 匯出 CSV 功能
+const exportToCSV = () => {
+  // 統計數據表頭
+  const statisticsHeaders = [
+    "總訂單數", 
+    "平均每月訂單數", 
+    "最高訂單月份", 
+    "總營業額"
+  ];
+
+  // 統計數據
+  const statisticsRow = [
+    totalOrders.value, 
+    averageOrdersPerMonth.value, 
+    peakOrderMonth.value, 
+    totalPrice.value
+  ];
+
+  // 訂單明細表頭
+  const orderHeaders = [
+    "訂單編號", 
+    "訂單日期", 
+    "總金額"
+  ];
+
+  // 訂單明細數據
+  const orderRows = orders.value
+    .filter(order => new Date(order.orderDate).getFullYear() === selectedYear.value)
+    .map(order => [
+      order.orderId, 
+      order.orderDate.toLocaleDateString(), 
+      order.totalPrice || 0
+    ]);
+
+  // 整理 CSV 內容
+  const csvContent = [
+    statisticsHeaders.join(","), // 第一行: 統計數據表頭
+    statisticsRow.join(","),     // 第二行: 統計數據
+    orderHeaders.join(","),      // 第三行: 訂單明細表頭
+    ...orderRows.map(row => row.join(",")) // 從第四行開始: 訂單明細數據
+  ].join("\n");
+
+  // 添加 BOM 來確保 Excel 正確識別 UTF-8 編碼
+  const bom = "\uFEFF";
+  const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "orders.csv");
+  link.click();
 };
 
 // 監聽年份變化
