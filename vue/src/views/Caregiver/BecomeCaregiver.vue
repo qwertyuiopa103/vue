@@ -1,213 +1,201 @@
 <template>
-    <div class="pa-6">
-      <v-card class="mx-auto" max-width="800">
-        <v-card-title class="text-center">註冊成為看護</v-card-title>
-        <v-card-text>
-          <v-form ref="form" v-model="valid">
-            <v-container>
-              <v-row>
-                <!-- 顯示 UserID (唯讀) -->
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="formData.userID"
-                    label="會員編號"
-                    readonly
-                    outlined
-                    :rules="[v => !!v || '會員編號不能為空']"
-                  ></v-text-field>
-                </v-col>
-  
-                <v-col cols="12" md="6">
-                  <v-select
-                    v-model="formData.caregiverGender"
-                    :items="['男', '女']"
-                    label="性別"
-                    required
-                    :rules="[v => !!v || '請選擇性別']"
-                  ></v-select>
-                </v-col>
-  
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="formData.caregiverAge"
-                    label="年齡"
-                    type="number"
-                    required
-                    :rules="[
-                      v => !!v || '請輸入年齡',
-                      v => v >= 18 || '年齡必須大於18歲'
-                    ]"
-                  ></v-text-field>
-                </v-col>
-  
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="formData.expYears"
-                    label="工作經驗(年)"
-                    type="number"
-                    required
-                    :rules="[
-                      v => !!v || '請輸入工作經驗年數',
-                      v => v >= 0 || '工作經驗不能為負數'
-                    ]"
-                  ></v-text-field>
-                </v-col>
-  
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="formData.hourlyRate"
-                    label="時薪"
-                    type="number"
-                    prefix="$"
-                    required
-                    :rules="[
-                      v => !!v || '請輸入時薪',
-                      v => v > 0 || '時薪必須大於0'
-                    ]"
-                  ></v-text-field>
-                </v-col>
-  
-                <v-col cols="12">
-                  <v-textarea
-                    v-model="formData.eduExperience"
-                    label="學歷與經驗"
-                    required
-                    :rules="[v => !!v || '請輸入學歷與經驗']"
-                    rows="3"
-                  ></v-textarea>
-                </v-col>
-              </v-row>
-            </v-container>
-  
-            <v-card-actions class="justify-center">
-              <v-btn
-                color="primary"
-                @click="submitForm"
-                :loading="loading"
-                :disabled="!valid"
-              >
-                確認新增
-              </v-btn>
-              <v-btn color="error" @click="cancel">取消</v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  import Swal from 'sweetalert2';
-  import jwt_decode from 'jwt-decode';
-  
-  export default {
-    name: 'CaregiverManualInsert',
+  <v-container>
+    <v-card class="mx-auto" max-width="800">
+      <v-card-title>申請成為看護</v-card-title>
+      <v-card-text>
+        <v-form ref="form" v-model="valid">
+          <v-row>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model="formData.userID"
+                label="會員編號"
+                readonly
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="formData.caregiverGender"
+                :items="['男', '女']"
+                label="性別"
+                required
+              ></v-select>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model.number="formData.caregiverAge"
+                label="年齡"
+                type="number"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model.number="formData.expYears"
+                label="工作年資"
+                type="number"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="formData.education"
+                :items="educationOptions"
+                label="學歷"
+                required
+              ></v-select>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                v-model.number="formData.daylyRate"
+                label="日薪"
+                type="number"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="formData.services"
+                :items="serviceOptions"
+                label="服務等級"
+                required
+              ></v-select>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12">
+              <v-file-input
+                v-model="certifiPhotos"
+                label="上傳證照 (最多5張)"
+                multiple
+                accept="image/*"
+                :rules="photoRules"
+                show-size
+                counter
+                max="5"
+              ></v-file-input>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12">
+              <v-card-subtitle>服務區域</v-card-subtitle>
+              <v-checkbox
+                v-for="area in areaOptions"
+                :key="area.value"
+                v-model="selectedAreas[area.value]"
+                :label="area.text"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+          
+          <v-btn
+            color="primary"
+            @click="submitForm"
+            :loading="loading"
+            :disabled="!valid"
+            block
+          >
+            提交申請
+          </v-btn>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </v-container>
+</template>
+
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
+
+const router = useRouter()
+const valid = ref(false)
+const loading = ref(false)
+
+const formData = reactive({
+  userID: '',
+  caregiverGender: '',
+  caregiverAge: null,
+  expYears: null,
+  education: '',
+  daylyRate: null,
+  services: '',
+  status: 'PENDING'
+})
+
+const certifiPhotos = ref([])
+const selectedAreas = reactive({})
+
+const educationOptions = [
+  '小學含以下',
+  '中學含肄業',
+  '高中職含肄業',
+  '大專院校含肄業',
+  '碩博含肄業'
+]
+
+const serviceOptions = [
+  '初階看護人員',
+  '中階看護人員',
+  '高階看護人員',
+  '專業護理師'
+]
+
+const areaOptions = [
+  { text: '台北市', value: 'taipei_city' },
+  { text: '新北市', value: 'new_taipei_city' },
+  // ... other areas
+]
+
+const photoRules = [
+  v => !v || v.length <= 5 || '最多只能上傳5張照片',
+  v => !v || v.every(file => file.size < 5000000) || '每張照片需小於5MB'
+]
+
+async function submitForm() {
+  try {
+    loading.value = true
+
+    // 上傳證照
+    const photoFormData = new FormData()
+    certifiPhotos.value.forEach(file => {
+      photoFormData.append('files', file)
+    })
+    const photoResponse = await axios.post('/api/certifiPhoto/upload', photoFormData)
     
-    data() {
-      return {
-        valid: false,
-        loading: false,
-        formData: {
-          userID: '',
-          caregiverGender: '',
-          caregiverAge: null,
-          expYears: null,
-          eduExperience: '',
-          hourlyRate: null
-        }
-      };
-    },
-  
-    created() {
-      this.getUserIDFromToken();
-    },
-  
-    methods: {
-      getUserIDFromToken() {
-        const token = localStorage.getItem('token');
-        if (token) {
-          try {
-            // JWT token 解碼後會包含用戶ID
-            const decoded = jwt_decode(token);
-            this.formData.userID = decoded.sub; // 'sub' 是儲存用戶ID的標準claim
-          } catch (error) {
-            console.error('Token解析失敗:', error);
-            Swal.fire({
-              icon: 'error',
-              title: '錯誤',
-              text: '無法獲取用戶信息，請重新登入'
-            }).then(() => {
-              this.$router.push('/login');
-            });
-          }
-        } else {
-          // 如果沒有token，重定向到登入頁面
-          this.$router.push('/login');
-        }
-      },
-  
-      async submitForm() {
-        if (!this.$refs.form.validate()) return;
-  
-        this.loading = true;
-        try {
-          const response = await axios.post(
-            'http://localhost:8080/api/caregiver/InsertCaregiver',
-            {
-              user: {
-                userID: this.formData.userID
-              },
-              caregiverGender: this.formData.caregiverGender,
-              caregiverAge: this.formData.caregiverAge,
-              expYears: this.formData.expYears,
-              eduExperience: this.formData.eduExperience,
-              hourlyRate: this.formData.hourlyRate
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
-            }
-          );
-  
-          if (response.data && response.data.message === "新增成功") {
-            await Swal.fire({
-              icon: 'success',
-              title: '成功',
-              text: '護工資料新增成功'
-            });
-            this.$router.push('/home/caregiver/setting');
-          }
-        } catch (error) {
-          console.error('新增失敗:', error);
-          let errorMessage = '護工資料新增失敗';
-          if (error.response?.data?.error) {
-            errorMessage = error.response.data.error;
-          }
-          Swal.fire({
-            icon: 'error',
-            title: '新增失敗',
-            text: errorMessage
-          });
-        } finally {
-          this.loading = false;
-        }
-      },
-  
-      cancel() {
-        this.$router.push('/admin/caregiver');
-      }
+    // 準備區域資料
+    const serviceArea = new ServiceAreaBean()
+    Object.entries(selectedAreas).forEach(([key, value]) => {
+      if (value) serviceArea[key] = true
+    })
+    
+    // 提交申請
+    const caregiverData = {
+      ...formData,
+      certifiPhotoID: photoResponse.data.certifiPhotoID,
+      serviceArea
     }
-  };
-  </script>
-  
-  <style scoped>
-  .v-card {
-    margin-top: 20px;
+    
+    await axios.post('/api/caregiver/apply', caregiverData)
+    
+    Swal.fire('成功', '申請已提交，請等待審核', 'success')
+    router.push('/profile')
+  } catch (error) {
+    console.error(error)
+    Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error')
+  } finally {
+    loading.value = false
   }
-  
-  .v-text-field {
-    width: 100%;
+}
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('/api/user/profile')
+    formData.userID = response.data.id
+  } catch (error) {
+    console.error('無法獲取用戶資料:', error)
   }
-  </style>
+})
+</script>
