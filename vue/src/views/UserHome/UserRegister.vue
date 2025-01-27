@@ -86,7 +86,7 @@
 <script setup>
 import Swal from 'sweetalert2'
 import { ref, watch, onMounted } from 'vue'
-import { useForm, useField, } from 'vee-validate'
+import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import locations from '@/data/locations.json'
 import axios from '@/plugins/axios'
@@ -163,10 +163,10 @@ const { handleSubmit, resetForm, errors, validateField, values } = useForm({
 
 // 定義每個表單欄位
 const { value: name, errorMessage: nameError, handleBlur: nameBlur, meta: nameMeta } = useField('name')
-const { value: email, errorMessage: emailError, handleBlur: emailBlur, meta: emailMeta } = useField('email')
+const { value: email, errorMessage: emailError, handleBlur: emailBlur, meta: emailMeta, validate: validateEmail, } = useField('email')
 const { value: password, errorMessage: passwordError, handleBlur: passwordBlur, meta: passwordMeta } = useField('password')
 const { value: confirmPassword, errorMessage: confirmPasswordError, handleBlur: confirmPasswordBlur, meta: confirmPasswordMeta } = useField('confirmPassword')
-const { value: phone, errorMessage: phoneError, handleBlur: phoneBlur, meta: phoneMeta } = useField('phone')
+const { value: phone, errorMessage: phoneError, handleBlur: phoneBlur, meta: phoneMeta, validate: validatePhone, } = useField('phone')
 const { value: city, errorMessage: cityError } = useField('city')
 const { value: district, errorMessage: districtError } = useField('district')
 const { value: address, errorMessage: addressError, handleBlur: addressBlur, meta: addressMeta } = useField('address')
@@ -247,6 +247,22 @@ const togglePasswordVisibility2 = () => {
 const submit = handleSubmit(async (values) => {
     try {
         loading.value = true;
+
+        await emailBlurHandler(); // 確保 email 驗證完成
+        await phoneBlurHandler(); // 確保 phone 驗證完成
+        const emailResult = await validateEmail(); // 確保 email 格式正確
+        if (!emailResult.valid || emailErrorCustom.value) {
+            loading.value = false;
+            return; // 停止提交
+        }
+
+        // **手動驗證手機**
+        const phoneResult = await validatePhone(); // 確保 phone 格式正確
+        if (!phoneResult.valid || phoneErrorCustom.value) {
+            loading.value = false;
+            return; // 停止提交
+        }
+
         // 創建 FormData
         const formData = new FormData()
         formData.append('userName', values.name)
@@ -283,9 +299,6 @@ const submit = handleSubmit(async (values) => {
     } catch (error) {
         if (error.response && error.response.data) {
             alert(`提交失敗：${error.response.data}`)
-        } else {
-            console.error('提交失敗:', error)
-            alert('提交失敗，請稍後再試。')
         }
         loading.value = false;
     }
@@ -321,7 +334,7 @@ function handleFileChange(event) {
 }
 const edit = () => {
     name.value = '周杰倫';
-    email.value = 'qwertyuiopa106@gmail.com';
+    email.value = 'eeit190@gmail.com';
     password.value = 'aaa123@';
     confirmPassword.value = 'aaa123@';
     phone.value = '0912345678';

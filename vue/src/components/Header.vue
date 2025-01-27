@@ -3,14 +3,12 @@
     <header id="header" class="header d-flex align-items-center sticky-top">
         <div class="container-fluid container-xl position-relative d-flex align-items-center  justify-content-between">
             <router-link to="/home" class="logo d-flex align-items-center mr-10">
-                <img src="/Home/img/logo.png" alt="Logo">
+                <img src="/Home/img/logo2.png" alt="Logo">
                 <h1 class="sitename mt-1" style="font-size: 35px; font-weight: bolder;">心護家</h1>
             </router-link>
 
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
-                    <!-- <li><router-link to="/" class="active" @click="closeMobileNav">Home</router-link></li> -->
-                    <!-- 新增看護選項 -->
                     <li><router-link to="/home/caregiver/Management" @click="closeMobileNav">尋找看護</router-link></li>
                     <li><router-link to="/home/caregiver/Become" @click="closeMobileNav">成為看護</router-link></li>
                     <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
@@ -29,10 +27,10 @@
                         </transition>
                     </li> -->
 
-                    <div class="mr-2" style="font-size: small;">歡迎，<strong>{{ username }}</strong></div>
+                    <div class="mr-2" style="font-size:20px;">歡迎，<strong>{{ username }}</strong></div>
                     <li class="dropdown" :class="{ 'active': userDropdownActive }">
                         <a href="#" @click.prevent="toggleUserDropdown">
-                            <img :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="40" height="40"
+                            <img :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="50" height="50"
                                 class="rounded-circle"><i class="bi bi-caret-down-fill"></i>
                         </a>
                         <transition name="fade">
@@ -52,7 +50,7 @@
                 </ul>
             </nav>
             <div class="text-end" v-else>
-                <router-link to="/home/userLogin" class="btn btn-outline-dark me-2">登入</router-link>
+                <router-link to="/home/userLogin" class="btn btn-outline-danger me-2">登入</router-link>
                 <router-link to="/home/userRegister" class="btn btn-outline-warning">註冊</router-link>
             </div>
         </div>
@@ -223,8 +221,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.container-xl {
+    max-width: 1250px !important;
+}
+
 h1 {
-    color: #FF5757 !important;
+    color: #FFA042 !important;
 }
 
 .navmenu ul {
@@ -243,8 +245,8 @@ h1 {
 
 .navmenu a {
     text-decoration: none;
-    color: #FF7575;
-    font-size: 20px !important;
+    color: #FF9D6F;
+    font-size: 25px !important;
     font-weight: bold;
 }
 
@@ -288,9 +290,10 @@ a {
 }
 
 .navmenu li:hover>a {
-    color: #EA0000 !important;
-    text-decoration: underline !important;
+    color: #F75000 !important;
+    /* text-decoration: underline !important; */
 }
+
 
 hr {
     margin: 0;

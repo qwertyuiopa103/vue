@@ -146,10 +146,10 @@ async function confirmAndUpdate() {
         text: '修改後無法恢復',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         confirmButtonText: '確定',
-        cancelButtonText: '取消'
+        cancelButtonText: '取消',
     })
 
     if (result.isConfirmed) {
@@ -214,8 +214,8 @@ const deleteUser = async () => {
         text: `您確定要刪除會員嗎?`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         cancelButtonText: '取消',
         confirmButtonText: '刪除',
     })
@@ -231,7 +231,7 @@ const deleteUser = async () => {
                     title: '刪除成功！',
                     text: '即將導向首頁',
                     icon: 'success',
-                    confirmButtonColor: '#E0E0E0',
+                    confirmButtonColor: '#FFC78E',
                     confirmButtonText: '確定',
                 }).then(() => {
                     // 按下確定後跳轉至登入頁面
@@ -246,7 +246,14 @@ const deleteUser = async () => {
             }
         } catch (error) {
             console.error(error)
-            Swal.fire('錯誤', '刪除用戶失敗', 'error')
+            const errorMessage = error.response?.data || '刪除用戶失敗'; // 後端返回的錯誤訊息，默認值為固定的錯誤描述
+            Swal.fire({
+                title: '刪除失敗',
+                text: errorMessage,
+                icon: 'error',
+                confirmButtonColor: '#FFC78E',
+                confirmButtonText: '確定',
+            });
         }
     }
 }

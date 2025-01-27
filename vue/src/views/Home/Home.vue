@@ -31,6 +31,7 @@ const swiperOptions = {
 
 const memberCount = ref(0);
 const OrderCount = ref(0);
+const CaregiverCount = ref(0);
 onMounted(async () => {
     // 確保 DOM 完全渲染
     await nextTick();
@@ -58,6 +59,14 @@ onMounted(async () => {
     } catch (error) {
         console.error('獲取會員總數失敗:', error);
     }
+
+    try {
+        const response = await axios.get('/UserNoAuth/user/caregiverCount');
+        CaregiverCount.value = response.data;
+    } catch (error) {
+        console.error('獲取會員總數失敗:', error);
+    }
+
 
     // 初始化 PureCounter
     new PureCounter();
@@ -136,7 +145,7 @@ onMounted(async () => {
                             <!-- Start Stats Item -->
                             <div class="col-4 counter" data-aos="fade-up" data-aos-delay="200">
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
-                                    data-purecounter-end="2831" data-purecounter-duration="1"
+                                    :data-purecounter-end="CaregiverCount" data-purecounter-duration="1"
                                     class="purecounter number"></span>
                                 <span class="d-block">專業看護</span>
                             </div>
@@ -165,6 +174,10 @@ onMounted(async () => {
 
 <style lang="css" scoped>
 h1 {
-    color: #FF9797 !important;
+    color: #FF8000 !important;
 }
+
+/* p {
+    color: #FF8F59 !important;
+} */
 </style>

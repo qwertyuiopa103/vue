@@ -84,6 +84,11 @@ const router = createRouter({
           component: () => import("@/views/Home/Home.vue"),
         },
         {
+          name: "home_error",
+          path: "error",
+          component: () => import("@/views/Home/Home.vue"),
+        },
+        {
           name: "userProfile_view",
           path: "userProfile",
           component: () => import("@/views/UserHome/UserProfile.vue"),

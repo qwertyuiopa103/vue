@@ -14,7 +14,7 @@
                     </v-col>
                     <v-col cols="0">
                         <v-text-field v-model="search" label="輸入關鍵字" prepend-inner-icon="mdi-magnify" variant="outlined"
-                            hide-details single-line density="compact" clearable="ture"></v-text-field>
+                            hide-details single-line density="compact" clearable="true"></v-text-field>
                     </v-col>
                 </v-row>
                 <v-data-table :headers="headers" :items="filteredUsers" item-key="userID" :loading="loading"
@@ -28,11 +28,11 @@
                     </template>
                     <!-- 自訂啟用狀態欄位 -->
                     <template #item.userActive="{ item }">
-                        <VSwitch v-model="item.userActive" @change="() => updateUserStatus(item)"
-                            :label="item.userActive ? '啟用' : '停用'" hide-details inset />
+                        <VSwitch v-model="item.userSecurity.userActive" @change="() => updateUserStatus(item)"
+                            :label="item.userSecurity.userActive ? '啟用' : '停用'" hide-details inset />
                     </template>
                     <template #item.userDeleted="{ item }">
-                        <span>{{ item.userDeleted }}</span>
+                        <span>{{ item.userSecurity.userDeleted ? '是' : '否' }}</span>
                     </template>
                     <!-- 角色 -->
                     <template #item.userRole="{ item }">
@@ -103,7 +103,7 @@ const headers = [
 const roleMap = {
     ROLE_ADMIN: '管理員',
     ROLE_USER: '使用者',
-    //moderator: '版主',
+    ROLE_CAREGIVER: '看護員',
 };
 // 取得用戶資料
 const fetchUsers = async () => {
@@ -114,6 +114,7 @@ const fetchUsers = async () => {
         if (response.status === 200) {
             // users.value = response.data.filter(user => !user.userDeleted);
             users.value = response.data;
+            console.log('API 返回的用戶數據:', response.data);
         } else {
             throw new Error('Failed to fetch users');
         }
@@ -129,10 +130,16 @@ const fetchUsers = async () => {
 const updateUserStatus = async (user) => {
     try {
         const response = await axios.patch(`/UserAdmin/users/${user.userID}/status`, {
-            userStatus: user.userActive ? 1 : 0,
+            userStatus: user.userSecurity.userActive ? 1 : 0,
         });
         if (response.status === 200) {
-            Swal.fire('成功', '用戶狀態已更新', 'success');
+            Swal.fire({
+                title: '成功',
+                text: '用戶狀態已更新',
+                icon: 'success',
+                timer: 1200, // 自動關閉時間，單位毫秒
+                showConfirmButton: false, // 隱藏確認按鈕
+            });
         } else {
             throw new Error('Failed to update status');
         }
@@ -140,7 +147,7 @@ const updateUserStatus = async (user) => {
         console.error(error)
         Swal.fire('錯誤', '更新用戶狀態失敗', 'error')
         // 如果更新失敗，將狀態還原
-        user.userActive = !user.userActive
+        user.userSecurity.userActive = !user.userSecurity.userActive
     }
 }
 
@@ -161,8 +168,8 @@ const deleteUser = async (userID) => {
         text: `您確定要刪除會員編號 ${userID} 嗎?`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         cancelButtonText: '取消',
         confirmButtonText: '刪除',
     })
@@ -172,7 +179,14 @@ const deleteUser = async (userID) => {
             const response = await axios.delete(`/UserAdmin/users/${userID}`);
 
             if (response.status === 200) {
-                Swal.fire('已刪除!', `${userID} 已成功刪除。`, 'success');
+                Swal.fire({
+                    title: '已刪除!',
+                    text: `${userID} 已成功刪除。`,
+                    icon: 'success',
+                    timer: 1200, // 自動關閉時間，單位毫秒
+                    showConfirmButton: false, // 隱藏確認按鈕
+                });
+
                 // 重新取得用戶資料
                 await fetchUsers();
             } else {
@@ -185,22 +199,29 @@ const deleteUser = async (userID) => {
     }
 }
 const filteredUsers = computed(() => {
-    // 格式化用戶數據
     const formattedUsers = users.value.map(user => ({
         ...user,
-        userRoleDisplay: roleMap[user.userRole] || '未知角色', // 格式化角色顯示名稱
-        userDeleted: user.userDeleted ? '是' : '否',          // 格式化刪除狀態
+        userRoleDisplay: roleMap[user.userRole] || '未知角色',
+        userDeleted: user.userSecurity.userDeleted ? '是' : '否',
     }));
 
-    // 如果沒有搜尋條件，返回全部用戶
     if (!search.value || !searchField.value) {
         return formattedUsers;
     }
 
-    // 根據搜尋條件進行篩選
     return formattedUsers.filter(user => {
-        const fieldKey = searchField.value; // 搜尋欄位
-        const fieldValue = fieldKey === 'userRole' ? user.userRoleDisplay : user[fieldKey]; // 使用顯示名稱
+        const fieldKey = searchField.value;
+        let fieldValue;
+
+        // 處理嵌套屬性
+        if (fieldKey.startsWith('userSecurity.')) {
+            const key = fieldKey.split('.')[1];
+            fieldValue = user.userSecurity?.[key];
+        } else if (fieldKey === 'userRole') {
+            fieldValue = user.userRoleDisplay;
+        } else {
+            fieldValue = user[fieldKey];
+        }
 
         if (!fieldValue) {
             return false;
@@ -209,7 +230,6 @@ const filteredUsers = computed(() => {
         return fieldValue.toString().toLowerCase().includes(search.value.toLowerCase());
     });
 });
-
 // 在組件掛載時取得用戶資料
 onMounted(() => {
     fetchUsers()

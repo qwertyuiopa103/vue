@@ -88,7 +88,7 @@ const processData = () => {
     // 提取年份
     const yearSet = new Set();
     users.value.forEach(user => {
-        const creationDate = new Date(user.userCreat);
+        const creationDate = new Date(user.userSecurity.userCreat);
         if (!isNaN(creationDate)) { // 檢查日期有效性
             const year = creationDate.getFullYear();
             yearSet.add(year);
@@ -268,7 +268,7 @@ const getLineChartData = () => {
     const data = Array(12).fill(0); // 初始化 12 個月的數據為 0
 
     users.value.forEach(user => {
-        const creationDate = new Date(user.userCreat);
+        const creationDate = new Date(user.userSecurity.userCreat);
         if (!isNaN(creationDate)) { // 檢查日期有效性
             const year = creationDate.getFullYear();
             const month = creationDate.getMonth(); // 0-11

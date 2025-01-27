@@ -24,33 +24,37 @@ const user = ref({
     userCity: '',
     userDistrict: '',
     userAddress: '',
-    userCreat: '',
-    userLogin: null, // 初始化為 null
-    userUpdated: null,
-    userLockoutEnd: '',
-    userFailedLoginAttempts: 0,
-    userVerified: false,
-    userActive: false,
-    userPasswordChanged: null,
-    userDeleted: false,
     userRole: '',
+    userSecurity: {
+        userCreat: '',
+        userLogin: null, // 初始化為 null
+        userUpdated: null,
+        userLockoutEnd: '',
+        userFailedLoginAttempts: 0,
+        userVerified: false,
+        userActive: false,
+        userPasswordChanged: null,
+        userDeleted: false,
+    },
 })
 // 格式化使用者資料的 computed
 const formattedUser = computed(() => ({
     ...user.value,
-    userLogin: user.value.userLogin || '尚未登入',
-    userUpdated: user.value.userUpdated || '尚未更新',
-    userLockoutEnd: user.value.userLockoutEnd || '未被鎖定',
-    userPasswordChanged: user.value.userPasswordChanged || '未更改密碼',
-    userVerified: user.value.userVerified ? '已驗證' : '未驗證',
-    userActive: user.value.userActive ? '啟用' : '禁用',
-    userDeleted: user.value.userDeleted ? '已刪除' : '未刪除',
+    userCreat: user.value.userSecurity.userCreat,
+    userFailedLoginAttempts: user.value.userSecurity.userFailedLoginAttempts,
+    userLogin: user.value.userSecurity.userLogin || '尚未登入',
+    userUpdated: user.value.userSecurity.userUpdated || '尚未更新',
+    userLockoutEnd: user.value.userSecurity.userLockoutEnd || '未被鎖定',
+    userPasswordChanged: user.value.userSecurity.userPasswordChanged || '未更改密碼',
+    userVerified: user.value.userSecurity.userVerified ? '已驗證' : '未驗證',
+    userActive: user.value.userSecurity.userActive ? '啟用' : '禁用',
+    userDeleted: user.value.userSecurity.userDeleted ? '已刪除' : '未刪除',
     userRole: roleMap[user.value.userRole] || '未知角色',
 }));
 const roleMap = {
     ROLE_ADMIN: '管理員',
     ROLE_USER: '使用者',
-    //moderator: '版主',
+    ROLE_CAREGIVER: '看護員',
 };
 
 // 3. 在組件掛載時，去呼叫後端 API 取得資料

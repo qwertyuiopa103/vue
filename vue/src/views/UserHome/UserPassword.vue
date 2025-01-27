@@ -8,7 +8,7 @@ const loading = ref(false);
 const isSubmissionSuccessful = ref(false);
 const router = useRouter(); // 獲取路由實例
 const edit = () => {
-    email.value = 'qwertyuiopa106@gmail.com';
+    email.value = 'eeit190@gmail.com';
 };
 const sendPasswordRequest = async () => {
     if (!email.value) {
