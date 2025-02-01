@@ -12,6 +12,7 @@ import 'swiper/css/pagination';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import PureCounter from '@srexi/purecounterjs';
+import ChatComponent from '@/components/User/ChatComponent.vue';
 
 const route = useRoute()
 const showBackToTop = ref(false)
@@ -82,21 +83,10 @@ watch(
         </div>
         <Header></Header>
         <main class="main">
-            <!--  <Swiper :modules="[Navigation, Pagination]" :loop="true" :pagination="{ clickable: true }"
-                :navigation="true" class="mySwiper">
-                <SwiperSlide>Slide 1</SwiperSlide>
-                <SwiperSlide>Slide 2</SwiperSlide>
-                <SwiperSlide>Slide 3</SwiperSlide>
-                添加更多 SwiperSlide 根據需要 
-            </Swiper>-->
             <RouterView></RouterView>
         </main>
         <Footer></Footer>
-        <!-- <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"
-            v-show="showScrollTop" @click.prevent="scrollToTop">
-            <i class="bi bi-arrow-up-short"></i>
-        </a> -->
-
+        <ChatComponent></ChatComponent>
         <button class="back-to-top" @click="scrollToTop" :class="{ 'show': showBackToTop }" aria-label="返回頂部">
             <i class="fas fa-arrow-up"></i>
         </button>

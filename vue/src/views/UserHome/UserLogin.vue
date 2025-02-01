@@ -1,10 +1,11 @@
 <template>
     <div>
 
-        <v-card class="mx-auto pa-4 pb-8 my-6" elevation="8" max-width="448" rounded="lg">
+        <v-card class="mx-auto pa-4 pb-8 my-8" elevation="8" max-width="448" rounded="lg">
             <!-- <v-img class="mx-auto my-2" max-width="100" src="/Home/img/logo.png"></v-img> -->
             <div class="text-center  mt-3">
-                <h3>歡迎回來</h3>
+
+                <h3 style="color: #FFAF60;"><strong>歡迎回來<i class="mdi mdi-emoticon-outline ml-2"></i></strong></h3>
             </div>
             <div class="text-subtitle-1 text-medium-emphasis">帳號</div>
 

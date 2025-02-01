@@ -93,7 +93,7 @@ const headers = [
     { title: '姓名', key: 'userName', width: '60px ' },
     { title: '信箱', key: 'userEmail', align: 'center', width: '200px ' },
     { title: '手機', key: 'userPhone', align: 'center', width: '100px ' },
-    { title: '啟用狀態', key: 'userActive', align: 'center', width: '110px ' },
+    { title: '啟用狀態', key: 'userActive', align: 'center', width: '120px ' },
     { title: '刪除', key: 'userDeleted', width: '40px' },
     { title: '角色', key: 'userRole', align: 'center', width: '80px' },
     { title: '詳細資料', key: 'details', align: 'center', sortable: false, width: '60px' },

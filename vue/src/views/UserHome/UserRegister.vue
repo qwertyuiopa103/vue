@@ -57,8 +57,8 @@
                             variant="outlined" accept="image/*" :error-messages="avatarError"
                             @change="handleFileChange"></v-file-input>
 
-                        <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="接受條款" type="checkbox"
-                            value="1" class=""></v-checkbox>
+                        <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="同意接受服務及註冊條款。"
+                            type="checkbox" value="1" class=""></v-checkbox>
                         <div class=" text-end mb-3">
                             <v-btn prepend-icon="mdi-draw-pen" class="mr-5" @click="edit">
                                 一鍵輸入

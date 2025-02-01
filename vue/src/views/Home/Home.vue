@@ -1,7 +1,7 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -28,6 +28,18 @@ const swiperOptions = {
         },
     },
 };
+
+// 圖片列表
+const slides = ref([
+    "/Home/img/home3.jpg",
+    "/Home/img/home1.jpg",
+    "/Home/img/home4.jpg"
+]);
+
+// 監聽 slides 變化，確保 Swiper 能夠正常運行 loop
+watch(slides, (newSlides) => {
+    swiperOptions.value.loop = newSlides.length > 1; // 當 slides 大於 1 才啟用 loop
+});
 
 const memberCount = ref(0);
 const OrderCount = ref(0);
@@ -57,14 +69,14 @@ onMounted(async () => {
         const response = await axios.get('/OrderNoAuth/Count');
         OrderCount.value = response.data;
     } catch (error) {
-        console.error('獲取會員總數失敗:', error);
+        console.error('獲取訂單總數失敗:', error);
     }
 
     try {
         const response = await axios.get('/UserNoAuth/user/caregiverCount');
         CaregiverCount.value = response.data;
     } catch (error) {
-        console.error('獲取會員總數失敗:', error);
+        console.error('獲取看護總數失敗:', error);
     }
 
 
@@ -84,12 +96,11 @@ onMounted(async () => {
                     <div class="col-lg-7 mb-5 mb-lg-0 order-lg-2" data-aos="fade-up" data-aos-delay="400">
                         <div class="swiper">
                             <div class="swiper-wrapper">
-                                <Swiper v-bind="swiperOptions" class="mySwiper">
-                                    <SwiperSlide><img src="/Home/img/home3.jpg" alt="Image" class="img-fluid" />
-                                    </SwiperSlide>
-                                    <SwiperSlide><img src="/Home/img/home1.jpg" alt="Image" class="img-fluid" />
-                                    </SwiperSlide>
-                                    <SwiperSlide><img src="/Home/img/home4.jpg" alt="Image" class="img-fluid" />
+                                <Swiper :modules="[Navigation, Pagination, Autoplay]" :loop="slides.length > 1"
+                                    :pagination="{ clickable: true }" :navigation="false" :autoplay="{ delay: 1800 }"
+                                    class="mySwiper">
+                                    <SwiperSlide v-for="(img, index) in slides" :key="index">
+                                        <img :src="img" alt="Image" class="img-fluid" />
                                     </SwiperSlide>
                                 </Swiper>
                             </div>
