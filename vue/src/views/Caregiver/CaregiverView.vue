@@ -68,14 +68,13 @@
       <template #item.actions="{ item }">
         <!-- 詳細資料按鈕 -->
         <v-btn 
-          small 
-          color="info" 
-          class="mr-2"
-          @click="showDetails(item)"
-          :disabled="item.CGstatus !== 'PENDING'"
-        >
-          詳細資料
-        </v-btn>
+  small 
+  color="info" 
+  class="mr-2"
+  @click="showDetails(item)"
+>
+  詳細資料
+</v-btn>
         
         <!-- 編輯按鈕 -->
         <v-btn 
@@ -156,15 +155,49 @@
                 />
               </v-col>
             </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">取消</v-btn>
-          <v-btn color="blue darken-1" text @click="save">儲存</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+            
+        <!-- 新增照片上傳區域 -->
+        <v-row>
+          <v-col cols="12">
+            <h3>現有證照照片</h3>
+            <v-row>
+              <v-col 
+                v-for="(photo, i) in getCertifiPhotos(editedItem.certifiPhoto)"
+                :key="i"
+                cols="12"
+                sm="6"
+                md="4"
+              >
+                <v-img
+                  :src="photo"
+                  height="150"
+                  cover
+                  class="mb-2"
+                />
+              </v-col>
+            </v-row>
+
+            <v-file-input
+              v-model="newPhotos"
+              :label="`可上傳 ${getMaxNewPhotos()} 張新照片`"
+              multiple
+              accept="image/*"
+              :rules="[
+                v => !v || v.length <= getMaxNewPhotos() || `最多只能上傳 ${getMaxNewPhotos()} 張新照片`
+              ]"
+              @change="handlePhotoSelection"
+            ></v-file-input>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="blue darken-1" text @click="close">取消</v-btn>
+      <v-btn color="blue darken-1" text @click="save">儲存</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
     <!-- 詳細資料對話框 -->
     <v-dialog v-model="detailDialog" max-width="800px">
@@ -175,13 +208,18 @@
             <v-row>
               <!-- 基本資料 -->
               <v-col cols="12" md="6">
-                <v-avatar size="150" class="mb-4">
-                  <img
-                    v-if="selectedItem.user?.userPhoto"
-                    :src="selectedItem.user.userPhoto"
-                  />
-                  <v-icon v-else size="150">mdi-account</v-icon>
-                </v-avatar>
+                <v-avatar
+                size="200"
+                class="mb-4"
+                style="width: 60%; height: auto; display: block; margin: 0 auto;"
+              >
+                <v-img
+                  v-if="selectedItem.user?.userPhoto"
+                  :src="selectedItem.user.userPhoto"
+                  style="width: 100%; height: 100%; object-fit: cover;"
+                />
+                <v-icon v-else size="120">mdi-account</v-icon>
+              </v-avatar>
                 <p><strong>護工編號:</strong> {{ selectedItem.caregiverNO }}</p>
                 <p><strong>會員編號:</strong> {{ selectedItem.user?.userID }}</p>
                 <p><strong>姓名:</strong> {{ selectedItem.user?.userName }}</p>
@@ -273,7 +311,97 @@
     </v-card-actions>
   </v-card>
 </v-dialog>
+<!-- 審核對話框 -->
+<v-dialog v-model="approvalDialog" max-width="800px">
+  <v-card v-if="selectedItem">
+    <v-card-title>護工審核</v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-row>
+          <!-- 基本資料 -->
+          <v-col cols="12" md="6">
+            <v-avatar
+              size="200"
+              class="mb-4"
+              style="width: 60%; height: auto; display: block; margin: 0 auto;"
+            >
+              <v-img
+                v-if="selectedItem.user?.userPhoto"
+                :src="selectedItem.user.userPhoto"
+                style="width: 100%; height: 100%; object-fit: cover;"
+              />
+              <v-icon v-else size="120">mdi-account</v-icon>
+            </v-avatar>
+            <p><strong>護工編號:</strong> {{ selectedItem.caregiverNO }}</p>
+            <p><strong>會員編號:</strong> {{ selectedItem.user?.userID }}</p>
+            <p><strong>姓名:</strong> {{ selectedItem.user?.userName }}</p>
+            <p><strong>性別:</strong> {{ selectedItem.caregiverGender }}</p>
+            <p><strong>年齡:</strong> {{ selectedItem.caregiverAge }}</p>
+            <p><strong>工作年資:</strong> {{ selectedItem.expYears }}年</p>
+            <p><strong>教育程度:</strong> {{ selectedItem.education }}</p>
+            <p><strong>日薪:</strong> {{ selectedItem.daylyRate }}元</p>
+            <p><strong>服務等級:</strong> {{ selectedItem.services }}</p>
+          </v-col>
 
+          <!-- 證書與服務區域 -->
+          <v-col cols="12" md="6">
+            <h3>證照資料</h3>
+            <v-carousel 
+              v-if="selectedItem.certifiPhoto" 
+              height="300"
+              hide-delimiter-background
+              show-arrows="hover"
+            >
+              <v-carousel-item
+                v-for="(photo, i) in getCertifiPhotos(selectedItem.certifiPhoto)"
+                :key="i"
+                @click="showLargeImage(photo)"
+              >
+                <v-img
+                  :src="photo"
+                  alt="Certificate"
+                  height="300"
+                  cover
+                  class="certificate-photo"
+                  style="cursor: pointer"
+                />
+              </v-carousel-item>
+            </v-carousel>
+          </v-col>
+        </v-row>
+
+        <!-- 審核按鈕 -->
+        <v-row>
+          <v-col cols="12" class="text-center">
+            <v-text-field
+              v-model="rejectionReason"
+              label="退件原因"
+              v-if="showRejectionReason"
+            ></v-text-field>
+            <v-btn
+              color="success"
+              class="mr-4"
+              @click="approveApplication"
+              :disabled="showRejectionReason"
+            >
+              審核通過
+            </v-btn>
+            <v-btn
+              color="error"
+              @click="showRejectionReason ? rejectApplication() : showRejectionReason = true"
+            >
+              {{ showRejectionReason ? '確認退件' : '審核退件' }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="grey" text @click="closeApprovalDialog">關閉</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
   </div>
 </template>
@@ -289,10 +417,11 @@ const dialog = ref(false)
 const detailDialog = ref(false)
 const selectedItem = ref(null)
 const caregivers = ref([])
+const approvalDialog = ref(false)
 const selectedStatus = ref('ALL')
 const showRejectionReason = ref(false)
 const rejectionReason = ref('')
-
+const newPhotos = ref(null)
 const editedIndex = ref(-1)
 const editedItem = ref({
   caregiverNO: null,
@@ -372,8 +501,20 @@ const getStatusText = (status) => {
 
 const handleStatusClick = (item) => {
   if (item.CGstatus === 'PENDING') {
-    showDetails(item)
+    openApprovalDialog(item)
   }
+}
+const openApprovalDialog = (item) => {
+  selectedItem.value = item
+  approvalDialog.value = true
+  showRejectionReason.value = false
+  rejectionReason.value = ''
+}
+
+const closeApprovalDialog = () => {
+  approvalDialog.value = false
+  showRejectionReason.value = false
+  rejectionReason.value = ''
 }
 
 const fetchCaregivers = async () => {
@@ -442,32 +583,52 @@ const editItem = (item) => {
   dialog.value = true
 }
 
+// 修改關閉方法
 const close = () => {
-  dialog.value = false
-  editedItem.value = Object.assign({}, defaultItem)
-  editedIndex.value = -1
-}
+  dialog.value = false;
+  editedItem.value = Object.assign({}, defaultItem);
+  editedIndex.value = -1;
+  newPhotos.value = null;  // 清除照片選擇
+};
 
+// 修改保存方法
 const save = async () => {
   try {
+    // 創建 FormData
+    const formData = new FormData();
+    
+    // 將 caregiver 數據轉換為字串並添加到 FormData
+    const caregiverData = { ...editedItem.value };
+    formData.append('caregiverData', JSON.stringify(caregiverData));
+
+    // 添加新照片
+    if (newPhotos.value) {
+      for (const file of newPhotos.value) {
+        formData.append('photos', file);
+      }
+    }
+
+    // 發送請求
     const response = await axios.put(
       'http://localhost:8080/api/caregiver/update',
-      editedItem.value,
+      formData,
       {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       }
-    )
-    await Swal.fire('成功', '更新成功', 'success')
-    close()
-    await fetchCaregivers()
+    );
+
+    await Swal.fire('成功', '更新成功', 'success');
+    close();
+    await fetchCaregivers();
   } catch (error) {
-    console.error('更新失敗:', error)
-    Swal.fire('錯誤', '更新失敗', 'error')
+    console.error('更新失敗:', error);
+    Swal.fire('錯誤', '更新失敗: ' + (error.response?.data || error.message), 'error');
   }
-}
+};
+
 
 const approveApplication = async () => {
   try {
@@ -603,6 +764,23 @@ const getCertifiPhotos = (certifiPhoto) => {
   console.log('Processed photos:', photos);
   return photos;
 };
+// 計算可上傳的最大照片數
+const getMaxNewPhotos = () => {
+  if (!editedItem.value.certifiPhoto) return 5;
+  const existingPhotos = getCertifiPhotos(editedItem.value.certifiPhoto).length;
+  return Math.max(0, 5 - existingPhotos);
+};
+
+// 處理照片選擇
+const handlePhotoSelection = (files) => {
+  if (!files) return;
+  
+  const maxAllowed = getMaxNewPhotos();
+  if (files.length > maxAllowed) {
+    Swal.fire('警告', `最多只能上傳 ${maxAllowed} 張新照片`, 'warning');
+    newPhotos.value = files.slice(0, maxAllowed);
+  }
+};
 
 
 
@@ -644,5 +822,17 @@ onMounted(() => {
 
 .certificate-photo:hover {
   opacity: 0.8;
+}
+.user-photo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.v-avatar {
+  max-width: 80%;
+  height: auto !important;
 }
 </style>

@@ -9,13 +9,23 @@
               <v-img :src="user.avatar || '/user/img/user3.png'" alt="avatar"></v-img>
             </v-avatar>
             <h3 class="mb-1">{{ user.name }}</h3>
-            <v-chip :color="getStatusColor(caregiver.CGstatus)" text-color="white" class="mb-4">
+            <v-chip :color="getStatusColor(caregiver.CGstatus)" text-color="white" class="mb-2">
               {{ getStatusText(caregiver.CGstatus) }}
             </v-chip>
+            
+            <!-- 新增編輯按鈕 -->
+            <div class="mt-2">
+              <v-btn
+                color="primary"
+                @click="dialog = true"
+                small
+              >
+                編輯資料
+              </v-btn>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-
       <!-- 右側詳細資訊 -->
       <v-col cols="12" md="8">
         <v-card>
@@ -97,12 +107,66 @@
         </v-card>
       </v-col>
     </v-row>
+
+  <!-- 編輯對話框 -->
+  <v-dialog v-model="dialog" max-width="600px">
+      <v-card>
+        <v-card-title>編輯資料</v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <!-- 基本資料編輯表單 -->
+              <v-col cols="12">
+                <v-select
+                  v-model="editedItem.caregiverGender"
+                  :items="['男', '女']"
+                  label="性別"
+                />
+                <v-text-field
+                  v-model.number="editedItem.caregiverAge"
+                  label="年齡"
+                  type="number"
+                />
+                <v-text-field
+                  v-model.number="editedItem.expYears"
+                  label="工作年資"
+                  type="number"
+                />
+                <v-text-field
+                  v-model.number="editedItem.daylyRate"
+                  label="日薪"
+                  type="number"
+                />
+                <v-select
+                  v-model="editedItem.services"
+                  :items="['初階看護人員', '中階看護人員', '高階看護人員', '專業護理師']"
+                  label="服務等級"
+                />
+                <v-select
+                  v-model="editedItem.education"
+                  :items="['小學含以下', '中學含肄業', '高中職含肄業', '大專院校含肄業', '碩博含肄業']"
+                  label="學歷"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="dialog = false">取消</v-btn>
+          <v-btn color="blue darken-1" text @click="save">儲存</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
+  
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from '@/plugins/axios';
+const dialog = ref(false);
+const editedItem = ref({});
 
 // 新增 id 屬性，確保後續能正確根據用戶 id 取得看護資料
 const user = ref({
@@ -135,48 +199,41 @@ const fetchUserProfile = async () => {
 };
 
 // 取得看護資料，並對返回欄位做對應處理（依據後端實際返回格式調整）
+// 修正後的 fetchCaregiverData 方法
 const fetchCaregiverData = async () => {
   try {
-    // 1. 首先確保用戶已登入且有權限
     if (!user.value.id) {
       throw new Error('用戶未登入');
     }
 
-    // 2. 先用 userID 查詢對應的 caregiverNO
-    // const caregiverInfoRes = await axios.get(`/caregiver/findByUserId/${user.value.id}`);
-    // if (!caregiverInfoRes.data) {
-    //   throw new Error('未找到看護資料');
-    // }
     const res = await axios.get(`/caregiver/findByUserId/${user.value.id}`);
     if (!res.data) {
       throw new Error('未找到看護資料');
     }
-    // // 3. 獲取詳細資料
-    // const caregiverNO = caregiverInfoRes.data.caregiverNO;
-    // const res = await axios.get(`/caregiver/${caregiverNO}`);
 
-    // 4. 調試輸出
-    console.log('API Response:', res.data);
-
-    // 5. 更新 caregiver ref，注意屬性名稱匹配
+    const data = res.data;
     caregiver.value = {
-      caregiverNO: res.data.caregiverNO,
-      CGstatus: res.data.CGstatus || 'PENDING',
-      caregiverGender: res.data.caregiverGender || '',
-      caregiverAge: res.data.caregiverAge || 0,
-      serviceArea: res.data.serviceArea || null,
-      services: res.data.services || '',
-      expYears: res.data.expYears || 0,
-      education: res.data.education || '',
-      daylyRate: res.data.daylyRate || 0,
-      certifiPhoto: res.data.certifiPhoto || null
+      caregiverNO: data.caregiverNO,
+      CGstatus: data.CGstatus, // 直接使用後端回傳的值
+      caregiverGender: data.caregiverGender || '',
+      caregiverAge: data.caregiverAge || 0,
+      serviceArea: data.serviceArea || null,
+      services: data.services || '',
+      expYears: data.expYears || 0,
+      education: data.education || '',
+      daylyRate: data.daylyRate || 0,
+      certifiPhoto: data.certifiPhoto || null
     };
+
+    // 設置編輯表單的初始值
+    editedItem.value = { ...caregiver.value };
 
     console.log('Caregiver data loaded:', caregiver.value);
   } catch (err) {
     console.error('獲取看護資料失敗:', err);
   }
 };
+    
 onMounted(async () => {
 try {
   await fetchUserProfile();
@@ -253,13 +310,35 @@ const hexToBase64 = (hexString) => {
 
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
+  
   return [
-    certifiPhoto.photo1 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo1)}` : null,
-    certifiPhoto.photo2 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo2)}` : null,
-    certifiPhoto.photo3 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo3)}` : null,
-    certifiPhoto.photo4 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo4)}` : null,
-    certifiPhoto.photo5 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo5)}` : null
+    certifiPhoto.photo1Base64,
+    certifiPhoto.photo2Base64,
+    certifiPhoto.photo3Base64,
+    certifiPhoto.photo4Base64,
+    certifiPhoto.photo5Base64
   ].filter(Boolean);
+};
+// 新增 save 方法
+const save = async () => {
+  try {
+    await axios.put(
+      '/caregiver/update',
+      editedItem.value,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+    
+    dialog.value = false;
+    await fetchCaregiverData();
+  } catch (error) {
+    console.error('更新失敗:', error);
+    // 使用您偏好的提示方式顯示錯誤
+  }
 };
 </script>
 
