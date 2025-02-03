@@ -177,8 +177,8 @@
               <v-col cols="12" md="6">
                 <v-avatar size="150" class="mb-4">
                   <img
-                    v-if="selectedItem.user?.userPhotoBase64"
-                    :src="selectedItem.user.userPhotoBase64"
+                    v-if="selectedItem.user?.userPhoto"
+                    :src="selectedItem.user.userPhoto"
                   />
                   <v-icon v-else size="150">mdi-account</v-icon>
                 </v-avatar>
@@ -195,28 +195,29 @@
 
               <!-- 證書與服務區域 -->
               <v-col cols="12" md="6">
-                <h3>證照資料</h3>
-                <v-carousel v-if="selectedItem.certifiPhoto" height="300">
-  <v-carousel-item
-    v-for="(photo, i) in getCertifiPhotos(selectedItem.certifiPhoto)"
-    :key="i"
-    v-if="photo"
+  <h3>證照資料</h3>
+  <v-carousel 
+    v-if="selectedItem.certifiPhoto" 
+    height="300"
+    hide-delimiter-background
+    show-arrows="hover"
   >
-    <img :src="photo" alt="Certificate" class="certificate-photo" />
-  </v-carousel-item>
-</v-carousel>
+    <v-carousel-item
+      v-for="(photo, i) in getCertifiPhotos(selectedItem.certifiPhoto)"
+      :key="i"
+      @click="showLargeImage(photo)"
+    >
+      <v-img
+        :src="photo"
+        alt="Certificate"
+        height="300"
+        cover
+        class="certificate-photo"
+        style="cursor: pointer"
+      />
+    </v-carousel-item>
+  </v-carousel>
 
-                <h3 class="mt-4">服務區域</h3>
-                <v-chip-group>
-                  <v-chip
-                    v-for="area in getServiceAreas(selectedItem.serviceArea)"
-                    :key="area"
-                    color="primary"
-                    small
-                  >
-                    {{ area }}
-                  </v-chip>
-                </v-chip-group>
               </v-col>
             </v-row>
 
@@ -252,13 +253,36 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- 新增大圖顯示的對話框 -->
+<v-dialog v-model="largeImageDialog" max-width="90vw">
+  <v-card>
+    <v-img
+      :src="selectedImage"
+      max-height="90vh"
+      contain
+    >
+      <template v-slot:placeholder>
+        <v-row class="fill-height ma-0" align="center" justify="center">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </v-row>
+      </template>
+    </v-img>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn icon="mdi-close" @click="largeImageDialog = false"></v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+
   </div>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
-
+const largeImageDialog = ref(false);
+const selectedImage = ref(null);
 const search = ref('')
 const loading = ref(false)
 const dialog = ref(false)
@@ -383,12 +407,27 @@ const filterByStatus = () => {
   fetchCaregivers()
 }
 
-const showDetails = (item) => {
-  selectedItem.value = item
-  detailDialog.value = true
-  showRejectionReason.value = false
-  rejectionReason.value = ''
-}
+const showDetails = async (item) => {
+  try {
+    // 重新呼叫 detail 端點，確保拿到完整的證照資料
+    const response = await axios.get(
+      `http://localhost:8080/api/caregiver/findCaregiver/${item.caregiverNO}`,
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }
+    );
+    selectedItem.value = response.data;
+    detailDialog.value = true;
+    showRejectionReason.value = false;
+    rejectionReason.value = '';
+    
+    console.log('Fetched detailed item:', response.data);
+  } catch (error) {
+    console.error('Error fetching caregiver detail:', error);
+    Swal.fire('錯誤', '無法取得詳細資料', 'error');
+  }
+};
+
 
 const closeDetailDialog = () => {
   detailDialog.value = false
@@ -550,14 +589,27 @@ function hexToBase64(hexString) {
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
   
-  return [
-    certifiPhoto.photo1,
-    certifiPhoto.photo2,
-    certifiPhoto.photo3,
-    certifiPhoto.photo4,
-    certifiPhoto.photo5
-  ].filter(Boolean); // 過濾掉 null 或 undefined 值
-}
+  // 優先使用 photo1，如果不存在則嘗試 photo1Base64（其他依此類推）
+  const photos = [
+    certifiPhoto.photo1 || certifiPhoto.photo1Base64,
+    certifiPhoto.photo2 || certifiPhoto.photo2Base64,
+    certifiPhoto.photo3 || certifiPhoto.photo3Base64,
+    certifiPhoto.photo4 || certifiPhoto.photo4Base64,
+    certifiPhoto.photo5 || certifiPhoto.photo5Base64
+  ]
+  // 如果照片存在且以 "data:" 開頭，則視為有效 Base64 圖片
+  .filter(photo => photo && photo.startsWith('data:'));
+  
+  console.log('Processed photos:', photos);
+  return photos;
+};
+
+
+
+const showLargeImage = (photo) => {
+  selectedImage.value = photo;
+  largeImageDialog.value = true;
+};
 
 onMounted(() => {
   fetchCaregivers()
@@ -587,5 +639,10 @@ onMounted(() => {
   max-width: 100%;
   height: 300px;
   object-fit: contain;
+  transition: opacity 0.2s;
+}
+
+.certificate-photo:hover {
+  opacity: 0.8;
 }
 </style>

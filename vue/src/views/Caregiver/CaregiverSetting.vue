@@ -143,15 +143,17 @@ const fetchCaregiverData = async () => {
     }
 
     // 2. 先用 userID 查詢對應的 caregiverNO
-    const caregiverInfoRes = await axios.get(`/api/caregiver/findByUserId/${user.value.id}`);
-    
-    if (!caregiverInfoRes.data) {
+    // const caregiverInfoRes = await axios.get(`/caregiver/findByUserId/${user.value.id}`);
+    // if (!caregiverInfoRes.data) {
+    //   throw new Error('未找到看護資料');
+    // }
+    const res = await axios.get(`/caregiver/findByUserId/${user.value.id}`);
+    if (!res.data) {
       throw new Error('未找到看護資料');
     }
-
-    // 3. 獲取詳細資料
-    const caregiverNO = caregiverInfoRes.data.caregiverNO;
-    const res = await axios.get(`/api/caregiver/${caregiverNO}`);
+    // // 3. 獲取詳細資料
+    // const caregiverNO = caregiverInfoRes.data.caregiverNO;
+    // const res = await axios.get(`/caregiver/${caregiverNO}`);
 
     // 4. 調試輸出
     console.log('API Response:', res.data);
