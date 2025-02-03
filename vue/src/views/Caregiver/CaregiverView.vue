@@ -550,14 +550,14 @@ function hexToBase64(hexString) {
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
   
-  return [    
-    certifiPhoto.photo1 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo1)}` : null,
-    certifiPhoto.photo2 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo2)}` : null,
-    certifiPhoto.photo3 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo3)}` : null,
-    certifiPhoto.photo4 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo4)}` : null,
-    certifiPhoto.photo5 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo5)}` : null
-  ].filter(Boolean);
-};
+  return [
+    certifiPhoto.photo1,
+    certifiPhoto.photo2,
+    certifiPhoto.photo3,
+    certifiPhoto.photo4,
+    certifiPhoto.photo5
+  ].filter(Boolean); // 過濾掉 null 或 undefined 值
+}
 
 onMounted(() => {
   fetchCaregivers()

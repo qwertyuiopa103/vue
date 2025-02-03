@@ -103,21 +103,21 @@
               </v-card-title>
 
               <v-card-text>
-                <div class="d-flex flex-column gap-2">
-                  <div>
-                    <v-icon icon="mdi-currency-usd" class="mr-2"></v-icon>
-                    日薪：{{ caregiver.daylyRate }}元/日
-                  </div>
-                  <div>
-                    <v-icon icon="mdi-briefcase" class="mr-2"></v-icon>
-                    經驗：{{ caregiver.expYears }}年
-                  </div>
-                  <div>
-                    <v-icon icon="mdi-school" class="mr-2"></v-icon>
-                    學歷：{{ caregiver.education }}
-                  </div>
-                </div>
-              </v-card-text>
+  <div class="d-flex flex-column gap-2">
+    <div>
+      <v-icon icon="mdi-account" class="mr-2"></v-icon>
+      年齡：{{ caregiver.caregiverAge }} 歲
+    </div>
+    <div>
+      <v-icon icon="mdi-currency-usd" class="mr-2"></v-icon>
+      日薪：{{ caregiver.daylyRate }}元/日
+    </div>
+    <div>
+      <v-icon icon="mdi-map-marker" class="mr-2"></v-icon>
+      服務地區：{{ getServiceAreas(caregiver.serviceArea) }}
+    </div>
+  </div>
+</v-card-text>
 
               <v-card-actions class="justify-center pb-4">
                 <v-btn 
@@ -146,112 +146,116 @@
     </v-row>
 
     <!-- 詳細資料對話框 -->
-    <v-dialog
-      v-model="detailDialog"
-      max-width="600px"
-    >
-      <v-card v-if="selectedCaregiver">
-        <v-card-title class="text-h5">
-          護理人員詳細資料
-          <v-btn icon="mdi-close" variant="text" @click="detailDialog = false" class="float-right"></v-btn>
-        </v-card-title>
+    <v-dialog v-model="detailDialog" max-width="600px">
+  <v-card v-if="selectedCaregiver">
+    <v-card-title class="text-h5">
+      護理人員詳細資料
+      <v-btn icon="mdi-close" variant="text" @click="detailDialog = false" class="float-right"></v-btn>
+    </v-card-title>
 
-        <v-card-text>
+    <v-card-text>
+      <v-row>
+        <!-- 主要照片：獨占一行 -->
+        <v-col cols="12" class="text-center">
+          <v-avatar size="200">
+            <v-img
+              :src="selectedCaregiver.user?.userPhoto || '/api/placeholder/200/200'"
+              :alt="selectedCaregiver.user?.userName"
+              cover
+            ></v-img>
+          </v-avatar>
+        </v-col>
+
+        <!-- 基本資料：每行兩個 -->
+        <v-col cols="12">
           <v-row>
-            <!-- 主要照片 -->
-            <v-col cols="12" class="text-center">
-              <v-avatar size="200">
-                <v-img
-                  :src="selectedCaregiver.user?.userPhoto || '/api/placeholder/200/200'"
-                  :alt="selectedCaregiver.user?.userName"
-                  cover
-                ></v-img>
-              </v-avatar>
+            <v-col cols="6">
+              <strong>姓名:</strong> {{ selectedCaregiver.user?.userName }}
             </v-col>
-
-            <!-- 基本資料列表 -->
-            <v-col cols="12">
-              <v-list>
-                <v-list-item>
-                  <v-list-item-title>姓名</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.user?.userName }}</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>性別</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.caregiverGender }}</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>年齡</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.caregiverAge }} 歲</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>工作經驗</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.expYears }} 年</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>學歷</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.education }}</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>日薪</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.daylyRate }} 元/日</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>服務類型</v-list-item-title>
-                  <v-list-item-subtitle>{{ selectedCaregiver.services }}</v-list-item-subtitle>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-title>服務區域</v-list-item-title>
-                  <v-list-item-subtitle>{{ getServiceAreas(selectedCaregiver.serviceArea) }}</v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
+            <v-col cols="6">
+              <strong>性別:</strong> {{ selectedCaregiver.caregiverGender }}
             </v-col>
-
-            <!-- 證書照片 -->
-            <!-- 證書照片 -->
-<v-col cols="12" class="text-center">
-  <div class="text-subtitle-2 mb-2">證書照片</div>
-  <v-row justify="center">
-    <v-col v-for="i in 5" :key="i" cols="12" sm="6" md="4">
-      <template v-if="selectedCaregiver.certifiPhoto">
-        <v-img
-          v-if="selectedCaregiver.certifiPhoto[`photo${i}Base64`]"
-          :src="selectedCaregiver.certifiPhoto[`photo${i}Base64`]"
-          :alt="`證書照片 ${i}`"
-          max-width="300"
-          class="mx-auto mb-2"
-          contain
-          @error="handleImageError"
-        >
-          <template v-slot:placeholder>
-            <div class="text-caption">載入中...</div>
-          </template>
-        </v-img>
-        <div v-else class="text-caption">
-          證書照片 {{i}} 未上傳
-        </div>
-      </template>
-      <div v-else class="text-caption">
-        無證書照片資料
-      </div>
-    </v-col>
-  </v-row>
-</v-col>
+            <v-col cols="6">
+              <strong>年齡:</strong> {{ selectedCaregiver.caregiverAge }} 歲
+            </v-col>
+            <v-col cols="6">
+              <strong>工作經驗:</strong> {{ selectedCaregiver.expYears }} 年
+            </v-col>
+            <v-col cols="6">
+              <strong>學歷:</strong> {{ selectedCaregiver.education }}
+            </v-col>
+            <v-col cols="6">
+              <strong>日薪:</strong> {{ selectedCaregiver.daylyRate }} 元/日
+            </v-col>
+            <v-col cols="6">
+              <strong>服務類型:</strong> {{ selectedCaregiver.services }}
+            </v-col>
+            <v-col cols="6">
+              <strong>服務區域:</strong> {{ getServiceAreas(selectedCaregiver.serviceArea) }}
+            </v-col>
           </v-row>
-        </v-card-text>
+        </v-col>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            variant="elevated"
-            :to="`/reserve/calendar/${selectedCaregiver.caregiverNO}`"
+        <!-- 證書照片：獨占一行 -->
+        <v-col cols="12" class="text-center mt-4">
+          <div class="text-subtitle-2 mb-2">證書照片</div>
+          <v-carousel
+            v-if="selectedCaregiver.certifiPhoto"
+            hide-delimiter-background
+            show-arrows="hover"
+            height="300"
           >
-            立即預約
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+            <v-carousel-item
+              v-for="(photo, index) in getCertifiPhotos(selectedCaregiver.certifiPhoto)"
+              :key="index"
+              @click="showLargeImage(photo)"
+            >
+              <v-img
+                :src="photo"
+                :alt="`證書照片 ${index + 1}`"
+                height="300"
+                class="mx-auto"
+                cover
+                style="cursor: pointer"
+              />
+            </v-carousel-item>
+          </v-carousel>
+        </v-col>
+      </v-row>
+    </v-card-text>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn
+        color="primary"
+        variant="elevated"
+        :to="`/reserve/calendar/${selectedCaregiver.caregiverNO}`"
+      >
+        立即預約
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
+    <v-dialog v-model="largeImageDialog" max-width="90vw">
+  <v-card>
+    <v-img
+      :src="selectedImage"
+      max-height="90vh"
+      contain
+    >
+      <template v-slot:placeholder>
+        <v-row class="fill-height ma-0" align="center" justify="center">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        </v-row>
+      </template>
+    </v-img>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn icon="mdi-close" @click="largeImageDialog = false"></v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
   </v-container>
 </template>
 
@@ -372,17 +376,14 @@ const totalPages = computed(() => {
 const fetchCaregivers = async () => {
   try {
     const response = await axios.get('http://localhost:8080/api/caregiver/findAllCaregiver');
+    console.log('API Response:', response.data);
     caregivers.value = response.data;
   } catch (error) {
     console.error('Error fetching caregivers:', error);
   }
 };
 
-// 點擊圖片顯示詳細資料對話框
-const showDetails = (caregiver) => {
-  selectedCaregiver.value = caregiver;
-  detailDialog.value = true;
-};
+
 
 // 依據 serviceArea 物件轉換成可讀字串，使用 serviceAreas 陣列來對應
 const getServiceAreas = (serviceArea) => {
@@ -403,6 +404,44 @@ const getServiceAreas = (serviceArea) => {
 onMounted(() => {
   fetchCaregivers();
 });
+const getCertifiPhotos = (certifiPhoto) => {
+  if (!certifiPhoto) return [];
+  
+  // 直接使用後端返回的 Base64 格式照片
+  return [
+    certifiPhoto.photo1,
+    certifiPhoto.photo2,
+    certifiPhoto.photo3,
+    certifiPhoto.photo4,
+    certifiPhoto.photo5
+  ].filter(Boolean); // 過濾掉 null 或 undefined 值
+};
+const handleImageError = (error) => {
+  console.error('Image failed to load:', error);
+};
+
+// 在 showDetails 函數中添加調試信息
+const showDetails = (caregiver) => {
+  console.log('Selected caregiver:', caregiver);
+  console.log('Certifi photos:', caregiver.certifiPhoto);
+  if (caregiver.certifiPhoto) {
+    console.log('Photo 1:', caregiver.certifiPhoto.photo1?.substring(0, 50));
+    console.log('Photo 2:', caregiver.certifiPhoto.photo2?.substring(0, 50));
+    // ... 其他照片
+  }
+  selectedCaregiver.value = caregiver;
+  detailDialog.value = true;
+};
+
+// 在現有的 ref 聲明中添加
+const largeImageDialog = ref(false);
+const selectedImage = ref(null);
+
+// 添加顯示大圖的函數
+const showLargeImage = (photo) => {
+  selectedImage.value = photo;
+  largeImageDialog.value = true;
+};
 </script>
 
 <style scoped>
