@@ -28,7 +28,7 @@ const router = createRouter({
         {
           name: "order_Pay_admin",
           path: "order/pay",
-          component: () => import("@/views/Order/OrderPay.vue"),
+          component: () => import("@/views/Order/OrderPayAdmin.vue"),
         },
         {
           name: "order_Pay_return",
@@ -124,7 +124,11 @@ const router = createRouter({
           path: "UserOrderView",
           component: () => import("@/views/Order/UserOrderView.vue"),
         },
-
+        {
+          name: "order_Pay_Home",
+          path: "order/payAdmin",
+          component: () => import("@/views/Order/OrderPayAdmin.vue"),
+        },
         {
           name: "order_Pay_User",
           path: "order/pay",

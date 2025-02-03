@@ -77,7 +77,7 @@ async function processPayment() {
   try {
     isProcessing.value = true;
 
-    // 假設後端需要訂單ID、總金額和選擇的付款方式
+    
     const response = await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/payment/ecpay/create`,
       {
