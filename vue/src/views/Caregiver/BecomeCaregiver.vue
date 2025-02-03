@@ -1,7 +1,18 @@
 <template>
   <v-container>
     <v-card class="mx-auto" max-width="800">
-      <v-card-title>申請成為看護</v-card-title>
+      <v-card-title class="d-flex align-center justify-space-between">
+  <span>申請成為看護</span>
+  <v-btn
+    color="info"
+    variant="outlined"
+    size="small"
+    @click="quickFill"
+    class="ml-2"
+  >
+    一鍵輸入範例
+  </v-btn>
+</v-card-title>
       <v-card-text>
         <v-form ref="form" v-model="valid">
           <v-row>
@@ -140,6 +151,11 @@
 
 <script setup>
 
+
+
+// 在最上方 import 部分加入
+import { nextTick } from 'vue';
+const form = ref(null);
 import { ref, reactive, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
@@ -303,7 +319,7 @@ async function submitForm() {
     };
     const response = await axios.post('/caregiver/insert', formData);
     Swal.fire('成功', '申請已提交，請等待審核', 'success');
-    router.push('/profile');
+    router.push('/ucaregvier/setting');
   } catch (error) {
     Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error');
   } finally {
@@ -357,6 +373,50 @@ onMounted(async () => {
     console.error('無法獲取用戶資料:', error);
   }
 });
+
+const quickFill = async () => {
+  const result = await Swal.fire({
+    title: '確定要一鍵填入範例資料？',
+    text: '這將會覆蓋目前已填寫的資料',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '確定',
+    cancelButtonText: '取消'
+  });
+
+  if (result.isConfirmed) {
+    formData.caregiverGender = '男';
+    formData.caregiverAge = 28;
+    formData.expYears = 6;
+    formData.education = '大專院校含肄業';
+    formData.daylyRate = 3000;
+    formData.services = '中階看護人員';
+
+    // 重置所有區域為 false
+    Object.keys(selectedAreas).forEach(key => {
+      selectedAreas[key] = false;
+    });
+
+    // 只設置台北市和新北市為 true
+    selectedAreas['taipei_city'] = true;
+    selectedAreas['new_taipei_city'] = true;
+
+    // 更新表單驗證狀態
+    nextTick(() => {
+      if (form.value) {
+        form.value.validate();
+      }
+    });
+
+    Swal.fire({
+      title: '填入成功！',
+      text: '範例資料已填入表單',
+      icon: 'success',
+      timer: 1500,
+      showConfirmButton: false
+    });
+  }
+};
 </script>
 
 <style scoped>

@@ -44,17 +44,7 @@
         </v-toolbar>
       </template>
 
-      <!-- 自訂欄位：照片 -->
-      <template #item.userPhoto="{ item }">
-        <v-avatar size="40">
-          <img
-            v-if="item.user && item.user.userPhotoBase64"
-            :src="item.user.userPhotoBase64"
-            :alt="item.user?.userName"
-          />
-          <v-icon v-else>mdi-account</v-icon>
-        </v-avatar>
-      </template>
+      
 
       <!-- 狀態欄位 -->
       <template #item.CGstatus="{ item }">
@@ -207,14 +197,14 @@
               <v-col cols="12" md="6">
                 <h3>證照資料</h3>
                 <v-carousel v-if="selectedItem.certifiPhoto" height="300">
-                  <v-carousel-item
-                    v-for="(photo, i) in getCertifiPhotos(selectedItem.certifiPhoto)"
-                    :key="i"
-                    v-show="photo"
-                  >
-                    <img :src="photo" alt="Certificate" class="certificate-photo" />
-                  </v-carousel-item>
-                </v-carousel>
+  <v-carousel-item
+    v-for="(photo, i) in getCertifiPhotos(selectedItem.certifiPhoto)"
+    :key="i"
+    v-if="photo"
+  >
+    <img :src="photo" alt="Certificate" class="certificate-photo" />
+  </v-carousel-item>
+</v-carousel>
 
                 <h3 class="mt-4">服務區域</h3>
                 <v-chip-group>
@@ -322,7 +312,6 @@ const statusOptions = [
 const headers = [
   { title: '護工編號', key: 'caregiverNO', align: 'start' },
   { title: '會員編號', key: 'user.userID' },
-  { title: '照片', key: 'userPhoto' },
   { title: '姓名', key: 'user.userName' },
   { title: '性別', key: 'caregiverGender' },
   { title: '年齡', key: 'caregiverAge' },
@@ -546,16 +535,29 @@ const getServiceAreas = (serviceArea) => {
     .filter(Boolean)
 }
 
-const getCertifiPhotos = (certifiPhoto) => {
-  if (!certifiPhoto) return []
-  return [
-    certifiPhoto.photo1,
-    certifiPhoto.photo2,
-    certifiPhoto.photo3,
-    certifiPhoto.photo4,
-    certifiPhoto.photo5
-  ].filter(Boolean)
+// 將 HEX 轉為 Base64
+function hexToBase64(hexString) {
+  if (!hexString) return ''; // 如果 hexString 為 null 或空字符串，直接返回空字符串
+  
+  // 去除開頭的 '0x'
+  hexString = hexString.replace(/^0x/, '');
+  return btoa(hexString.match(/\w{2}/g).map(function(a) {
+    return String.fromCharCode(parseInt(a, 16));
+  }).join(""));
 }
+
+// 在 getCertifiPhotos 中應用轉換
+const getCertifiPhotos = (certifiPhoto) => {
+  if (!certifiPhoto) return [];
+  
+  return [    
+    certifiPhoto.photo1 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo1)}` : null,
+    certifiPhoto.photo2 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo2)}` : null,
+    certifiPhoto.photo3 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo3)}` : null,
+    certifiPhoto.photo4 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo4)}` : null,
+    certifiPhoto.photo5 ? `data:image/jpeg;base64,${hexToBase64(certifiPhoto.photo5)}` : null
+  ].filter(Boolean);
+};
 
 onMounted(() => {
   fetchCaregivers()
