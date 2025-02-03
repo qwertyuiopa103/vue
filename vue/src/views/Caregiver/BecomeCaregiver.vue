@@ -7,8 +7,8 @@
           <v-row>
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="formData.userID"
-                label="會員編號"
+                v-model="userName"
+                label="會員姓名"
                 readonly
               ></v-text-field>
             </v-col>
@@ -25,6 +25,12 @@
                 v-model.number="formData.caregiverAge"
                 label="年齡"
                 type="number"
+                :rules="[
+    v => !!v || '年齡為必填',
+    v => (v >= 18 && v <= 65) || '年齡必須在18-65歲之間'
+  ]"
+  min="18"
+  max="65"
                 required
               ></v-text-field>
             </v-col>
@@ -64,37 +70,65 @@
 
           <v-row>
             <v-col cols="12">
-              <v-file-input
-                v-model="certifiPhotos"
-                label="上傳證照 (最多5張)"
-                multiple
-                accept="image/*"
-                :rules="photoRules"
-                show-size
-                counter
-                max="5"
-              ></v-file-input>
+              <v-card-subtitle>服務區域</v-card-subtitle>
+              <div class="d-flex flex-wrap">
+                <div v-for="area in areaOptions" :key="area.value" style="width: 20%;">
+                  <v-checkbox
+                    v-model="selectedAreas[area.value]"
+                    :label="area.text"
+                    density="compact"
+                    hide-details
+                  ></v-checkbox>
+                </div>
+              </div>
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="12">
-              <v-card-subtitle>服務區域</v-card-subtitle>
-              <v-checkbox
-                v-for="area in areaOptions"
-                :key="area.value"
-                v-model="selectedAreas[area.value]"
-                :label="area.text"
-              ></v-checkbox>
+              <v-file-input
+                v-model="certifiPhotos"
+                :rules="photoRules"
+                accept="image/*"
+                multiple
+                show-size
+                counter
+                max="5"
+                @change="previewFiles"
+                label="上傳證照 (最多5張)"
+              ></v-file-input>
             </v-col>
           </v-row>
-          
+
+          <v-row v-if="imagePreviewUrls.length > 0">
+            <v-col cols="12">
+              <v-card-subtitle>已上傳的照片預覽</v-card-subtitle>
+              <v-row>
+                <v-col v-for="(url, index) in imagePreviewUrls" :key="index" cols="6" md="4">
+                  <v-img
+                    :src="url"
+                    aspect-ratio="1"
+                    cover
+                    class="bg-grey-lighten-2"
+                  >
+                    <template v-slot:placeholder>
+                      <v-row class="fill-height ma-0" align="center" justify="center">
+                        <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
+                      </v-row>
+                    </template>
+                  </v-img>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+
           <v-btn
             color="primary"
             @click="submitForm"
             :loading="loading"
             :disabled="!valid"
             block
+            class="mt-4"
           >
             提交申請
           </v-btn>
@@ -105,28 +139,71 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
 
-const router = useRouter()
-const valid = ref(false)
-const loading = ref(false)
+import { ref, reactive, onMounted } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
+import jwt_decode from 'jwt-decode';
+
+
+const router = useRouter();
+const valid = ref(false);
+const loading = ref(false);
+const userName = ref('');
+const imagePreviewUrls = ref([]);
 
 const formData = reactive({
-  userID: '',
+  caregiverNO: null,
   caregiverGender: '',
-  caregiverAge: null,
-  expYears: null,
+  caregiverAge: 0,
+  expYears: 0,
   education: '',
-  daylyRate: null,
+  daylyRate: 0,
   services: '',
-  status: 'PENDING'
-})
+  CGstatus: 'PENDING',
+  user: {
+    userID: '',
+    userName: '',
+    userPhotoBase64: ''
+  },
+  serviceArea: {
+    taipei_city: false,
+    new_taipei_city: false,
+    taoyuan_city: false,
+    taichung_city: false,
+    tainan_city: false,
+    kaohsiung_city: false,
+    hsinchu_city: false,
+    hsinchu_county: false,
+    keelung_city: false,
+    yilan_county: false,
+    miaoli_county: false,
+    changhua_county: false,
+    nantou_county: false,
+    yunlin_county: false,
+    chiayi_city: false,
+    chiayi_county: false,
+    pingtung_county: false,
+    taitung_county: false,
+    hualien_county: false,
+    penghu_county: false,
+    kinmen_county: false,
+    lienchiang_county: false
+  },
+  certifiPhoto: {
+    certifiPhotoID:0,
+    photo1: null,
+    photo2: null,
+    photo3: null,
+    photo4: null,
+    photo5: null
+  }
 
-const certifiPhotos = ref([])
-const selectedAreas = reactive({})
+});
+
+const certifiPhotos = ref([]);
+const selectedAreas = reactive({});
 
 const educationOptions = [
   '小學含以下',
@@ -134,68 +211,154 @@ const educationOptions = [
   '高中職含肄業',
   '大專院校含肄業',
   '碩博含肄業'
-]
+];
 
 const serviceOptions = [
   '初階看護人員',
   '中階看護人員',
   '高階看護人員',
   '專業護理師'
-]
+];
 
 const areaOptions = [
   { text: '台北市', value: 'taipei_city' },
   { text: '新北市', value: 'new_taipei_city' },
-  // ... other areas
-]
+  { text: '桃園市', value: 'taoyuan_city' },
+  { text: '台中市', value: 'taichung_city' },
+  { text: '台南市', value: 'tainan_city' },
+  { text: '高雄市', value: 'kaohsiung_city' },
+  { text: '新竹市', value: 'hsinchu_city' },
+  { text: '新竹縣', value: 'hsinchu_county' },
+  { text: '基隆市', value: 'keelung_city' },
+  { text: '宜蘭縣', value: 'yilan_county' },
+  { text: '苗栗縣', value: 'miaoli_county' },
+  { text: '彰化縣', value: 'changhua_county' },
+  { text: '南投縣', value: 'nantou_county' },
+  { text: '雲林縣', value: 'yunlin_county' },
+  { text: '嘉義市', value: 'chiayi_city' },
+  { text: '嘉義縣', value: 'chiayi_county' },
+  { text: '屏東縣', value: 'pingtung_county' },
+  { text: '台東縣', value: 'taitung_county' },
+  { text: '花蓮縣', value: 'hualien_county' },
+  { text: '澎湖縣', value: 'penghu_county' },
+  { text: '金門縣', value: 'kinmen_county' },
+  { text: '連江縣', value: 'lienchiang_county' }
+];
 
 const photoRules = [
   v => !v || v.length <= 5 || '最多只能上傳5張照片',
   v => !v || v.every(file => file.size < 5000000) || '每張照片需小於5MB'
-]
+];
+
+function previewFiles(files) {
+  imagePreviewUrls.value = [];
+  if (!files) return;
+
+  const fileArray = Array.isArray(files) ? files : [files].filter(Boolean);
+
+  fileArray.forEach(file => {
+    if (file instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        imagePreviewUrls.value.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
 
 async function submitForm() {
   try {
-    loading.value = true
+    loading.value = true;
 
-    // 上傳證照
-    const photoFormData = new FormData()
-    certifiPhotos.value.forEach(file => {
-      photoFormData.append('files', file)
-    })
-    const photoResponse = await axios.post('/api/certifiPhoto/upload', photoFormData)
-    
-    // 準備區域資料
-    const serviceArea = new ServiceAreaBean()
+    const token = localStorage.getItem('token');
+    const decoded = jwt_decode(token);
+
+    formData.user.userID = decoded.sub;
+    formData.user.userName = userName.value;
+
     Object.entries(selectedAreas).forEach(([key, value]) => {
-      if (value) serviceArea[key] = true
-    })
+      formData.serviceArea[key] = value;
+    });
+    // const areaResponse = await axios.post('/area/upload',formdata.selectedArea);
     
-    // 提交申請
-    const caregiverData = {
-      ...formData,
+    const photoFormData = new FormData();
+    certifiPhotos.value.forEach(file => {
+      photoFormData.append('files', file);
+    });
+
+    const photoResponse = await axios.post('/certifiPhoto/upload', photoFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    // formData.user.userPhotoBase64 = photoResponse.data.photoBase64;
+    formData.certifiPhoto = {
       certifiPhotoID: photoResponse.data.certifiPhotoID,
-      serviceArea
-    }
-    
-    await axios.post('/api/caregiver/apply', caregiverData)
-    
-    Swal.fire('成功', '申請已提交，請等待審核', 'success')
-    router.push('/profile')
+      photo1: photoResponse.data.photo1,
+      photo2: photoResponse.data.photo2,
+      photo3: photoResponse.data.photo3,
+      photo4: photoResponse.data.photo4,
+      photo5: photoResponse.data.photo5
+    };
+    const response = await axios.post('/caregiver/insert', formData);
+    Swal.fire('成功', '申請已提交，請等待審核', 'success');
+    router.push('/profile');
   } catch (error) {
-    console.error(error)
-    Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error')
+    Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
+const validateAge = (age) => {
+  // 假設護工年齡限制為 18-65 歲
+  return age >= 18 && age <= 65;
+};
+
+// 在 save 函數中加入驗證
+const save = async () => {
+  if (!validateAge(editedItem.value.caregiverAge)) {
+    Swal.fire('錯誤', '護工年齡必須在18-65歲之間', 'error');
+    return;
+  }
+
+  try {
+    const response = await axios.put(
+      'http://localhost:8080/api/caregiver/update',
+      editedItem.value,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+    await Swal.fire('成功', '更新成功', 'success');
+    close();
+    await fetchCaregivers();
+  } catch (error) {
+    console.error('更新失敗:', error);
+    Swal.fire('錯誤', error.response?.data || '更新失敗', 'error');
+  }
+};
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/user/profile')
-    formData.userID = response.data.id
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwt_decode(token);
+      const response = await axios.get('/user/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      userName.value = response.data.name;
+      userID.value = response.data.id;
+    }
   } catch (error) {
-    console.error('無法獲取用戶資料:', error)
+    console.error('無法獲取用戶資料:', error);
   }
-})
+});
 </script>
+
+<style scoped>
+/* 可加入你的樣式 */
+</style>
