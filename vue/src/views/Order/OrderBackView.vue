@@ -151,7 +151,7 @@ const goToPayment = (item) => {
   setTimeout(() => {
     localStorage.setItem('orderToPay', JSON.stringify(item)); // 儲存訂單資料
     
-    router.push({ name: 'order_Pay_Home' });  // 跳轉頁面
+    router.push({ name: 'order_Pay_Back' });  // 跳轉頁面
   }, 500); // 延遲 500 毫秒
 };
 

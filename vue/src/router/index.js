@@ -70,6 +70,11 @@ const router = createRouter({
           path: "caregiver/role/management",
           component: () => import("@/views/Caregiver/RoleManagement.vue"),
         },
+        {
+          name: "order_Pay_Back",
+          path: "order/payAdmin",
+          component: () => import("@/views/Order/OrderPayAdmin.vue"),
+        },
 
       ]
     },
@@ -119,11 +124,7 @@ const router = createRouter({
           path: "UserOrderView",
           component: () => import("@/views/Order/UserOrderView.vue"),
         },
-        {
-          name: "order_Pay_Home",
-          path: "order/payAdmin",
-          component: () => import("@/views/Order/OrderPayAdmin.vue"),
-        },
+
         {
           name: "order_Pay_User",
           path: "order/pay",
