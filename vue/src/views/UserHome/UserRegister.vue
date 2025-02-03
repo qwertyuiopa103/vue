@@ -18,8 +18,8 @@
 
                         <v-text-field v-model="password" :error="passwordMeta.touched && !!passwordError"
                             :error-messages="passwordMeta.touched ? passwordError : []" label="密碼"
-                            prepend-icon="mdi-lock" variant="outlined" class="custom-label"
-                            hint="密碼至少6個字，且須包含英文數字特殊字元!@#$%^&*" :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+                            prepend-icon="mdi-lock" variant="outlined" class="custom-label" hint="最少6個字包含英文、數字及特殊字元"
+                            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
                             :type="visible ? 'text' : 'password'" @click:append-inner="togglePasswordVisibility"
                             @blur="passwordBlur"></v-text-field>
 
@@ -58,8 +58,9 @@
                             @change="handleFileChange"></v-file-input>
 
                         <v-checkbox v-model="checkbox" :error-messages="checkboxError" label="同意接受服務及註冊條款。"
-                            type="checkbox" value="1" class=""></v-checkbox>
-                        <div class=" text-end mb-3">
+                            type="checkbox" value="1" readonly @click="openTermsDialog"></v-checkbox>
+
+                        <div class=" text-end my-3 ">
                             <v-btn prepend-icon="mdi-draw-pen" class="mr-5" @click="edit">
                                 一鍵輸入
                             </v-btn>
@@ -81,11 +82,45 @@
                 </v-row>
             </fieldset>
         </form>
+        <v-dialog v-model="termsDialog" max-width="800">
+            <v-card>
+                <v-card-title class="headline text-center mt-2">服務及註冊條款</v-card-title>
+                <v-card-text>
+                    <div ref="termsContent" style="max-height: 400px; overflow-y: auto; padding-right: 8px;"
+                        @scroll="handleScroll">
+                        <!-- 請將條款內容替換成你的內容 -->
+                        <p>
+                            本服務將依據隱私權政策收集、處理及使用您的個人資料，僅用於帳號管理、服務提供、系統優化及行銷通知。我們承諾在未經您明確同意的情況下，不會將您的個資提供、出售或共享給任何無關第三方，除非基於法律要求或主管機關依法請求。
+                        </p>
+                        <p>
+                            您所提供的個人資料，包括但不限於姓名、聯絡方式、地址、電子郵件、登入資訊及使用紀錄，將受到嚴格保護，僅限於必要範圍內進行處理。我們採取適當的安全措施，以防止您的資料遭到未授權的存取、洩漏、竄改或毀損。
+                        </p>
+                        <p>
+                            您有權查詢、更正、刪除您的個人資料，或請求停止使用。若您希望行使這些權利，可透過客服與我們聯繫，我們將於合理時間內處理您的請求。請注意，若您選擇刪除或停止使用個人資料，可能影響您繼續使用本服務的權利。
+                        </p>
+                        <p>
+                            此外，我們可能會使用 Cookie、追蹤技術及其他工具來提升您的使用體驗，並分析服務的使用情況，以優化功能並提供更個人化的內容。您可在瀏覽器設定中管理 Cookie
+                            偏好，但部分功能可能因此受到影響。
+                        </p>
+                        <p>
+                            使用本服務即表示您已詳閱並同意本條款，如有任何疑問，請參閱完整隱私權政策或聯絡客服。若本條款有變更，我們將於網站公告，請定期查閱最新資訊，以確保您的權益。
+                        </p>
+                    </div>
+                </v-card-text>
+                <v-card-actions class="mr-4">
+                    <v-spacer></v-spacer>
+                    <v-btn text color="primary" size="x-large" @click="acceptTerms"
+                        :disabled="!hasScrolledToBottom">同意</v-btn>
+                    <v-btn text color="error" size="x-large" @click="rejectTerms"
+                        :disabled="!hasScrolledToBottom">不同意</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 <script setup>
 import Swal from 'sweetalert2'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { useForm, useField } from 'vee-validate'
 import * as yup from 'yup'
 import locations from '@/data/locations.json'
@@ -104,15 +139,6 @@ const schema = yup.object({
         .string()
         .required('信箱為必填項目')
         .email('信箱格式不正確'),
-    // .test('unique-email', '信箱已被使用', async (value) => {
-    //     if (!value) return false;
-    //     try {
-    //         const response = await axios.get('/UserNoAuth/user/emailCheck', { params: { userEmail: value } });
-    //         return !response.data;
-    //     } catch (error) {
-    //         return false;
-    //     }
-    // }),
     password: yup
         .string()
         .required('密碼為必填項目')
@@ -129,15 +155,6 @@ const schema = yup.object({
         .string()
         .required('手機為必填項目')
         .matches(/^\d{10,11}$/, '手機號碼格式不正確'),
-    // .test('unique-phone', '手機已被使用', async (value) => {
-    //     if (!value) return false;
-    //     try {
-    //         const response = await axios.get('/UserNoAuth/user/phoneCheck', { params: { userPhone: value } });
-    //         return !response.data;
-    //     } catch (error) {
-    //         return false;
-    //     }
-    // }),
     city: yup.string().required('縣市為必填項目'),
     district: yup.string().required('鄉鎮區為必填項目'),
     address: yup.string().required('詳細地址為必填項目'),
@@ -334,14 +351,14 @@ function handleFileChange(event) {
 }
 const edit = () => {
     name.value = '周杰倫';
-    email.value = 'eeit190@gmail.com';
-    password.value = 'aaa123@';
-    confirmPassword.value = 'aaa123@';
+    email.value = 'eeit19@gmail.com';
+    password.value = 'aa12@';
+    confirmPassword.value = 'aa12@0';
     phone.value = '0912345678';
     city.value = '桃園市';
     district.value = '中壢區';
     address.value = '新生路二段421號';
-    checkbox.value = "1";
+
 };
 const google = () => {
     password.value = 'aaa123@';
@@ -364,6 +381,47 @@ onMounted(() => {
         isOAuth.value = true; // 標記是第三方登入流程
     }
 });
+
+
+// 定義控制條款視窗是否開啟
+const termsDialog = ref(false)
+const hasScrolledToBottom = ref(false);
+const termsContent = ref(null);
+// **監聽滾動事件，當滾動到底部時啟用按鈕**
+const handleScroll = () => {
+    if (!termsContent.value) return;
+    const { scrollTop, scrollHeight, clientHeight } = termsContent.value;
+
+    // 檢查是否滾動到底部
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+        hasScrolledToBottom.value = true;
+    }
+};
+
+// **開啟條款視窗**
+const openTermsDialog = () => {
+    termsDialog.value = true;
+    hasScrolledToBottom.value = false; // 重置滾動狀態
+
+    // 確保視窗打開後滾動監聽生效
+    nextTick(() => {
+        if (termsContent.value) {
+            termsContent.value.scrollTop = 0; // 讓條款內容回到頂部
+        }
+    });
+};
+
+// 當使用者於條款視窗按下「同意」時
+const acceptTerms = () => {
+    checkbox.value = "1"  // 設定同意條款
+    termsDialog.value = false
+}
+
+// 當使用者按下「不同意」時
+const rejectTerms = () => {
+    checkbox.value = false // 取消同意
+    termsDialog.value = false
+}
 </script>
 
 <style scoped>
@@ -398,5 +456,13 @@ legend {
     overflow: hidden;
     /* 確保超出範圍的內容被裁剪 */
     border: 5px solid #c5ccd6;
+}
+
+:deep .v-messages__message {
+    font-size: 16px;
+}
+
+:deep .v-text-field .v-input__details {
+    padding-inline: 0px !important
 }
 </style>

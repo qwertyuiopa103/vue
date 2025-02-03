@@ -87,7 +87,7 @@ import Swal from 'sweetalert2';
 
 // 設定全域 axios 請求攔截器
 axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('token'); // 或從 Vuex 取得
+  const token = sessionStorage.getItem('token'); // 或從 Vuex 取得
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -207,7 +207,7 @@ export default {
     },
 
     async save() {
-      console.log('ABC:' + localStorage.getItem('token'));
+      console.log('ABC:' + sessionStorage.getItem('token'));
 
       try {
         const response = await axios.put('http://localhost:8080/api/CaregiverAdmin/UpdateCaregiver',
@@ -215,7 +215,7 @@ export default {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${sessionStorage.getItem('token')}`
             }
           }
         );
@@ -267,7 +267,7 @@ export default {
     async initialize() {
       this.loading = true;
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await axios.get('http://localhost:8080/api/CaregiverAdmin/FindAllCaregiver', {
           headers: {
             Authorization: `Bearer ${token}`

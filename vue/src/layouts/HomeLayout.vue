@@ -67,7 +67,7 @@ watch(
             Swal.fire({
                 icon: 'error',
                 title: '錯誤',
-                text: '此帳號已被停用，無法登入',
+                text: '此帳號已被刪除，無法登入',
                 confirmButtonColor: '#FFC78E',
                 confirmButtonText: '確定',
             })

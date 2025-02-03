@@ -57,7 +57,7 @@ const isValidOrder = computed(() => {
 
 // 初始化訂單資料
 try {
-  const orderData = localStorage.getItem('orderToPay');
+  const orderData = sessionStorage.getItem('orderToPay');
   if (orderData) {
     order.value = JSON.parse(orderData);
   } else {

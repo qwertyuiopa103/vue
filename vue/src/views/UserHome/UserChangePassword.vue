@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import axios from "axios";
 import { useRoute, useRouter } from "vue-router";
 import Swal from 'sweetalert2';
@@ -64,7 +64,8 @@ const handleSubmit = async (e) => {
     // 驗證密碼與確認密碼
     validatePassword();
     validatePasswordCheck();
-
+    // 等待下一個 DOM 更新循環，確保反應式狀態更新完成
+    await nextTick();
     // 如果有錯誤訊息，阻止提交
     if (errorMessages.value.password || errorMessages.value.passwordCheck) {
         return;
@@ -98,8 +99,8 @@ const handleSubmit = async (e) => {
     }
 };
 const edit = () => {
-    password.value = 'aa123@';
-    passwordCheck.value = 'aa123@'
+    password.value = 'aaa1@';
+    passwordCheck.value = 'aaa123@'
 };
 </script>
 

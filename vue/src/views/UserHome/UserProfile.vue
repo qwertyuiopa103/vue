@@ -66,8 +66,8 @@ watch(
 const defaultImageUrl = '/user/img/user3.png'
 const imageSrc = ref(defaultImageUrl)
 
-// Token (假設在 localStorage)
-const token = localStorage.getItem('token')
+// Token (假設在 sessionStorage)
+const token = sessionStorage.getItem('token')
 
 // 1. 進入頁面後，向後端取得使用者資料（含頭像）
 async function fetchUserProfile() {

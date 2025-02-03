@@ -21,7 +21,7 @@
             <VAppBarNavIcon icon="mdi-menu" @click="drawer = !drawer" />
 
             <VAppBarTitle class="title">
-                <RouterLink to="/admin">後台管理</RouterLink>
+                <span><strong>後台管理</strong></span>
             </VAppBarTitle>
 
             <!-- 右側功能按鈕 -->

@@ -96,9 +96,9 @@ const headers = [
     { title: '啟用狀態', key: 'userActive', align: 'center', width: '120px ' },
     { title: '刪除', key: 'userDeleted', width: '40px' },
     { title: '角色', key: 'userRole', align: 'center', width: '80px' },
-    { title: '詳細資料', key: 'details', align: 'center', sortable: false, width: '60px' },
+    { title: '詳細資料', key: 'details', align: 'center', sortable: false, width: '70px' },
     // { title: '修改', key: 'edit', align: 'center', sortable: false },
-    { title: '刪除', key: 'delete', align: 'center', sortable: false, width: '60px' },
+    { title: '刪除', key: 'delete', align: 'center', sortable: false, width: '70px' },
 ]
 const roleMap = {
     ROLE_ADMIN: '管理員',

@@ -145,8 +145,8 @@ const fetchOrders = async () => {
 const goToPaymentPage = (order) => {
   console.log("抓取的訂單資料:", order);
   setTimeout(() => {
-    // 儲存訂單資料到 localStorage
-    localStorage.setItem('orderToPay', JSON.stringify(order));
+    // 儲存訂單資料到 sessionStorage
+    sessionStorage.setItem('orderToPay', JSON.stringify(order));
     // 跳轉到付款頁面
     router.push({ name: 'order_Pay_Home' });
   }, 500); // 延遲500毫秒

@@ -18,7 +18,7 @@ const handleLogin = async () => {
         if (response.status === 200) {
             const { id, token, role } = response.data;
             authStore.login(id, token, role);
-            router.push('/admin');
+            router.push('/admin/user');
         }
 
     } catch (error) {
@@ -29,6 +29,10 @@ const handleLogin = async () => {
             alert('伺服器錯誤，請稍後再試');
         }
     }
+};
+const edit = () => {
+    password.value = 'aaa123@';
+    account.value = 'monique4434@gmail.com'
 };
 </script>
 
@@ -51,8 +55,11 @@ const handleLogin = async () => {
                 variant="outlined" v-model="password"></v-text-field>
 
 
-            <v-btn class="mb-8" color="teal" size="large" variant="tonal" block @click="handleLogin">
+            <v-btn class="mb-3" color="teal" size="large" variant="tonal" block @click="handleLogin">
                 登入
+            </v-btn>
+            <v-btn class="mb-8" color="blue-grey" size="large" variant="tonal" block @click="edit">
+                一鍵輸入
             </v-btn>
 
             <!-- <v-card-text class="text-center">

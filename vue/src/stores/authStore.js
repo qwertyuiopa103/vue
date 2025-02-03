@@ -1,5 +1,6 @@
 // src/stores/authStore.js
 import { defineStore } from 'pinia';
+
 import axios from 'axios';
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -9,6 +10,7 @@ export const useAuthStore = defineStore('auth', {
         role: null,
         name: '',          // 新增
         avatar: '',        // 新增
+        profileLoaded: false,  // 新增，表示用戶資料是否已載入
     }),
     actions: {
         async login(userId, token, userRole) {
@@ -17,9 +19,9 @@ export const useAuthStore = defineStore('auth', {
             this.token = token;
             this.role = userRole;
             console.log('Setting token:', token, 'and userId:', userId);
-            localStorage.setItem('token', token);
-            localStorage.setItem('userId', userId);
-            localStorage.setItem('userRole', userRole);
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('userId', userId);
+            sessionStorage.setItem('userRole', userRole);
             await this.fetchUserProfile();
         },
         logout() {
@@ -29,19 +31,31 @@ export const useAuthStore = defineStore('auth', {
             this.role = null;
             this.name = '';
             this.avatar = '';
-            localStorage.removeItem('token');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userRole');
+            this.profileLoaded = false;
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('userRole');
+
         },
         initialize() {
-            const token = localStorage.getItem('token');
-            const userId = localStorage.getItem('userId');
-            const userRole = localStorage.getItem('userRole');
+            const token = sessionStorage.getItem('token');
+            const userId = sessionStorage.getItem('userId');
+            const userRole = sessionStorage.getItem('userRole');
+            const cachedName = sessionStorage.getItem('userName');
+            const cachedAvatar = sessionStorage.getItem('userAvatar');
             if (token && userId) {
                 this.isAuthenticated = true;
                 this.token = token;
                 this.id = userId;
                 this.role = userRole;
+                if (cachedName) {
+                    this.name = cachedName;
+                    this.profileLoaded = true; // 如果有快取資料，直接視為已載入
+                }
+                if (cachedAvatar) {
+                    this.avatar = cachedAvatar;
+                }
+                // 後台仍可呼叫 fetchUserProfile() 來更新資料
                 this.fetchUserProfile();
             }
         },
@@ -70,8 +84,9 @@ export const useAuthStore = defineStore('auth', {
                     // 更新用戶詳細資料
                     this.name = name || '用戶';
                     this.avatar = avatar || '/user/img/user3.png';
-
-                    // console.log('用戶資料加載成功:', this.name, this.avatar);
+                    this.profileLoaded = true;
+                    sessionStorage.setItem('userName', this.name);
+                    sessionStorage.setItem('userAvatar', this.avatar);
                 }
             } catch (error) {
                 console.error('抓取用戶資料失敗:', error);

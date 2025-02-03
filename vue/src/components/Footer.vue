@@ -4,26 +4,26 @@
             <div class="row g-0">
                 <div class="col-md-6 col-lg-3 mb-3 mb-md-0">
                     <div class="widget">
-                        <strong class="widget-heading">訂閱我們</strong>
+                        <strong class="widget-heading" style="font-size: larger;">訂閱我們</strong>
                         <hr>
                         <ul class="list-unstyled social-icons light mb-3">
-                            <li><a href="#"><span class="bi bi-facebook"></span></a></li>
-                            <li><a href="#"><span class="bi bi-twitter-x"></span></a></li>
-                            <li><a href="#"><span class="bi bi-linkedin"></span></a></li>
-                            <li><a href="#"><span class="bi bi-google"></span></a></li>
-                            <li><a href="#"><span class="bi bi-google-play"></span></a></li>
+                            <li class="mr-2"><a href="#"><span class="bi bi-facebook"></span></a></li>
+                            <li class="mr-2"><a href="#"><span class="bi bi-threads"></span></a></li>
+                            <li class="mr-2"><a href="#"><span class="bi bi-linkedin"></span></a></li>
+                            <li class="mr-2"><a href="#"><span class="bi bi-google"></span></a></li>
+                            <li class="mr-2"><a href="#"><span class="bi bi-youtube"></span></a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3  mb-3  mx-3">
                     <div class="widget">
-                        <strong class="widget-heading">聯絡我們</strong>
+                        <strong class="widget-heading" style="font-size: larger;">聯絡我們</strong>
                         <hr>
-                        <ul class="list-unstyled float-start me-5">
-                            <strong>連絡電話</strong>
-                            <li>00000000</li>
-                            <strong>詳細地址</strong>
-                            <li>320桃園市中壢區新生路二段421號</li>
+                        <ul class="list-unstyled float-start ">
+                            <strong style="font-size: 16px;">連絡電話</strong>
+                            <li style="font-size: 16px !important;">00000000</li>
+                            <strong style="font-size: 16px;">詳細地址</strong>
+                            <li style="font-size: 16px !important;">320 桃園市中壢區新生路二段421號</li>
                         </ul>
 
                     </div>
@@ -61,4 +61,8 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 </script>
-<style scoped></style>
+<style scoped>
+.social-icons li a:hover {
+    background-color: #FFD1A4 !important;
+}
+</style>

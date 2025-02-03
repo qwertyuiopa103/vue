@@ -34,7 +34,7 @@ import zhTW from '@vee-validate/i18n/dist/locale/zh_TW.json';
 import axios from './plugins/axios'; // 導入自定義配置的 Axios
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faXmark } from '@fortawesome/free-solid-svg-icons'; 
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 library.add(faXmark);
 import App from './App.vue'
 import router from './router'
@@ -77,7 +77,7 @@ app.component('ErrorMessage', ErrorMessage);
 app.use(createPinia())
 app.use(router)
 const authStore = useAuthStore();
-console.log('Before initialize:', localStorage.getItem('token'), localStorage.getItem('userId'));
+console.log('Before initialize:', sessionStorage.getItem('token'), sessionStorage.getItem('userId'));
 authStore.initialize();
 console.log('After initialize:', authStore.token, authStore.id);
 app.use(vuetify)

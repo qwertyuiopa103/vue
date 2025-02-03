@@ -30,8 +30,10 @@
                     <div class="mr-2" style="font-size:20px;">歡迎，<strong>{{ username }}</strong></div>
                     <li class="dropdown" :class="{ 'active': userDropdownActive }">
                         <a href="#" @click.prevent="toggleUserDropdown">
-                            <img :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="50" height="50"
-                                class="rounded-circle"><i class="bi bi-caret-down-fill"></i>
+                            <img v-if="profileLoaded" :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="50"
+                                height="50" class="rounded-circle">
+                            <div v-else style="width:50px; height:50px; border-radius:50%; background:white;"></div><i
+                                class="bi bi-caret-down-fill"></i>
                         </a>
                         <transition name="fade">
                             <ul v-if="userDropdownActive" class="text-small dropdown-active">
@@ -69,12 +71,12 @@ const mobileNavActive = ref(false);
 const dropdownActive = ref(false);
 const userDropdownActive = ref(false);
 const authStore = useAuthStore();
-// 初始化 Pinia store
+const profileLoaded = computed(() => authStore.profileLoaded);
 authStore.initialize();
-// 從 localStorage 獲取 id 和 token
-const userId = ref(localStorage.getItem('userId'));
-const token = ref(localStorage.getItem('token'));
-const role = ref(localStorage.getItem('userRole'));
+// 從 sessionStorage 獲取 id 和 token
+const userId = ref(sessionStorage.getItem('userId'));
+const token = ref(sessionStorage.getItem('token'));
+const role = ref(sessionStorage.getItem('userRole'));
 // 用戶頭像的 URL
 const username = computed(() => authStore.name);
 const avatarUrl = computed(() => authStore.avatar);
@@ -193,9 +195,9 @@ onMounted(async () => {
     }
 
     // 如果已經登入，嘗試從 `authStore` 或本地儲存初始化
-    const tokenFromStorage = localStorage.getItem('token');
-    const idFromStorage = localStorage.getItem('userId');
-    const roleFromStorage = localStorage.getItem('userRole');
+    const tokenFromStorage = sessionStorage.getItem('token');
+    const idFromStorage = sessionStorage.getItem('userId');
+    const roleFromStorage = sessionStorage.getItem('userRole');
 
     if (tokenFromStorage && idFromStorage && roleFromStorage) {
         // 初始化 Pinia 狀態

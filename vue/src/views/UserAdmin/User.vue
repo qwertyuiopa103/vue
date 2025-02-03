@@ -35,6 +35,7 @@ const user = ref({
         userActive: false,
         userPasswordChanged: null,
         userDeleted: false,
+        userDeletedTime: null,
     },
 })
 // 格式化使用者資料的 computed
@@ -50,6 +51,7 @@ const formattedUser = computed(() => ({
     userActive: user.value.userSecurity.userActive ? '啟用' : '禁用',
     userDeleted: user.value.userSecurity.userDeleted ? '已刪除' : '未刪除',
     userRole: roleMap[user.value.userRole] || '未知角色',
+    userDeletedTime: user.value.userSecurity.userDeletedTime || '尚未刪除',
 }));
 const roleMap = {
     ROLE_ADMIN: '管理員',
@@ -80,10 +82,12 @@ onMounted(async () => {
                 <div class="card-box text-center">
                     <img :src="formattedUser.userPhoto || '/user/img/user3.png'"
                         class="rounded-circle avatar-xl img-thumbnail mb-3 " alt="profile-image">
-                    <input class="mb-2 text-center" style="font-size: larger;font-weight: bold;"
-                        v-model="formattedUser.userID" readonly>
-                    <input class="text-muted text-center" style="font-size: large;font-weight: bold;"
-                        v-model="formattedUser.userName" readonly>
+                    <div class="user-info">
+                        <input class="mb-2 user-id" style="font-size: larger;font-weight: bold;"
+                            v-model="formattedUser.userID" readonly>
+                        <input class="text-muted user-name" style="font-size: large;font-weight: bold;"
+                            v-model="formattedUser.userName" readonly>
+                    </div>
                 </div> <!-- end card-box -->
             </div> <!-- end col-->
 
@@ -226,7 +230,7 @@ onMounted(async () => {
                                         <input class="form-control" readonly v-model="formattedUser.userUpdated">
                                     </div> <!-- end row -->
                                 </div>
-                                <div class="row mb-3">
+                                <div class="row mb-2">
                                     <div class="form-group">
                                         <label class="mb-1">密碼更改時間</label>
                                         <input class="form-control" readonly
@@ -234,7 +238,12 @@ onMounted(async () => {
                                     </div> <!-- end row -->
                                 </div>
 
-
+                                <div class="row ">
+                                    <div class="form-group">
+                                        <label class="mb-1">軟刪除時間</label>
+                                        <input class="form-control" readonly v-model="formattedUser.userDeletedTime">
+                                    </div> <!-- end row -->
+                                </div>
                             </form>
                         </div>
                         <!-- end settings content-->
@@ -248,6 +257,22 @@ onMounted(async () => {
 </template>
 
 <style lang="css" scoped>
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 讓內容置中 */
+}
+
+.user-id,
+.user-name {
+
+    text-align: center;
+    /* 讓文字內容置中 */
+    width: 100%;
+    /* 讓 input 撐滿 */
+}
+
 body {
     color: #6c757d;
     background-color: #f5f6f8;

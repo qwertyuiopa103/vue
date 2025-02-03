@@ -179,9 +179,19 @@ const router = createRouter({
 })
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
+
+  if (token && !authStore.name) {
+    try {
+      await authStore.fetchUserProfile();
+    } catch (error) {
+      // 載入失敗則登出並導向首頁
+      authStore.logout();
+      return next({ path: '/home' });
+    }
+  }
 
   if (to.path === '/adminlogin') {
     return next();

@@ -5,7 +5,8 @@
             <!-- <v-img class="mx-auto my-2" max-width="100" src="/Home/img/logo.png"></v-img> -->
             <div class="text-center  mt-3">
 
-                <h3 style="color: #FFAF60;"><strong>歡迎回來<i class="mdi mdi-emoticon-outline ml-2"></i></strong></h3>
+                <h3 style="color: #FFAF60;"><strong>歡迎回來<img src="/user/img/heart2.gif" width="30px"
+                            class=" ml-2 mb-1"></strong></h3>
             </div>
             <div class="text-subtitle-1 text-medium-emphasis">帳號</div>
 
@@ -29,38 +30,32 @@
                     {{ errorMessage }}
                 </v-card-text>
             </v-card>
-            <v-row class="">
-                <v-col>
-                    <v-btn prepend-icon="mdi-account" @click="nomal" color="secondary" size="large" variant="tonal"
-                        block rounded="xl">
-                        正常帳號
-                    </v-btn>
-                </v-col>
-                <v-col>
-                    <v-btn prepend-icon="mdi-autorenew" @click="change" color="secondary" size="large" variant="tonal"
-                        block rounded="xl">
-                        修改密碼
-                    </v-btn>
-                </v-col>
-            </v-row>
-            <v-row class="mb-2">
-                <v-col>
-                    <v-btn prepend-icon="mdi-account-hard-hat" @click="admin" color="secondary" size="large"
-                        variant="tonal" block rounded="xl">
-                        管理員
-                    </v-btn>
-                </v-col>
-                <v-col>
-                    <v-btn prepend-icon="mdi-account-heart" @click="care" color="secondary" size="large" variant="tonal"
-                        block rounded="xl">
-                        看護員
-                    </v-btn>
-                </v-col>
-            </v-row>
-            <v-btn class="mb-2" color="blue" size="large" variant="tonal" block rounded="xl"
+            <v-btn class="mb-4" color="blue" size="large" variant="tonal" block rounded="xl"
                 prepend-icon='mdi-login-variant' @click="handleLogin">
                 登入會員
             </v-btn>
+            <v-row>
+                <v-col>
+                    <v-btn @click="nomal" color="secondary" size="large" variant="tonal" rounded="xl"><i
+                            class="mdi mdi-account"></i></v-btn>
+                </v-col>
+                <v-col>
+                    <v-btn @click="change" color="secondary" size="large" variant="tonal" rounded="xl">
+                        <i class="mdi mdi-emoticon-happy-outline"></i>
+                    </v-btn>
+                </v-col>
+                <v-col>
+                    <v-btn @click="admin" color="secondary" size="large" variant="tonal" rounded="xl">
+                        <i class="mdi mdi-account-hard-hat"></i>
+                    </v-btn>
+                </v-col>
+                <v-col>
+                    <v-btn @click="care" color="secondary" size="large" variant="tonal" rounded="xl"><i
+                            class="mdi mdi-account-heart"></i>
+                    </v-btn>
+                </v-col>
+            </v-row>
+
             <v-card-text class="text-center">
                 <div class="container">
                     <div class="line"></div>
@@ -128,8 +123,8 @@ const nomal = () => {
 };
 
 const change = () => {
-    userAccount.value = 'eeit190@gmail.com';
-    userPassword.value = 'aa123@';
+    userAccount.value = 'ralph5869@gmail.com';
+    userPassword.value = 'aaa123@';
 };
 const admin = () => {
     userAccount.value = 'monique4434@gmail.com';

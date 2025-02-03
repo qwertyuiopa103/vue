@@ -8,7 +8,7 @@ axios.defaults.headers.common['Content-Type'] = 'application/json';
 // 添加請求攔截器
 axios.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -34,7 +34,7 @@ axios.interceptors.response.use(
                     icon: 'warning',
                     confirmButtonText: '確定',
                 }).then(() => {
-                    localStorage.removeItem('token'); // 清除 Token
+                    sessionStorage.removeItem('token'); // 清除 Token
                     router.push("/home"); // 導向登入頁
                 });
             }

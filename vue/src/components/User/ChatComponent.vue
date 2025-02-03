@@ -30,12 +30,12 @@
                             <!-- 常見問題區塊 -->
                             <div class="common-questions mt-2">
                                 <div>
-                                    <span><strong>常見問題</strong></span>
-
                                     <button v-for="(question, idx) in commonQuestions" :key="idx"
                                         class="btn btn-secondary btn-sm m-1" @click="clickCommonQuestion(question)">
                                         {{ question }}
                                     </button>
+                                    <button class="btn btn-warning btn-sm m-1" @click="edit" type="button">問題1</button>
+                                    <button class="btn btn-warning btn-sm m-1" @click="edit2" type="button">問題2</button>
                                 </div>
                             </div>
 
@@ -66,7 +66,7 @@
                                         思考中...請稍後
                                     </div>
                                     <!-- 訊息文字 -->
-                                    <div class="direct-chat-text" v-else>
+                                    <div class="direct-chat-text" v-else style="white-space: pre-line;">
                                         {{ msg.content }}
                                     </div>
                                     <!-- /.direct-chat-text -->
@@ -110,6 +110,15 @@ const isChatOpen = ref(false)
 // 使用者輸入
 const userInput = ref('')
 // 所有對話記錄
+const edit = () => {
+    userInput.value = '我家長輩生重病需要看護，地點在台北和新北';
+    sendMessage();
+};
+const edit2 = () => {
+    userInput.value = '我家長輩只需要基本照護，有推薦的嗎?';
+    sendMessage();
+};
+
 const messages = ref([
     {
         role: 'assistant',
@@ -133,7 +142,7 @@ watch(isAuthenticated, (newVal, oldVal) => {
 });
 
 const commonQuestions = ref([
-    "如何成為看護",
+    "成為看護",
     "付款方式",
     "服務地區"
 ]);
