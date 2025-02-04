@@ -10,14 +10,14 @@ const token = route.params.token; // 提取 URL 中的 token
 
 const isPasswordVisible = ref(false);
 const password = ref("");
-
+const passwordInputRef = ref(null); // 取得 input 的 ref
 const togglePasswordVisibility = () => {
     isPasswordVisible.value = !isPasswordVisible.value;
 };
 
 const isPasswordVisibleCheck = ref(false);
 const passwordCheck = ref("");
-
+const passwordCheckInputRef = ref(null); // 取得 input 的 ref
 const togglePasswordVisibilityCheck = () => {
     isPasswordVisibleCheck.value = !isPasswordVisibleCheck.value;
 };
@@ -58,15 +58,16 @@ const validatePasswordCheck = () => {
     }
 };
 
+
 const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 驗證密碼與確認密碼
+    // 直接呼叫驗證函式，使用最新的 v-model 值進行檢查
     validatePassword();
     validatePasswordCheck();
+
     // 等待下一個 DOM 更新循環，確保反應式狀態更新完成
     await nextTick();
-    // 如果有錯誤訊息，阻止提交
+
     if (errorMessages.value.password || errorMessages.value.passwordCheck) {
         return;
     }
@@ -97,10 +98,11 @@ const handleSubmit = async (e) => {
         Swal.fire('失敗', errorMessage, 'error');
         router.push('/home/userLogin');
     }
+
 };
 const edit = () => {
-    password.value = 'aaa1@';
-    passwordCheck.value = 'aaa123@'
+    password.value = 'aaa123@';
+    passwordCheck.value = 'aaa123@0'
 };
 </script>
 
@@ -116,8 +118,8 @@ const edit = () => {
                                 <span class="input-group-text" id="inputGroup-sizing-default"><i
                                         class="mdi mdi-lock-reset mr-2"></i>更改密碼</span>
                                 <input :type="isPasswordVisible ? 'text' : 'password'" class="form-control"
-                                    v-model="password" @blur="validatePassword"><span class="input-group-text"
-                                    @click="togglePasswordVisibility" style="cursor: pointer">
+                                    v-model="password" @blur="validatePassword" ref="passwordInputRef"><span
+                                    class="input-group-text" @click="togglePasswordVisibility" style="cursor: pointer">
                                     <i :class="isPasswordVisible ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"></i></span>
                             </div>
                             <p v-if="errorMessages.password" class="text-danger error-placeholder mb-2">{{
@@ -127,7 +129,7 @@ const edit = () => {
                                         class="mdi mdi-lock-check mr-2"></i>確認密碼
                                 </span>
                                 <input :type="isPasswordVisibleCheck ? 'text' : 'password'" class="form-control"
-                                    v-model="passwordCheck" @blur="validatePasswordCheck">
+                                    v-model="passwordCheck" @blur="validatePasswordCheck" ref="passwordCheckInputRef">
                                 <span class="input-group-text" @click="togglePasswordVisibilityCheck"
                                     style="cursor: pointer">
                                     <i :class="isPasswordVisibleCheck ? 'mdi mdi-eye' : 'mdi mdi-eye-off'"></i>

@@ -433,7 +433,7 @@ watch(selectedCounty, () => {
 
 .filter2 {
     display: flex;
-    margin-left: 730px;
+    margin-left: 670px;
     /* flex-direction: column; */
     width: 200px;
     /* 設置固定寬度以確保一致性 */
