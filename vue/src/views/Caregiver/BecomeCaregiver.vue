@@ -243,15 +243,24 @@ async function submitForm() {
     // formData.user.userPhotoBase64 = photoResponse.data.photoBase64;
     formData.certifiPhoto = {
       certifiPhotoID: photoResponse.data.certifiPhotoID,
-      photo1: photoResponse.data.photo1,
-      photo2: photoResponse.data.photo2,
-      photo3: photoResponse.data.photo3,
-      photo4: photoResponse.data.photo4,
-      photo5: photoResponse.data.photo5
+      photo1: removeDataUrlPrefix(photoResponse.data.photo1),
+      photo2: removeDataUrlPrefix(photoResponse.data.photo2),
+      photo3: removeDataUrlPrefix(photoResponse.data.photo3),
+      photo4: removeDataUrlPrefix(photoResponse.data.photo4),
+      photo5: removeDataUrlPrefix(photoResponse.data.photo5)
     };
     const response = await axios.post('/caregiver/insert', formData);
-    Swal.fire('成功', '申請已提交，請等待審核', 'success');
-    router.push('/ucaregvier/setting');
+    // 修改這裡的 Swal.fire 顯示
+    await Swal.fire({
+      title: '申請已送出',
+      text: '您的申請我們已收到，將在三個工作日內進行審查，將與您電子郵件通知，謝謝您的申請!',
+      icon: 'success',
+      confirmButtonText: '確定'
+    });
+
+    // 確定按鈕被點擊後導向首頁
+    router.push('/home');
+
   } catch (error) {
     Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error');
   } finally {
@@ -289,7 +298,7 @@ const save = async () => {
     Swal.fire('錯誤', error.response?.data || '更新失敗', 'error');
   }
 };
-
+const userID = ref(''); // <-- 加上這一行
 onMounted(async () => {
   try {
     const token = sessionStorage.getItem('token');
@@ -349,6 +358,9 @@ const quickFill = async () => {
     });
   }
 };
+function removeDataUrlPrefix(dataUrl) {
+  return dataUrl.replace(/^data:image\/\w+;base64,/, '');
+}
 </script>
 
 <style scoped>

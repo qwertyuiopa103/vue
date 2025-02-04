@@ -1,23 +1,16 @@
 <template>
   <div>
-    <v-data-table :items="caregivers" :headers="headers" :search="search" :loading="loading" class="elevation-1">
+    <v-data-table :items="caregivers" :headers="headers" :search="search" :loading="loading"
+      class="elevation-1 fixed-table">
       <!-- 頂部工具欄 -->
       <template #top>
         <v-toolbar flat>
-          <v-toolbar-title>護工資料管理</v-toolbar-title>
+          <v-toolbar-title><strong>看護資料</strong></v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
 
           <!-- 審核狀態下拉選單 -->
-          <v-select v-model="selectedStatus" :items="statusOptions" label="審核狀態" class="mx-4" style="max-width: 200px"
-            @update:model-value="filterByStatus"></v-select>
-
-          <!-- 加入看護按鈕 -->
-          <v-btn color="primary" @click="$router.push('/admin/caregiver/insert')" class="mx-4">
-            加入看護
-          </v-btn>
-
-          <v-spacer></v-spacer>
-
+          <v-select v-model="selectedStatus" :items="statusOptions" label="審核狀態" class="mx-4"
+            style="max-width: 200px ;margin-top: 25px !important;" @update:model-value="filterByStatus"></v-select>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="搜尋" single-line hide-details />
         </v-toolbar>
       </template>
@@ -37,18 +30,18 @@
       <!-- 操作欄位 -->
       <template #item.actions="{ item }">
         <!-- 詳細資料按鈕 -->
-        <v-btn small color="info" class="mr-2" @click="showDetails(item)">
-          詳細資料
+        <v-btn small color="teal" class="mr-2" @click="showDetails(item)">
+          <v-icon>mdi-magnify</v-icon>
         </v-btn>
 
         <!-- 編輯按鈕 -->
         <v-btn small color="warning" class="mr-2" @click="editItem(item)">
-          編輯
+          <v-icon>mdi-pencil</v-icon>
         </v-btn>
 
         <!-- 刪除按鈕 -->
         <v-btn small color="error" @click="deleteItem(item)">
-          刪除
+          <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </template>
 
@@ -306,20 +299,20 @@ const statusOptions = [
 ]
 
 const headers = [
-  { title: '護工編號', key: 'caregiverNO', align: 'start' },
-  { title: '會員編號', key: 'user.userID' },
-  { title: '姓名', key: 'user.userName' },
-  { title: '性別', key: 'caregiverGender' },
-  { title: '年齡', key: 'caregiverAge' },
-  { title: '工作年資', key: 'expYears' },
-  { title: '日薪', key: 'daylyRate' },
+  { title: '護工編號', key: 'caregiverNO', align: 'start', width: '60px ' },
+  { title: '會員編號', key: 'user.userID', width: '60px ' },
+  { title: '姓名', key: 'user.userName', width: '60px ' },
+  { title: '性別', key: 'caregiverGender', width: '60px ' },
+  { title: '年齡', key: 'caregiverAge', width: '60px ' },
+  { title: '工作年資', key: 'expYears', width: '60px ' },
+  { title: '日薪', key: 'daylyRate', width: '60px ' },
   {
     title: '狀態',
     key: 'CGstatus',
     align: 'center',
-    sortable: true
+    sortable: true, width: '60px '
   },
-  { title: '操作', key: 'actions' }
+  { title: '操作', key: 'actions', width: '170px ' }
 ]
 
 const getStatusColor = (status) => {
@@ -637,9 +630,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.v-data-table {
-  margin: 20px;
+.fixed-table ::v-deep table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  /* 確保表格寬度佔滿 */
 }
+
+
 
 .cursor-pointer {
   cursor: pointer;
@@ -649,8 +646,9 @@ onMounted(() => {
   justify-content: center;
 }
 
+
 .status-chip {
-  min-width: 90px !important;
+  min-width: 70px !important;
   font-weight: 500 !important;
   padding: 0 12px !important;
 }

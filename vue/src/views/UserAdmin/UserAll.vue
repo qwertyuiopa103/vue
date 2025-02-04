@@ -40,7 +40,8 @@
                     </template>
                     <!-- 自訂詳細資料按鈕 -->
                     <template #item.details="{ item }">
-                        <v-btn icon @click="goToDetails(item.userID)">
+                        <v-btn icon @click="goToDetails(item.userID)" color="teal
+">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                     </template>
@@ -54,7 +55,7 @@
 
                     <!-- 自訂刪除按鈕 -->
                     <template #item.delete="{ item }">
-                        <v-btn icon @click="deleteUser(item.userID)">
+                        <v-btn icon @click="deleteUser(item.userID)" color="red">
                             <v-icon>mdi-trash-can</v-icon>
                         </v-btn>
                     </template>

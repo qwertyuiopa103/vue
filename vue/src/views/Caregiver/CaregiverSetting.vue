@@ -9,13 +9,11 @@
               <v-img :src="user.avatar || '/user/img/user3.png'" alt="avatar"></v-img>
             </v-avatar>
             <h3 class="mb-1">{{ user.name }}</h3>
-            <v-chip :color="getStatusColor(caregiver.CGstatus)" text-color="white" class="mb-2">
-              {{ getStatusText(caregiver.CGstatus) }}
-            </v-chip>
+
 
             <!-- 新增編輯按鈕 -->
             <div class="mt-2">
-              <v-btn color="primary" @click="dialog = true" small>
+              <v-btn color="amber" @click="dialog = true" small>
                 編輯資料
               </v-btn>
             </div>
@@ -81,18 +79,21 @@
                   <v-row v-if="getCertifiPhotos(caregiver.certifiPhoto).length > 0">
                     <v-col v-for="(photo, index) in getCertifiPhotos(caregiver.certifiPhoto)" :key="index" cols="12"
                       sm="6" md="4">
-                      <v-img :src="photo" :alt="`證書照片 ${index + 1}`" class="ma-1" max-height="200" contain></v-img>
+                      <v-img :src="photo" :alt="`證書照片 ${index + 1}`" class="ma-1 cursor-pointer" max-height="200"
+                        contain @click="openPhotoDialog(photo)"></v-img>
                     </v-col>
                   </v-row>
                   <p v-else class="text-center text-grey">無證書資料</p>
                 </v-list-item-subtitle>
               </v-list-item>
+
             </v-list>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
+    <!-- 編輯對話框 -->
     <!-- 編輯對話框 -->
     <v-dialog v-model="dialog" max-width="600px">
       <v-card>
@@ -121,7 +122,18 @@
       </v-card>
     </v-dialog>
   </v-container>
-
+  <v-dialog v-model="photoDialog" max-width="90vw" max-height="90vh">
+    <v-card>
+      <v-card-title class="d-flex justify-end">
+        <v-btn icon @click="photoDialog = false">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-card-title>
+      <v-card-text class="text-center">
+        <v-img :src="selectedPhoto" max-height="80vh" contain></v-img>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -129,7 +141,13 @@ import { ref, onMounted } from 'vue';
 import axios from '@/plugins/axios';
 const dialog = ref(false);
 const editedItem = ref({});
+const photoDialog = ref(false);
+const selectedPhoto = ref('');
 
+const openPhotoDialog = (photo) => {
+  selectedPhoto.value = photo;
+  photoDialog.value = true;
+};
 // 新增 id 屬性，確保後續能正確根據用戶 id 取得看護資料
 const user = ref({
   id: null,
@@ -209,23 +227,7 @@ onMounted(async () => {
   }
 });
 
-const getStatusColor = (status) => {
-  const colors = {
-    PENDING: '#F44336',  // 紅色
-    APPROVED: '#4CAF50', // 綠色
-    REJECTED: '#9E9E9E'  // 灰色
-  };
-  return colors[status] || '#9E9E9E';
-};
 
-const getStatusText = (status) => {
-  const texts = {
-    PENDING: '待審核',
-    APPROVED: '已通過',
-    REJECTED: '已退回'
-  };
-  return texts[status] || '待審核';
-};
 
 const getServiceAreas = (serviceArea) => {
   if (!serviceArea) return [];
@@ -270,66 +272,43 @@ const hexToBase64 = (hexString) => {
     .join(''));
 };
 
+
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
 
-  return [
-    certifiPhoto.photo1Base64,
-    certifiPhoto.photo2Base64,
-    certifiPhoto.photo3Base64,
-    certifiPhoto.photo4Base64,
-    certifiPhoto.photo5Base64
-  ].filter(Boolean);
-};
-// // 新增 save 方法
-// const save = async () => {
-//   try {
-//     await axios.put(
-//       '/caregiver/update',
-//       editedItem.value,
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${sessionStorage.getItem('token')}`
-//         }
-//       }
-//     );
+  // 直接返回存在的照片數據
+  const photos = [];
+  if (certifiPhoto.photo1) photos.push(certifiPhoto.photo1);
+  if (certifiPhoto.photo2) photos.push(certifiPhoto.photo2);
+  if (certifiPhoto.photo3) photos.push(certifiPhoto.photo3);
+  if (certifiPhoto.photo4) photos.push(certifiPhoto.photo4);
+  if (certifiPhoto.photo5) photos.push(certifiPhoto.photo5);
 
-//     dialog.value = false;
-//     await fetchCaregiverData();
-//   } catch (error) {
-//     console.error('更新失敗:', error);
-//     // 使用您偏好的提示方式顯示錯誤
-//   }
-// };
+  // 過濾掉空值並返回
+  return photos.filter(photo => photo != null);
+};
+// 新增 save 方法
 const save = async () => {
   try {
-    // 構建完整的 CaregiverBean，但要特別處理照片資料
-    const updateData = {
-      caregiverNO: caregiver.value.caregiverNO,
-      caregiverGender: editedItem.value.caregiverGender,
-      caregiverAge: editedItem.value.caregiverAge,
-      expYears: editedItem.value.expYears,
-      services: editedItem.value.services,
-      education: editedItem.value.education,
-      daylyRate: editedItem.value.daylyRate,
-      CGstatus: caregiver.value.CGstatus,
-      user: caregiver.value.user,
-      serviceArea: caregiver.value.serviceArea,
-      // 處理照片資料
-      certifiPhoto: {
-        certifiPhotoID: caregiver.value.certifiPhoto?.certifiPhotoID,
-        photo1Base64: caregiver.value.certifiPhoto?.photo1Base64?.split('base64,')[1],
-        photo2Base64: caregiver.value.certifiPhoto?.photo2Base64?.split('base64,')[1],
-        photo3Base64: caregiver.value.certifiPhoto?.photo3Base64?.split('base64,')[1],
-        photo4Base64: caregiver.value.certifiPhoto?.photo4Base64?.split('base64,')[1],
-        photo5Base64: caregiver.value.certifiPhoto?.photo5Base64?.split('base64,')[1]
-      }
-    };
+    // 先驗證年齡
+    if (editedItem.value.caregiverAge < 18 || editedItem.value.caregiverAge > 65) {
+      await Swal.fire('錯誤', '護工年齡必須在18-65歲之間', 'error');
+      return;
+    }
 
     const response = await axios.put(
-      'http://localhost:8080/api/caregiver/update',
-      updateData,
+      '/caregiver/update',
+      {
+        caregiverNO: editedItem.value.caregiverNO,
+        caregiverGender: editedItem.value.caregiverGender,
+        caregiverAge: editedItem.value.caregiverAge,
+        expYears: editedItem.value.expYears,
+        services: editedItem.value.services,
+        education: editedItem.value.education,
+        daylyRate: editedItem.value.daylyRate,
+        CGstatus: editedItem.value.CGstatus,
+        serviceArea: editedItem.value.serviceArea,
+      },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -343,7 +322,7 @@ const save = async () => {
     await fetchCaregiverData();
   } catch (error) {
     console.error('更新失敗:', error);
-    Swal.fire('錯誤', '更新失敗: ' + (error.response?.data || error.message), 'error');
+    await Swal.fire('錯誤', error.response?.data || '更新失敗', 'error');
   }
 };
 </script>
@@ -358,5 +337,14 @@ const save = async () => {
 .v-list-item-subtitle {
   font-size: 1rem;
   color: #616161;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.cursor-pointer:hover {
+  transform: scale(1.05);
 }
 </style>
