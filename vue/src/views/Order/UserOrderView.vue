@@ -6,7 +6,6 @@
       <v-card-text>
         <v-tabs v-model="currentTab" color="primary" align-tabs="center">
           <v-tab value="all">全部</v-tab>
-          <v-tab value="unconfirmed">待確認</v-tab>
           <v-tab value="unpaid">未付款</v-tab>
           <v-tab value="paid">付款完成</v-tab>
           <v-tab value="failed">付款失敗</v-tab>
@@ -41,11 +40,17 @@
                           <v-icon>mdi-credit-card-outline</v-icon>
                         </v-btn>
                       </template>
-                      <template v-if="order.status !== '已取消'">
-                        <v-btn @click.stop="openCancelDialog(order)" class="circle-btn ml-2">
-                          <v-icon>mdi-cancel</v-icon>
+                      <template v-if="order.status == '付款完成'">
+                        <v-btn color="red" @click.stop="openCancelDialog(order)" class="circle-btn ml-2">
+                          <v-icon>mdi-skull-crossbones</v-icon>
                         </v-btn>
                       </template>
+                      <template v-if="order.status == '未付款'">
+                      <v-btn @click.stop="openCancelUnpaidDialog(order)" class="circle-btn ml-2">
+                      <v-icon>mdi-cancel</v-icon>
+                      </v-btn>
+                      </template>
+
                       <template v-if="order.status === '已取消'">
                       <v-btn @click="cancelOrder(order)" icon class="ml-2">
                         <v-icon>mdi-file-cancel</v-icon>
@@ -85,6 +90,12 @@
     ref="cancelOrderForm" 
     @order-cancelled="fetchOrders"
   />
+  <CancelForUnpay
+    ref="cancelforunpay" 
+    @order-cancelled="fetchOrders"
+  />
+  
+
 </template>
 
 <script setup>
@@ -95,14 +106,14 @@ import { useRoute, useRouter } from 'vue-router';
 import Timeline from '@/components/Order/Timeline.vue';
 import CancelOrderForm from '@/components/Order/CancelOrderForm.vue';  
 import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
-
+import CancelForUnpay from'@/components/Order/CancelForUnpay.vue'
 const route = useRoute();
 const userID = route.params.userID;
 const router = useRouter();
 const currentTab = ref('all');
 const orders = ref([]);
 const cancelOrderForm = ref(null);
-
+const cancelforunpay = ref(null);
 // 查看取消訂單詳情
 const cancelOrder = (item) => {
   selectedOrderId.value = item.orderId;
@@ -111,6 +122,12 @@ const cancelOrder = (item) => {
 const showCancelDetail = ref(false);
 const selectedOrderId = ref(null);
 
+const openCancelUnpaidDialog = (selectedOrder) => {
+  console.log("Opening cancel dialog for unpaid order:", selectedOrder);
+  if (cancelforunpay.value) {
+    cancelforunpay.value.openDialog(selectedOrder);
+  }
+};
 
 const filteredOrders = computed(() => {
   if (!orders.value) return [];

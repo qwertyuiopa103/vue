@@ -38,12 +38,6 @@
             outlined
           ></v-select>
 
-          <v-text-field
-            label="預計退款金額"
-            :model-value="`NT$ ${formatPrice(calculatedRefund)}`"
-            readonly
-          ></v-text-field>
-
           <v-alert
             v-if="!canCancel"
             type="error"
@@ -81,6 +75,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 
 <script setup>
 import { ref, computed } from 'vue';

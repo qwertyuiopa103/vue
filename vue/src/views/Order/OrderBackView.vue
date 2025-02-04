@@ -179,7 +179,7 @@ const quickAddOrder = () => {
   Object.assign(currentOrder, {
     orderId: null,
     user: {
-      userID: "USR0014"
+      userID: "USR0001"
     },
     caregiver: {
       caregiverNO: "2"
@@ -187,7 +187,7 @@ const quickAddOrder = () => {
     orderDate: currentDate,  // 當前日期
     startDate: currentDate,
     endDate: currentDate,
-    status: "付款完成",
+    status: "未付款",
     totalPrice: 114
   });
 
