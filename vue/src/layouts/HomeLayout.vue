@@ -13,6 +13,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import PureCounter from '@srexi/purecounterjs';
 import ChatComponent from '@/components/User/ChatComponent.vue';
+import ChatComponentDEMO from '@/components/User/ChatComponentDEMO.vue';
 
 const route = useRoute()
 const showBackToTop = ref(false)
@@ -86,7 +87,8 @@ watch(
             <RouterView></RouterView>
         </main>
         <Footer></Footer>
-        <ChatComponent></ChatComponent>
+        <!-- <ChatComponent></ChatComponent> -->
+        <ChatComponentDEMO></ChatComponentDEMO>
         <button class="back-to-top" @click="scrollToTop" :class="{ 'show': showBackToTop }" aria-label="返回頂部">
             <i class="fas fa-arrow-up"></i>
         </button>
