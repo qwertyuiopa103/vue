@@ -296,7 +296,6 @@ async function submitForm() {
     Object.entries(selectedAreas).forEach(([key, value]) => {
       formData.serviceArea[key] = value;
     });
-    // const areaResponse = await axios.post('/area/upload',formdata.selectedArea);
     
     const photoFormData = new FormData();
     certifiPhotos.value.forEach(file => {
@@ -308,7 +307,7 @@ async function submitForm() {
         'Content-Type': 'multipart/form-data'
       }
     });
-    // formData.user.userPhotoBase64 = photoResponse.data.photoBase64;
+
     formData.certifiPhoto = {
       certifiPhotoID: photoResponse.data.certifiPhotoID,
       photo1: photoResponse.data.photo1,
@@ -317,19 +316,26 @@ async function submitForm() {
       photo4: photoResponse.data.photo4,
       photo5: photoResponse.data.photo5
     };
+
     const response = await axios.post('/caregiver/insert', formData);
-    Swal.fire('成功', '申請已提交，請等待審核', 'success');
-    router.push('/ucaregvier/setting');
+    
+    // 修改這裡的 Swal.fire 顯示
+    await Swal.fire({
+      title: '申請已送出',
+      text: '您的申請我們已收到，將在三個工作日內進行審查，將與您電子郵件通知，謝謝您的申請!',
+      icon: 'success',
+      confirmButtonText: '確定'
+    });
+
+    // 確定按鈕被點擊後導向首頁
+    router.push('/home');
+
   } catch (error) {
     Swal.fire('錯誤', error.response?.data?.message || '提交失敗', 'error');
   } finally {
     loading.value = false;
   }
 }
-const validateAge = (age) => {
-  // 假設護工年齡限制為 18-65 歲
-  return age >= 18 && age <= 65;
-};
 
 // 在 save 函數中加入驗證
 const save = async () => {
@@ -357,6 +363,7 @@ const save = async () => {
     Swal.fire('錯誤', error.response?.data || '更新失敗', 'error');
   }
 };
+
 
 onMounted(async () => {
   try {
