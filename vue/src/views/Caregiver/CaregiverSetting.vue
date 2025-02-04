@@ -319,12 +319,55 @@ const getCertifiPhotos = (certifiPhoto) => {
     certifiPhoto.photo5Base64
   ].filter(Boolean);
 };
-// 新增 save 方法
+// // 新增 save 方法
+// const save = async () => {
+//   try {
+//     await axios.put(
+//       '/caregiver/update',
+//       editedItem.value,
+//       {
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${localStorage.getItem('token')}`
+//         }
+//       }
+//     );
+    
+//     dialog.value = false;
+//     await fetchCaregiverData();
+//   } catch (error) {
+//     console.error('更新失敗:', error);
+//     // 使用您偏好的提示方式顯示錯誤
+//   }
+// };
 const save = async () => {
   try {
-    await axios.put(
-      '/caregiver/update',
-      editedItem.value,
+    // 構建完整的 CaregiverBean，但要特別處理照片資料
+    const updateData = {
+      caregiverNO: caregiver.value.caregiverNO,
+      caregiverGender: editedItem.value.caregiverGender,
+      caregiverAge: editedItem.value.caregiverAge,
+      expYears: editedItem.value.expYears,
+      services: editedItem.value.services,
+      education: editedItem.value.education,
+      daylyRate: editedItem.value.daylyRate,
+      CGstatus: caregiver.value.CGstatus,
+      user: caregiver.value.user,
+      serviceArea: caregiver.value.serviceArea,
+      // 處理照片資料
+      certifiPhoto: {
+        certifiPhotoID: caregiver.value.certifiPhoto?.certifiPhotoID,
+        photo1Base64: caregiver.value.certifiPhoto?.photo1Base64?.split('base64,')[1],
+        photo2Base64: caregiver.value.certifiPhoto?.photo2Base64?.split('base64,')[1],
+        photo3Base64: caregiver.value.certifiPhoto?.photo3Base64?.split('base64,')[1],
+        photo4Base64: caregiver.value.certifiPhoto?.photo4Base64?.split('base64,')[1],
+        photo5Base64: caregiver.value.certifiPhoto?.photo5Base64?.split('base64,')[1]
+      }
+    };
+
+    const response = await axios.put(
+      'http://localhost:8080/api/caregiver/update',
+      updateData,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -332,12 +375,13 @@ const save = async () => {
         }
       }
     );
-    
+
+    await Swal.fire('成功', '更新成功', 'success');
     dialog.value = false;
     await fetchCaregiverData();
   } catch (error) {
     console.error('更新失敗:', error);
-    // 使用您偏好的提示方式顯示錯誤
+    Swal.fire('錯誤', '更新失敗: ' + (error.response?.data || error.message), 'error');
   }
 };
 </script>

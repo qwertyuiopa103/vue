@@ -594,35 +594,34 @@ const close = () => {
 // 修改保存方法
 const save = async () => {
   try {
-    // 創建 FormData
-    const formData = new FormData();
+    // 深拷貝編輯物件
+    const sendData = { ...editedItem.value };
     
-    // 將 caregiver 數據轉換為字串並添加到 FormData
-    const caregiverData = { ...editedItem.value };
-    formData.append('caregiverData', JSON.stringify(caregiverData));
-
-    // 添加新照片
-    if (newPhotos.value) {
-      for (const file of newPhotos.value) {
-        formData.append('photos', file);
+    // 如果有照片資料，需要清理 base64 字串前綴
+    if (sendData.certifiPhoto) {
+      const photos = sendData.certifiPhoto;
+      for (const key in photos) {
+        if (photos[key] && typeof photos[key] === 'string' && photos[key].includes('base64,')) {
+          // 只保留 base64 字串部分
+          photos[key] = photos[key].split('base64,')[1];
+        }
       }
     }
 
-    // 發送請求
     const response = await axios.put(
       'http://localhost:8080/api/caregiver/update',
-      formData,
+      sendData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       }
     );
 
     await Swal.fire('成功', '更新成功', 'success');
-    close();
-    await fetchCaregivers();
+    dialog.value = false;
+    // await fetchCaregiverData();
   } catch (error) {
     console.error('更新失敗:', error);
     Swal.fire('錯誤', '更新失敗: ' + (error.response?.data || error.message), 'error');
