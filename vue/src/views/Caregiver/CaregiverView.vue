@@ -369,7 +369,7 @@ const fetchCaregivers = async () => {
 
     const response = await axios.get(endpoint, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
         'Content-Type': 'application/json'
       }
     });
@@ -397,7 +397,7 @@ const showDetails = async (item) => {
     const response = await axios.get(
       `http://localhost:8080/api/caregiver/findCaregiver/${item.caregiverNO}`,
       {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
       }
     );
     selectedItem.value = response.data;
@@ -457,7 +457,7 @@ const save = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       }
     );
@@ -479,7 +479,7 @@ const approveApplication = async () => {
       {},
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         }
       }
@@ -506,7 +506,7 @@ const rejectApplication = async () => {
       `http://localhost:8080/api/caregiver/reject/${selectedItem.value.caregiverNO}`,
       { reason: rejectionReason.value },
       {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
       }
     )
     Swal.fire('成功', '已退件', 'success')
@@ -533,7 +533,7 @@ const deleteItem = async (item) => {
       await axios.delete(
         `http://localhost:8080/api/caregiver/${item.caregiverNO}`,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         }
       )
       Swal.fire('成功', '刪除成功', 'success')

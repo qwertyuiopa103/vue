@@ -72,7 +72,7 @@
             </v-col>
           </v-row>
 
-          <v-btn color="primary" @click="submitForm" :loading="loading" :disabled="!valid" block class="mt-4">
+          <v-btn color="amber" @click="submitForm" :loading="loading" :disabled="!valid" block class="mt-4">
             提交申請
           </v-btn>
         </v-form>
@@ -219,7 +219,7 @@ async function submitForm() {
   try {
     loading.value = true;
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const decoded = jwt_decode(token);
 
     formData.user.userID = decoded.sub;
@@ -277,7 +277,7 @@ const save = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       }
     );
@@ -292,7 +292,7 @@ const save = async () => {
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       const decoded = jwt_decode(token);
       const response = await axios.get('/user/profile', {
@@ -317,7 +317,7 @@ const quickFill = async () => {
   });
 
   if (result.isConfirmed) {
-    formData.caregiverGender = '男';
+    formData.caregiverGender = '女';
     formData.caregiverAge = 28;
     formData.expYears = 6;
     formData.education = '大專院校含肄業';

@@ -12,14 +12,10 @@
             <v-chip :color="getStatusColor(caregiver.CGstatus)" text-color="white" class="mb-2">
               {{ getStatusText(caregiver.CGstatus) }}
             </v-chip>
-            
+
             <!-- 新增編輯按鈕 -->
             <div class="mt-2">
-              <v-btn
-                color="primary"
-                @click="dialog = true"
-                small
-              >
+              <v-btn color="primary" @click="dialog = true" small>
                 編輯資料
               </v-btn>
             </div>
@@ -46,8 +42,8 @@
               <v-list-item>
                 <v-list-item-title>服務地區</v-list-item-title>
                 <v-list-item-subtitle>
-                  <v-chip v-for="area in getServiceAreas(caregiver.serviceArea)" :key="area"
-                    class="ma-1" color="primary" small>
+                  <v-chip v-for="area in getServiceAreas(caregiver.serviceArea)" :key="area" class="ma-1"
+                    color="primary" small>
                     {{ area }}
                   </v-chip>
                 </v-list-item-subtitle>
@@ -83,20 +79,9 @@
                 <v-list-item-title>證書照片</v-list-item-title>
                 <v-list-item-subtitle>
                   <v-row v-if="getCertifiPhotos(caregiver.certifiPhoto).length > 0">
-                    <v-col 
-                      v-for="(photo, index) in getCertifiPhotos(caregiver.certifiPhoto)" 
-                      :key="index" 
-                      cols="12" 
-                      sm="6" 
-                      md="4"
-                    >
-                      <v-img 
-                        :src="photo" 
-                        :alt="`證書照片 ${index + 1}`" 
-                        class="ma-1"
-                        max-height="200"
-                        contain
-                      ></v-img>
+                    <v-col v-for="(photo, index) in getCertifiPhotos(caregiver.certifiPhoto)" :key="index" cols="12"
+                      sm="6" md="4">
+                      <v-img :src="photo" :alt="`證書照片 ${index + 1}`" class="ma-1" max-height="200" contain></v-img>
                     </v-col>
                   </v-row>
                   <p v-else class="text-center text-grey">無證書資料</p>
@@ -108,8 +93,8 @@
       </v-col>
     </v-row>
 
-  <!-- 編輯對話框 -->
-  <v-dialog v-model="dialog" max-width="600px">
+    <!-- 編輯對話框 -->
+    <v-dialog v-model="dialog" max-width="600px">
       <v-card>
         <v-card-title>編輯資料</v-card-title>
         <v-card-text>
@@ -117,36 +102,13 @@
             <v-row>
               <!-- 基本資料編輯表單 -->
               <v-col cols="12">
-                <v-select
-                  v-model="editedItem.caregiverGender"
-                  :items="['男', '女']"
-                  label="性別"
-                />
-                <v-text-field
-                  v-model.number="editedItem.caregiverAge"
-                  label="年齡"
-                  type="number"
-                />
-                <v-text-field
-                  v-model.number="editedItem.expYears"
-                  label="工作年資"
-                  type="number"
-                />
-                <v-text-field
-                  v-model.number="editedItem.daylyRate"
-                  label="日薪"
-                  type="number"
-                />
-                <v-select
-                  v-model="editedItem.services"
-                  :items="['初階看護人員', '中階看護人員', '高階看護人員', '專業護理師']"
-                  label="服務等級"
-                />
-                <v-select
-                  v-model="editedItem.education"
-                  :items="['小學含以下', '中學含肄業', '高中職含肄業', '大專院校含肄業', '碩博含肄業']"
-                  label="學歷"
-                />
+                <v-select v-model="editedItem.caregiverGender" :items="['男', '女']" label="性別" />
+                <v-text-field v-model.number="editedItem.caregiverAge" label="年齡" type="number" />
+                <v-text-field v-model.number="editedItem.expYears" label="工作年資" type="number" />
+                <v-text-field v-model.number="editedItem.daylyRate" label="日薪" type="number" />
+                <v-select v-model="editedItem.services" :items="['初階看護人員', '中階看護人員', '高階看護人員', '專業護理師']" label="服務等級" />
+                <v-select v-model="editedItem.education" :items="['小學含以下', '中學含肄業', '高中職含肄業', '大專院校含肄業', '碩博含肄業']"
+                  label="學歷" />
               </v-col>
             </v-row>
           </v-container>
@@ -159,7 +121,7 @@
       </v-card>
     </v-dialog>
   </v-container>
-  
+
 </template>
 
 <script setup>
@@ -233,18 +195,18 @@ const fetchCaregiverData = async () => {
     console.error('獲取看護資料失敗:', err);
   }
 };
-    
+
 onMounted(async () => {
-try {
-  await fetchUserProfile();
-  if (user.value.id) {
-    await fetchCaregiverData();
-  } else {
-    console.error('無法獲取用戶ID');
+  try {
+    await fetchUserProfile();
+    if (user.value.id) {
+      await fetchCaregiverData();
+    } else {
+      console.error('無法獲取用戶ID');
+    }
+  } catch (error) {
+    console.error('初始化失敗:', error);
   }
-} catch (error) {
-  console.error('初始化失敗:', error);
-}
 });
 
 const getStatusColor = (status) => {
@@ -259,7 +221,7 @@ const getStatusColor = (status) => {
 const getStatusText = (status) => {
   const texts = {
     PENDING: '待審核',
-    APPROVED: '已通過', 
+    APPROVED: '已通過',
     REJECTED: '已退回'
   };
   return texts[status] || '待審核';
@@ -267,7 +229,7 @@ const getStatusText = (status) => {
 
 const getServiceAreas = (serviceArea) => {
   if (!serviceArea) return [];
-  
+
   const areas = {
     taipei_city: '台北市',
     new_taipei_city: '新北市',
@@ -301,7 +263,7 @@ const getServiceAreas = (serviceArea) => {
 
 const hexToBase64 = (hexString) => {
   if (!hexString) return '';
-  
+
   hexString = hexString.replace(/^0x/, '');
   return btoa(hexString.match(/\w{2}/g)
     .map(char => String.fromCharCode(parseInt(char, 16)))
@@ -310,7 +272,7 @@ const hexToBase64 = (hexString) => {
 
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
-  
+
   return [
     certifiPhoto.photo1Base64,
     certifiPhoto.photo2Base64,
@@ -328,11 +290,11 @@ const getCertifiPhotos = (certifiPhoto) => {
 //       {
 //         headers: {
 //           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${localStorage.getItem('token')}`
+//           Authorization: `Bearer ${sessionStorage.getItem('token')}`
 //         }
 //       }
 //     );
-    
+
 //     dialog.value = false;
 //     await fetchCaregiverData();
 //   } catch (error) {
@@ -371,7 +333,7 @@ const save = async () => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`
         }
       }
     );
