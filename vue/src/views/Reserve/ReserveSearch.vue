@@ -43,7 +43,9 @@
         <template v-slot:[`item.status`]="{ item }">
           <select class="short-input" v-model="item.status">
             <option value="待確認">待確認</option>
-            <option value="已取消">已取消</option>
+            <option value="已接受">已接受</option>
+            <option value="已拒絕">已拒絕</option>
+            <option value="已過期">已過期</option>
           </select>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
@@ -130,7 +132,7 @@ export default {
         totalPrice: '',
         status: '待確認',
       },
-      statusOptions: ['待確認', '已取消'],
+      statusOptions: ['待確認', '已接受','已拒絕','已過期'],
     };
   },
   created() {

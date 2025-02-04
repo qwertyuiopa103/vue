@@ -13,8 +13,8 @@
                   ? '#FFA3A3'      // 淺紅色（已取消）
                   : event.color === 'yellow'
                     ? '#FFF4A3'      // 淺黃色（即將開始的預約）
-                    : event.color === 'gray'
-                      ? '#D3D3D3'      // 淺灰色（已完成）
+                    : event.color === 'green'
+                      ? '#A3FFB3'      // 淺灰色（已完成）
                       : '#FFFFFF'      // 其他顏色為白色
           }">
             <span>{{ event.title }}</span> <!-- 顯示 caregiverName 或 userName -->
@@ -37,8 +37,8 @@
           <p>訂單總金額: {{ reserve.totalPrice }}</p>
           <!-- 每一筆預約有獨立的新增與刪除按鈕 -->
           <div class="reserve-actions">
-            <v-btn color="primary" @click="createOrder(reserve)">新增</v-btn>
-            <v-btn color="red" @click="deleteReserve(reserve, index)">刪除</v-btn>
+            <i class="fas fa-check-circle" @click="createOrder(reserve)" style="font-size: 36px; color: green; cursor: pointer;"></i>
+            <i class="fas fa-times-circle" @click="deleteReserve(reserve, index)" style="font-size: 36px; color: red; cursor: pointer;"></i>
           </div>
         </div>
       </div>
@@ -66,12 +66,16 @@ export default {
     reserves: [],        // 預約資料 (右邊的預約列表)
     orders: [],
     caregiverNO: 1,      // 預設的看護師 ID (caregiverNO)
+    userId:'',
   }),
 
-  mounted() {
+  async mounted() {
     const adapter = useDate();
     const startOfMonth = adapter.startOfDay(adapter.startOfMonth(new Date()));
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
+    // await this.fetchLoginUser();
+    console.log(this.caregiverNO);
+    
     this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth }); // 用於行事曆的訂單資料
     this.fetchReservesByCaregiver(this.caregiverNO); // 用於右邊預約列表的資料
   },
@@ -92,10 +96,10 @@ export default {
     },
 
     // 從 API 獲取預約資料（右邊的預約列表）
-    async fetchReservesByCaregiver(caregiverId) {
+    async fetchReservesByCaregiver(caregiverNO) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/reserve/search/${caregiverId}`
+          `http://localhost:8080/reserve/search/caregiver/${caregiverNO}`
         );
 
         // 篩選出 status 為 "待確認" 的預約
@@ -103,6 +107,28 @@ export default {
 
         // 將篩選後的預約資料映射到行事曆事件
         this.mapReservesToEvents(this.reserves);
+      } catch (error) {
+        console.error("Error fetching reserves:", error);
+      }
+    },
+    async fetchLoginUser() {
+      try {
+        const userResponse = await axios.get(
+          `http://localhost:8080/api/user/profile`
+        );
+        this.userId = userResponse.data.id;
+        
+        const userBean = {
+            userID: userResponse.data.id,
+            userName: userResponse.data.name,
+            userEmail: userResponse.data.email,
+          }
+        const caregiverResponse = await axios.get(
+          `http://localhost:8080/api/caregiver/FindByUserID/${this.userId}`
+        )
+        this.caregiverNO = caregiverResponse.data.caregiverNO;
+        console.log("caregiverGet:"+this.caregiverNO);
+        
       } catch (error) {
         console.error("Error fetching reserves:", error);
       }
@@ -126,7 +152,7 @@ export default {
           }
           // 如果已經完成，設為灰色
           else if (endDate < new Date()) {
-            eventColor = 'gray';
+            eventColor = 'green';
           }
           // 如果結束日期大於今天，表示進行中，保持藍色
           else if (endDate >= new Date()) {
@@ -200,7 +226,7 @@ export default {
 
         if (response.status === 201) {
           // 2. 刪除對應的預約
-          const deleteResponse = await axios.delete(`http://localhost:8080/reserve/${reserveId}`);
+          const deleteResponse = await axios.put(`http://localhost:8080/reserve/order/${reserveId}`);
 
           if (deleteResponse.status === 200) {
             // 3. 更新 reserves
@@ -268,45 +294,35 @@ export default {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            // 使用 fetch 呼叫後端刪除 API
-            fetch(`http://localhost:8080/reserve/${reserve.reserveId}`, {
-              method: 'DELETE',
-            })
-              .then((response) => {
-                if (!response.ok) {
-                  // 如果 response 不是成功狀態，嘗試解析錯誤訊息
-                  return response.json().then((data) => {
-                    throw new Error(data.message || '刪除失敗');
-                  });
-                }
-                // 成功處理
-                Swal.fire('成功!', '資料已刪除', 'success');
-                // 從 reserves 陣列中移除該預約
-                this.reserves.splice(index, 1);
-                // 從 events 陣列中移除對應的事件
-                const startDate = new Date(reserve.startDate).toISOString();
-                const endDate = new Date(reserve.endDate).toISOString();
+            // 使用 axios 發送 DELETE 請求
+            const response = await axios.put(`http://localhost:8080/reserve/${reserve.reserveId}`);
 
-                this.events = this.events.filter(event => {
-                  const eventStart = new Date(event.start).toISOString();
-                  const eventEnd = new Date(event.end).toISOString();
-                  const isYellowEvent = event.color === "yellow";
-                  return !(
-                    isYellowEvent && // 確保只刪除黃色事件
-                    event.title === reserve.userBean.userName &&
-                    eventStart >= startDate &&
-                    eventEnd <= endDate
-                  );
-                });
+            // 成功處理
+            if(response.status===200){
+              Swal.fire("成功!", "資料已刪除", "success");
+            }
 
-              })
-              .catch((error) => {
-                // 捕捉錯誤並顯示錯誤訊息
-                Swal.fire('錯誤!', error.message, 'error');
-              });
+            // 從 reserves 陣列中移除該預約
+            this.reserves.splice(index, 1);
+
+            // 從 events 陣列中移除對應的事件
+            const startDate = new Date(reserve.startDate).toISOString();
+            const endDate = new Date(reserve.endDate).toISOString();
+
+            this.events = this.events.filter((event) => {
+              const eventStart = new Date(event.start).toISOString();
+              const eventEnd = new Date(event.end).toISOString();
+              const isYellowEvent = event.color === "yellow";
+              return !(
+                isYellowEvent && // 確保只刪除黃色事件
+                event.title === reserve.userBean.userName &&
+                eventStart >= startDate &&
+                eventEnd <= endDate
+              );
+            });
           } catch (error) {
-            // 如果有其他錯誤，顯示錯誤訊息
-            Swal.fire('錯誤!', error.message, 'error');
+            // 捕捉錯誤並顯示錯誤訊息
+            Swal.fire("錯誤!", error.response?.data?.message || "刪除失敗", "error");
           }
         }
       });
@@ -320,20 +336,23 @@ export default {
 .main-container {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: 90%;
   height: 100%;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中 */
+  margin: 0 auto;          /* 確保容器本身在其父容器中居中 */
 }
 
 /* 行事曆區塊 */
 .calendar-container {
-  width: 50%;
+  width: 60%;
   /* 左側佔 50% */
   padding-right: 10px;
 }
 
 /* 預約列表區塊 */
 .reserve-list {
-  width: 50%;
+  width: 40%;
   /* 右側佔 50% */
   padding-left: 10px;
   border-left: 1px solid #ddd;
@@ -350,7 +369,10 @@ export default {
   font-weight: bold;
   color: #333;
 }
-
+.reserve-items {
+  height: 800px;
+  overflow-y: auto;
+}
 /* 預約列表中的每一項 */
 .reserve-item {
   background-color: #f9f9f9;
@@ -381,5 +403,28 @@ export default {
   font-size: 14px;
   font-weight: bold;
   text-align: center;
+}
+
+/* 設定滾動條背景顏色 */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+/* 滾動條背景 */
+::-webkit-scrollbar-track {
+  background: #ffffff;  /* 白色背景 */
+  border-radius: 10px;
+}
+
+/* 滾動條滑塊 */
+::-webkit-scrollbar-thumb {
+  background: #f0f0f0;  /* 非常淺的灰色滑塊 */
+  border-radius: 10px;
+}
+
+/* 滾動條滑塊在滑動時顯示的顏色 */
+::-webkit-scrollbar-thumb:hover {
+  background: #e0e0e0;  /* 略深的灰色 */
 }
 </style>

@@ -131,7 +131,7 @@
                   </div>
                   <div class="text-center mt-3">
                     <router-link 
-                      :to="`/reserve/calendar/${caregiver.caregiverNO}`" 
+                      :to="`/home/reserve/calendar/${caregiver.caregiverNO}`" 
                       class="btn btn-primary btn-sm">
                       立即預約
                     </router-link>

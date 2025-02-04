@@ -33,11 +33,10 @@
 
           <v-form v-model="formValid">
             <!-- 開始日期 -->
-            <v-text-field v-model="startDate" label="開始日期" type="date" :rules="[requiredRule]" required></v-text-field>
+            <v-text-field v-model="startDate" label="開始日期" type="date" required></v-text-field>
 
             <!-- 結束日期 -->
-            <v-text-field v-model="endDate" label="結束日期" type="date" :rules="[requiredRule, endDateRule]"
-              required></v-text-field>
+            <v-text-field v-model="endDate" label="結束日期" type="date" required></v-text-field>
 
             <!-- 預約按鈕 -->
             <v-btn :disabled="!formValid" @click="submitReservation" color="primary" block>
@@ -74,23 +73,23 @@ export default {
     focus: [new Date()],
     events: [],
     selectedCaregiver: {
+      caregiverNO:'',
       user: {
         userName: '',
         userPhoto: '',
+        userPhone:'',
+        userEmail:'',
       },
       caregiverPhone: '',
       eduExperience: '',
+      hourlyRate:'',
     }, // 初始化selectedCaregiver的属性
-    caregiverNO: 2,
+    caregiverNO: this.$route.params.caregiverNO,
     startDate: null,
     endDate: null,
     formValid: false,
     minDate: new Date().toISOString().substr(0, 10),
     maxDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-    requiredRule: [(v) => !!v || '此欄位為必填'],  // requiredRule 設定
-    endDateRule: [
-      (v) => v >= this.startDate || '結束日期必須大於等於開始日期',
-    ],
   };
 },
 
@@ -98,10 +97,41 @@ export default {
     const adapter = useDate();
     const startOfMonth = adapter.startOfDay(adapter.startOfMonth(new Date()));
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
+    this.fetchCaregiver();
     this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth });
   },
 
   methods: {
+    async fetchCaregiver() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/caregiver/FindCaregiver?caregiverNO=${this.caregiverNO}`
+        );
+        const caregiver = response.data;
+        
+        // **動態設置 selectedCaregiver**
+        this.selectedCaregiver.caregiverNO = caregiver.caregiverNO || null;
+        this.selectedCaregiver.user.userName = caregiver.user.userName || "未指定";
+        this.selectedCaregiver.user.userPhoto = caregiver.user.userPhoto || "https://via.placeholder.com/150";
+        this.selectedCaregiver.user.userPhone = caregiver.user.userPhone || "未知";
+        this.selectedCaregiver.user.userEmail = caregiver.user.userEmail || "未知";
+        this.selectedCaregiver.eduExperience = caregiver.eduExperience || "未提供";
+        this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
+      } catch (error) {
+        console.error("Error fetching caregiver info:", error);
+        this.selectedCaregiver = {
+          caregiverNO: null,
+          user: {
+            userName: "未指定",
+            userPhoto: "https://via.placeholder.com/150",
+            userPhone: "未知",
+            userEmail: "未知",
+          },
+          eduExperience: "未提供",
+          hourlyRate: "未提供",
+        };
+      }
+    },
     async fetchOrdersByCaregiver({ start, end }) {
       try {
         const response = await axios.get(
@@ -110,18 +140,22 @@ export default {
         const orders = response.data;
         
         // 動態設置看護師資料（直接賦值完整物件）
-        if (orders.length > 0 && orders[0].caregiver) {
-          const caregiver = orders[0].caregiver;
-          this.selectedCaregiver.user.userName = caregiver.user.userName || "未指定";
-          this.selectedCaregiver.user.userPhoto = caregiver.user.userPhoto || "https://via.placeholder.com/150";
-          this.selectedCaregiver.user.userPhone = caregiver.user.userPhone || "未知";
-          this.selectedCaregiver.eduExperience = caregiver.eduExperience || "未提供";
-        } else {
-          this.selectedCaregiver.user.userName = "未指定";
-          this.selectedCaregiver.user.userPhoto = "https://via.placeholder.com/150";
-          this.selectedCaregiver.caregiverPhone = "未知";
-          this.selectedCaregiver.eduExperience = "未提供";
-        }
+        // if (orders.length > 0 && orders[0].caregiver) {
+        //   const caregiver = orders[0].caregiver;
+        //   this.selectedCaregiver.caregiverNO = this.caregiverNO;
+        //   this.selectedCaregiver.user.userName = caregiver.user.userName || "未指定";
+        //   this.selectedCaregiver.user.userPhoto = caregiver.user.userPhoto || "https://via.placeholder.com/150";
+        //   this.selectedCaregiver.user.userPhone = caregiver.user.userPhone || "未知";
+        //   this.selectedCaregiver.eduExperience = caregiver.eduExperience || "未提供";
+        //   this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
+        // } else {
+        //   this.selectedCaregiver.caregiverNO = null;
+        //   this.selectedCaregiver.user.userName = "未指定";
+        //   this.selectedCaregiver.user.userPhoto = "https://via.placeholder.com/150";
+        //   this.selectedCaregiver.caregiverPhone = "未知";
+        //   this.selectedCaregiver.eduExperience = "未提供";
+        //   this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
+        // }
         
         this.mapOrdersToEvents(orders);
       } catch (error) {
@@ -151,25 +185,87 @@ export default {
     },
 
     async submitReservation() {
-      if (this.startDate && this.endDate) {
+      const today = new Date();
+      
+      if (!this.startDate) {
+        Swal.fire({
+          icon: "warning",
+          title: "欄位未填",
+          text: "請選擇開始日期",
+        });
+        return;
+      }
+      if (!this.endDate) {
+        Swal.fire({
+          icon: "warning",
+          title: "欄位未填",
+          text: "請選擇結束日期",
+        });
+        return;
+      }
+      if (this.endDate < this.startDate) {
+        Swal.fire({
+          icon: "error",
+          title: "日期錯誤",
+          text: "結束日期必須大於等於開始日期",
+        });
+        return;
+      }
+      if (new Date(this.startDate) <= today) {
+        Swal.fire({
+          icon: "error",
+          title: "日期錯誤",
+          text: "只能預約當日以後的服務",
+        });
+        return;
+      }
         try {
+          const userResponse = await axios.get("http://localhost:8080/api/user/profile");
+    
+          const data = userResponse.data;
+      
+          const userBean = {
+            userID: data.id,
+            userName: data.name,
+            userEmail: data.email,
+          };
+          const start = new Date(this.startDate);
+          const end = new Date(this.endDate);
+
+          // 計算天數（包含開始與結束當天）
+          const timeDiff = end.getTime() - start.getTime();
+          const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+          const dailyPrice = this.selectedCaregiver.hourlyRate || 0;
+          const totalPrice = days * dailyPrice;
+
           const reservation = {
-            ...this.selectedCaregiver, // 包含看護師完整資料
+            userBean:userBean,
+            caregiverBean: this.selectedCaregiver, // 包含看護師完整資料
             startDate: this.startDate,
             endDate: this.endDate,
+            orderDate:today,
+            totalPrice:totalPrice,
+            status:"待確認",
           };
-
+          
           const response = await axios.post(
-            `http://localhost:8080/orders/reserve`,
+            `http://localhost:8080/reserve`,
             reservation
           );
-          console.log("預約成功", response.data);
-          alert("預約成功！");
+          Swal.fire({
+            icon: "success",
+            title: "預約成功",
+            text: "您的預約已提交！",
+            confirmButtonText: "確定"
+          });
         } catch (error) {
-          console.error("預約錯誤:", error);
-          alert("預約失敗！");
+          Swal.fire({
+            icon: "error",
+            title: "預約失敗",
+            text: "發生錯誤，請稍後再試！",
+            confirmButtonText: "確定"
+          });
         }
-      }
     },
   },
 };
@@ -180,6 +276,11 @@ export default {
 /* 佈局和樣式調整 */
 .v-container {
   padding: 16px;
+  width: 90%;
+  height: 100%;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中 */
+  margin: 0 auto;          /* 確保容器本身在其父容器中居中 */
 }
 
 .v-sheet {
