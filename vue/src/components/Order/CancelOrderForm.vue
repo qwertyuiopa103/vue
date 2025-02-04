@@ -7,50 +7,19 @@
 
       <v-card-text>
         <v-form>
-          <v-text-field
-            label="訂單編號"
-            :model-value="formData.orderId"
-            readonly
-          ></v-text-field>
-          <v-text-field
-            label="看護名字"
-            :model-value="formData.caregiverName"
-            readonly
-          ></v-text-field>
-          <v-text-field
-            label="開始時間"
-            :model-value="formData.startDate"
-            readonly
-          ></v-text-field>
-          <v-text-field
-            label="總金額"
-            :model-value="`NT$ ${formatPrice(formData.totalPrice)}`"
-            readonly
-          ></v-text-field>
+          <v-text-field label="訂單編號" :model-value="formData.orderId" readonly></v-text-field>
+          <v-text-field label="看護名字" :model-value="formData.caregiverName" readonly></v-text-field>
+          <v-text-field label="開始時間" :model-value="formData.startDate" readonly></v-text-field>
+          <v-text-field label="總金額" :model-value="`NT$ ${formatPrice(formData.totalPrice)}`" readonly></v-text-field>
 
-          <v-select
-            label="取消原因"
-            v-model="formData.cancelReason"
-            :items="cancelReasonOptions"
-            item-title="text"
-            item-value="value"
-            :rules="[v => !!v || '請選擇取消原因']"
-            outlined
-          ></v-select>
+          <v-select label="取消原因" v-model="formData.cancelReason" :items="cancelReasonOptions" item-title="text"
+            item-value="value" :rules="[v => !!v || '請選擇取消原因']" outlined></v-select>
 
-          <v-alert
-            v-if="!canCancel"
-            type="error"
-            class="mt-3"
-          >
+          <v-alert v-if="!canCancel" type="error" class="mt-3">
             服務已開始，無法取消訂單
           </v-alert>
 
-          <v-alert
-            v-else
-            type="info"
-            class="mt-3"
-          >
+          <v-alert v-else type="info" class="mt-3">
             {{ refundMessage }}
           </v-alert>
         </v-form>
@@ -58,17 +27,10 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          color="primary"
-          @click="handleCancel"
-          :disabled="!canCancel || !formData.cancelReason"
-        >
+        <v-btn color="primary" @click="handleCancel" :disabled="!canCancel || !formData.cancelReason">
           確認取消
         </v-btn>
-        <v-btn
-          color="error"
-          @click="closeDialog"
-        >
+        <v-btn color="error" @click="closeDialog">
           關閉
         </v-btn>
       </v-card-actions>
@@ -100,35 +62,35 @@ const cancelReasonOptions = [
 
 const canCancel = computed(() => {
   if (!formData.value.startDate) return false;
-  
+
   const startDate = new Date(formData.value.startDate);
   const today = new Date();
-  
+
   startDate.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   return startDate > today;
 });
 
 const calculatedRefund = computed(() => {
   if (!canCancel.value || !formData.value.totalPrice) return 0;
-  
+
   const startDate = new Date(formData.value.startDate);
   const today = new Date();
   const diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
-  
+
   return diffDays >= 7 ? formData.value.totalPrice : Math.floor(formData.value.totalPrice * 0.5);
 });
 
 const refundMessage = computed(() => {
   if (!formData.value.startDate) return '';
-  
+
   const startDate = new Date(formData.value.startDate);
   const today = new Date();
   const diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
-  
-  return diffDays >= 7 
-    ? '距離服務開始7天以上，可全額退款' 
+
+  return diffDays >= 7
+    ? '距離服務開始7天以上，可全額退款'
     : '距離服務開始少於7天，退還50%金額';
 });
 
@@ -142,7 +104,7 @@ const formatDate = (date) => {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day}`;
 };
 
@@ -177,21 +139,21 @@ const handleCancel = async () => {
 
     const cancelResponse = await axios.post('http://localhost:8080/api/ordercancel/createcancel', cancelData);
     console.log('Cancellation response:', cancelResponse);
-    
+
     if (cancelResponse.status === 201) {
       // 2. 取得新建立的 cancellation_id
       const cancellationId = cancelResponse.data.cancellationId;
-      
+
       // 3. 更新訂單狀態
       const updateOrderData = {
         status: '已取消',
-        cancellationId: cancellationId 
+        cancellationId: cancellationId
       };
 
       console.log('Updating order with data:', updateOrderData);
 
       const orderResponse = await axios.put(
-        `http://localhost:8080/api/ordersAdmin/updateStatus/${formData.value.orderId}`,
+        `http://localhost:8080/orders/updateStatus/${formData.value.orderId}`,
         updateOrderData
       );
 
@@ -208,14 +170,14 @@ const handleCancel = async () => {
   } catch (error) {
     console.error('取消訂單失敗:', error);
     console.error('錯誤詳情:', error.response?.data);
-    
+
     let errorMessage = '取消訂單失敗';
     if (error.response?.data) {
-      errorMessage = typeof error.response.data === 'string' 
-        ? error.response.data 
+      errorMessage = typeof error.response.data === 'string'
+        ? error.response.data
         : error.response.data.message || errorMessage;
     }
-    
+
     Swal.fire({
       title: '錯誤',
       text: errorMessage,

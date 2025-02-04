@@ -299,7 +299,7 @@ const statusOptions = [
 ]
 
 const headers = [
-  { title: '護工編號', key: 'caregiverNO', align: 'start', width: '60px ' },
+  { title: '看護編號', key: 'caregiverNO', align: 'start', width: '60px ' },
   { title: '會員編號', key: 'user.userID', width: '60px ' },
   { title: '姓名', key: 'user.userName', width: '60px ' },
   { title: '性別', key: 'caregiverGender', width: '60px ' },

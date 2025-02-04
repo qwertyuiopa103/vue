@@ -36,22 +36,22 @@
                   <v-col cols="1.5" class="d-flex justify-start">
                     <!-- 按鍵-->
                     <template v-if="order.status === '未付款'">
-                        <v-btn color="green" @click.stop="goToPaymentPage(order)" class="circle-btn">
-                          <v-icon>mdi-credit-card-outline</v-icon>
-                        </v-btn>
-                      </template>
-                      <template v-if="order.status == '付款完成'">
-                        <v-btn color="red" @click.stop="openCancelDialog(order)" class="circle-btn ml-2">
-                          <v-icon>mdi-skull-crossbones</v-icon>
-                        </v-btn>
-                      </template>
-                      <template v-if="order.status == '未付款'">
-                      <v-btn @click.stop="openCancelUnpaidDialog(order)" class="circle-btn ml-2">
-                      <v-icon>mdi-cancel</v-icon>
+                      <v-btn color="green" @click.stop="goToPaymentPage(order)" class="circle-btn">
+                        <v-icon>mdi-credit-card-outline</v-icon>
                       </v-btn>
-                      </template>
+                    </template>
+                    <template v-if="order.status == '付款完成'">
+                      <v-btn color="red" @click.stop="openCancelDialog(order)" class="circle-btn ml-2">
+                        <v-icon>mdi-skull-crossbones</v-icon>
+                      </v-btn>
+                    </template>
+                    <template v-if="order.status == '未付款'">
+                      <v-btn @click.stop="openCancelUnpaidDialog(order)" class="circle-btn ml-2">
+                        <v-icon>mdi-cancel</v-icon>
+                      </v-btn>
+                    </template>
 
-                      <template v-if="order.status === '已取消'">
+                    <template v-if="order.status === '已取消'">
                       <v-btn @click="cancelOrder(order)" icon class="ml-2">
                         <v-icon>mdi-file-cancel</v-icon>
                       </v-btn>
@@ -79,22 +79,12 @@
     </v-card>
     <!-- 當 showCancelDetail 為 true 時顯示 CancelOrderDetail 組件，並將選中的訂單 ID 傳遞給它 -->
 
-    <CancelOrderDetail 
-    v-if="showCancelDetail" 
-   :orderId="selectedOrderId"
-    @close="showCancelDetail = false"
-      />
+    <CancelOrderDetail v-if="showCancelDetail" :orderId="selectedOrderId" @close="showCancelDetail = false" />
   </v-container>
 
-  <CancelOrderForm 
-    ref="cancelOrderForm" 
-    @order-cancelled="fetchOrders"
-  />
-  <CancelForUnpay
-    ref="cancelforunpay" 
-    @order-cancelled="fetchOrders"
-  />
-  
+  <CancelOrderForm ref="cancelOrderForm" @order-cancelled="fetchOrders" />
+  <CancelForUnpay ref="cancelforunpay" @order-cancelled="fetchOrders" />
+
 
 </template>
 
@@ -104,9 +94,9 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useRoute, useRouter } from 'vue-router';
 import Timeline from '@/components/Order/Timeline.vue';
-import CancelOrderForm from '@/components/Order/CancelOrderForm.vue';  
+import CancelOrderForm from '@/components/Order/CancelOrderForm.vue';
 import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
-import CancelForUnpay from'@/components/Order/CancelForUnpay.vue'
+import CancelForUnpay from '@/components/Order/CancelForUnpay.vue'
 const route = useRoute();
 const userID = route.params.userID;
 const router = useRouter();
@@ -150,19 +140,19 @@ const getTimelineSteps = (order) => {
   const currentTime = new Date();
 
   const steps = [
-    { 
-      title: '訂單建立', 
-      date: order.orderDate, 
+    {
+      title: '訂單建立',
+      date: order.orderDate,
       completed: new Date(order.orderDate) <= currentTime
     },
-    { 
-      title: '服務開始', 
-      date: order.startDate, 
+    {
+      title: '服務開始',
+      date: order.startDate,
       completed: new Date(order.startDate) <= currentTime
     },
-    { 
-      title: '服務結束', 
-      date: order.endDate, 
+    {
+      title: '服務結束',
+      date: order.endDate,
       completed: new Date(order.endDate) <= currentTime
     },
   ];
@@ -188,7 +178,7 @@ const openCancelDialog = (selectedOrder) => {
   console.log("Opening cancel dialog for order:", selectedOrder);
   if (cancelOrderForm.value) {
     cancelOrderForm.value.openDialog(selectedOrder);
-      }
+  }
 };
 const fetchOrders = async () => {
   try {
@@ -207,17 +197,11 @@ const fetchOrders = async () => {
 
 const goToPaymentPage = (order) => {
   setTimeout(() => {
-<<<<<<< HEAD
     // 儲存訂單資料到 sessionStorage
     sessionStorage.setItem('orderToPay', JSON.stringify(order));
     // 跳轉到付款頁面
     router.push({ name: 'order_Pay_Home' });
   }, 500); // 延遲500毫秒
-=======
-    localStorage.setItem('orderToPay', JSON.stringify(order));
-    router.push({ name: 'order_Pay_User' });
-  }, 500);
->>>>>>> vue/Order2
 };
 
 
@@ -228,7 +212,7 @@ onMounted(fetchOrders);
 .circle-btn {
   width: 40px;
   /* 設定寬度 */
-  height: 40px;
+  height: 40px !important;
   /* 設定高度 */
   border-radius: 50% !important;
   /* 強制設置為圓形 */

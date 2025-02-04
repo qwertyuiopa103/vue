@@ -10,18 +10,18 @@
           <v-col cols="12" class="pb-0">
             <strong>取消日期：</strong>{{ formatDate(cancelDetail.cancelDate) }}
           </v-col>
-          <v-col cols="12" class="pb-0">
+          <!-- <v-col cols="12" class="pb-0">
             <strong>取消原因：</strong>{{ cancelDetail.cancellationReason }}
-          </v-col>
+          </v-col> -->
           <v-col cols="12" class="pb-0">
             <strong>詳細原因：</strong>{{ cancelDetail.reason }}
           </v-col>
           <v-col cols="12" class="pb-0">
             <strong>賠款金額：</strong>{{ formatCurrency(cancelDetail.refundAmount) }}
           </v-col>
-          <v-col cols="12" class="pb-0">
+          <!-- <v-col cols="12" class="pb-0">
             <strong>照片證明：</strong>{{ cancelDetail.proofReceived ? '已提供' : '未提供' }}
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-card-text>
       <v-card-actions>

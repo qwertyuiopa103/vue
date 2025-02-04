@@ -26,16 +26,17 @@
               <v-text-field v-model="search" label="搜尋" clearable outlined dense class="mb-3" />
             </div>
 
-            <v-data-table :headers="headers" :items="filteredOrders" :items-per-page="10" class="elevation-1">
+            <v-data-table :headers="headers" :items="filteredOrders" :items-per-page="10"
+              class="elevation-1 fixed-table">
               <template v-slot:item.actions="{ item }">
-                <v-btn @click="editOrder(item)" icon>
+                <v-btn @click="editOrder(item)" icon class="my-2" color="warning">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
-                <v-btn @click="deleteOrder(item.orderId)" icon>
+                <v-btn @click="deleteOrder(item.orderId)" icon class="mb-2" color="error">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
                 <!-- 前往付款按鈕 -->
-                <v-btn v-if="item.status === '未付款'" @click="goToPayment(item)" color="green" icon>
+                <v-btn v-if="item.status === '未付款'" @click="goToPayment(item)" color="green" icon class="mb-2">
                   <v-icon>mdi-credit-card-outline</v-icon>
                 </v-btn>
                 <!-- 新增取消細節按鈕，只在狀態為可取消時顯示 -->
@@ -149,16 +150,16 @@ const goToPayment = (item) => {
 
 // 資料表的欄位標題
 const headers = computed(() => [
-  { title: "編號", key: "orderId", align: 'start' },
-  { title: showNames.value ? "使用者名稱" : "使用者編號", key: showNames.value ? "userName" : "userID" },
-  { title: showNames.value ? "照護人員名稱" : "照護人員編號", key: showNames.value ? "caregiverName" : "caregiverNO" },
-  { title: "訂單日期", key: "orderDate" },
-  { title: "開始日期", key: "startDate" },
-  { title: "結束日期", key: "endDate" },
-  { title: "狀態", key: "status" },
-  { title: "付款方式", key: "paymentMethod" },
-  { title: "總金額", key: "totalPrice" },
-  { title: "操作", key: "actions", sortable: false }
+  { title: "編號", key: "orderId", align: 'start', width: '60px ' },
+  { title: showNames.value ? "會員名稱" : "會員編號", key: showNames.value ? "userName" : "userID", width: '80px ' },
+  { title: showNames.value ? "看護名稱" : "看護編號", key: showNames.value ? "caregiverName" : "caregiverNO", width: '80px ' },
+  { title: "訂單日期", key: "orderDate", width: '60px ' },
+  { title: "開始日期", key: "startDate", width: '60px ' },
+  { title: "結束日期", key: "endDate", width: '60px ' },
+  { title: "狀態", key: "status", width: '60px ' },
+  { title: "付款方式", key: "paymentMethod", width: '60px ' },
+  { title: "金額", key: "totalPrice", width: '60px ' },
+  { title: "操作", key: "actions", sortable: false, width: '50px ' }
 ]);
 
 
@@ -371,5 +372,19 @@ onMounted(fetchOrders);
 <style scoped>
 .v-data-table {
   margin-top: 20px;
+}
+
+.fixed-table ::v-deep table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  /* 確保表格寬度佔滿 */
+}
+
+.v-container {
+  padding: 0px !important;
+}
+
+.v-card-text {
+  padding: 0px !important;
 }
 </style>

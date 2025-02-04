@@ -31,11 +31,6 @@ const router = createRouter({
           component: () => import("@/views/Order/OrderPayAdmin.vue"),
         },
         {
-          name: "order_Pay_return",
-          path: "order/return",
-          component: () => import("@/views/Order/Return.vue"),
-        },
-        {
           name: "reserve_home",
           path: "reserve",
           component: () => import("@/views/Reserve/ReserveHome.vue"),
@@ -131,8 +126,8 @@ const router = createRouter({
         },
         {
           name: "order_Pay_Home",
-          path: "order/payAdmin",
-          component: () => import("@/views/Order/OrderPayAdmin.vue"),
+          path: "order/pay",
+          component: () => import("@/views/Order/OrderPay.vue"),
         },
         {
           name: "order_Pay_User",
