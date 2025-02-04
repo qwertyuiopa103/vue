@@ -123,8 +123,13 @@ const nomal = () => {
 };
 
 const change = () => {
+<<<<<<< HEAD
     userAccount.value = 'ralph5869@gmail.com';
     userPassword.value = 'aaa123@';
+=======
+    userAccount.value = 'eeit190@gmail.com';
+    userPassword.value = 'aa123@';
+>>>>>>> vue/Order2
 };
 const admin = () => {
     userAccount.value = 'monique4434@gmail.com';
@@ -135,6 +140,10 @@ const care = () => {
     userAccount.value = 'caregivereeit90@gmail.com';
     userPassword.value = 'aaa123@';
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> vue/Order2
 </script>
 <style scoped>
 .container {

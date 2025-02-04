@@ -14,7 +14,8 @@
 
             <div>
               <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
-              <v-btn color="primary" @click="openCreateDialog">新增訂單</v-btn>
+              <v-btn color="primary" @click="openCreateDialog" class="mr-2">新增訂單</v-btn>
+
             </div>
           </v-card-title>
 
@@ -37,6 +38,11 @@
                 <v-btn v-if="item.status === '未付款'" @click="goToPayment(item)" color="green" icon>
                   <v-icon>mdi-credit-card-outline</v-icon>
                 </v-btn>
+                <!-- 新增取消細節按鈕，只在狀態為可取消時顯示 -->
+                <v-btn v-if="item.status === '已取消'" @click="cancelOrder(item)" icon>
+                  <v-icon>mdi-file-cancel</v-icon>
+                </v-btn>
+
               </template>
             </v-data-table>
           </v-card-text>
@@ -75,6 +81,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- 當 showCancelDetail 為 true 時顯示 CancelOrderDetail 組件，並將選中的訂單 ID 傳遞給它 -->
+
+    <CancelOrderDetail v-if="showCancelDetail" :orderId="selectedOrderId" @close="showCancelDetail = false" />
   </v-container>
 </template>
 
@@ -86,8 +95,7 @@ import axios from "axios"; // 用於發送 HTTP 請求
 import Swal from "sweetalert2"; // 用於顯示彈出式警告
 import OrderAnalysis from '@/components/Order/OrderData.vue';
 import { useRouter } from 'vue-router';
-
-const router = useRouter();
+import CancelOrderDetail from '@/components/Order/CancelDetail.vue';
 
 // 新增頁籤控制變數
 const activeTab = ref('orders');
@@ -101,6 +109,16 @@ const dialog = ref(false);
 const dialogTitle = ref("");
 // 控制是否顯示名稱
 const showNames = ref(false);
+const router = useRouter();
+// 查看取消訂單詳情
+const cancelOrder = (item) => {
+  selectedOrderId.value = item.orderId;
+  showCancelDetail.value = true;
+};
+const showCancelDetail = ref(false);
+const selectedOrderId = ref(null);
+
+
 // 當前正在編輯的訂單數據
 const currentOrder = reactive({
   orderId: null,
@@ -152,7 +170,7 @@ const quickAddOrder = () => {
   Object.assign(currentOrder, {
     orderId: null,
     user: {
-      userID: "USR0014"
+      userID: "USR0001"
     },
     caregiver: {
       caregiverNO: "2"
@@ -160,8 +178,8 @@ const quickAddOrder = () => {
     orderDate: currentDate,  // 當前日期
     startDate: currentDate,
     endDate: currentDate,
-    status: "完成",
-    totalPrice: 114514
+    status: "未付款",
+    totalPrice: 114
   });
 
   dialog.value = true; // 打開對話框
@@ -293,7 +311,7 @@ const filteredOrders = computed(() => {
     userID: order.user?.userID || '',
     userName: order.user?.userName || '',
     caregiverNO: order.caregiver?.caregiverNO || '',
-    caregiverName: order.caregiver?.caregiverName || '',
+    caregiverName: order.caregiver?.user.userName || '',
     orderDate: formatDateToLocalDate(order.orderDate),
     startDate: formatDateToLocalDate(order.startDate),
     endDate: formatDateToLocalDate(order.endDate),
