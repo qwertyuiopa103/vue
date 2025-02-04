@@ -135,7 +135,6 @@ const care = () => {
     userAccount.value = 'caregivereeit90@gmail.com';
     userPassword.value = 'aaa123@';
 };
-
 </script>
 <style scoped>
 .container {

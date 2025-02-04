@@ -10,7 +10,7 @@
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
                     <li><router-link to="/home/caregiver/Management" @click="closeMobileNav">尋找看護</router-link></li>
-                    <li><router-link to="/home/caregiver/Become" @click="closeMobileNav">成為看護</router-link></li>
+                    <li  v-if="!userCaregiverPreview"><router-link to="/home/caregiver/Become" @click="closeMobileNav">成為看護</router-link></li>
                     <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>
@@ -40,6 +40,9 @@
                                 <li><router-link class="dropdown-item" to="/home/userProfile">個人資料</router-link></li>
                                 <li v-if="userAdmin"><router-link class="dropdown-item"
                                         to="/admin/user">後台系統</router-link>
+                                </li>
+                                <li v-if="userCaregiverPreview"><router-link class="dropdown-item"
+                                        to="/home/caregiver/setting">看護系統</router-link>
                                 </li>
                                 <li>
                                     <hr>
@@ -84,6 +87,7 @@ const avatarUrl = computed(() => authStore.avatar);
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 //const userAdmin = ref(false);
 const userAdmin = computed(() => authStore.role === 'ROLE_ADMIN');
+const userCaregiverPreview = computed(() => authStore.role === 'ROLE_CAREGIVER');
 // const checkAdminRole = () => {
 //     // userAdmin.value = role.value === 'ROLE_ADMIN';
 //     console.log('Current role:', role.value);
