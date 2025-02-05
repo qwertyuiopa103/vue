@@ -44,27 +44,23 @@
     </div>
 
     <!-- 返回頂部按鈕 -->
-    <!-- <button 
-        class="back-to-top" 
-        @click="scrollToTop" 
-        :class="{ 'show': showBackToTop }"
-        aria-label="返回頂部"
-      >
-        <i class="fas fa-arrow-up"></i>
-      </button> -->
+    <!-- <button class="back-to-top" @click="scrollToTop" :class="{ 'show': showBackToTop }" aria-label="返回頂部">
+      <i class="fas fa-arrow-up"></i>
+    </button> -->
   </div>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'EventList',
   setup() {
     const events = ref([])
     const showBackToTop = ref(false)
-
+    const router = useRouter();  // 在 setup 中獲取路由實例
     // 格式化日期
     const formatDate = (date, format) => {
       const d = new Date(date)
@@ -88,7 +84,9 @@ export default {
 
     // 顯示活動詳情
     const showEventDetails = (event) => {
-      console.log('顯示活動詳情:', event)
+      router.push({
+        path: `/home/event/${event.eventID}`, // 使用動態路徑
+      });
     }
 
     // 處理滾動事件
@@ -179,22 +177,44 @@ body {
   right: 30px;
   top: 30px;
   background-color: white;
-  color: rgba(25, 47, 89, 0.9);
+  color: #FF8040;
   padding: 12px 20px 8px 20px;
   text-transform: uppercase;
+  font-weight: bold;
+}
+
+.event-time {
+  display: flex;
+  /* 使用 flexbox 將列表項目排成一行 */
+  justify-content: flex-start;
+  /* 靠左對齊 */
+  align-items: center;
+  /* 垂直置中 */
+  gap: 20px;
+  /* 每個項目間距 */
+  padding: 0;
+  /* 移除多餘內邊距 */
+  list-style: none;
+  /* 移除列表符號 */
 }
 
 .event-time li {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.event-time li:last-child {
-  margin-right: 0;
+  display: flex;
+  /* 保持單項目的內容為水平排列 */
+  align-items: center;
+  /* 垂直置中圖標與文字 */
+  margin: 0;
+  /* 移除 margin */
 }
 
 .event-time li i {
-  color: #59c17a;
+  margin-right: 8px;
+  /* 調整圖標和文字之間的間距 */
+}
+
+
+.event-time li i {
+  color: #FF9D6F;
 }
 
 .event-block {
@@ -231,7 +251,8 @@ body {
   }
 
   .padding-60px-lr {
-    padding: 20px;
+    padding-left: 30px;
+    padding-right: 5px;
   }
 
   .back-to-top {
@@ -251,8 +272,8 @@ body {
 }
 
 .padding-60px-lr {
-  padding-left: 60px;
-  padding-right: 60px;
+  padding-left: 30px;
+  padding-right: 5px;
 }
 
 .margin-15px-bottom {
@@ -268,12 +289,13 @@ body {
 }
 
 .text-theme-color {
-  color: #192f59;
+  color: #F75000;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .text-theme-color:hover {
-  color: #59c17a;
+  color: #FF9D6F;
 }
 
 .margin-10px-bottom {
