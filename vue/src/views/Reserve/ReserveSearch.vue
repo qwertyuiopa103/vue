@@ -61,14 +61,28 @@
 
     <!-- 統計圖表 -->
     <v-tab-item v-if="tab === 1">
-      <v-row>
-        <v-col>
-          <VSelect v-model="selectedCaregiver" :items="caregiverList" item-title="user.userName" item-value="caregiverNO"
-            label="選擇看護師" />
-          <canvas id="caregiverStatsChart"></canvas>
-        </v-col>
-      </v-row>
-    </v-tab-item>
+    <v-row class="chart">
+      <v-col>
+        <div class="d-flex align-center mb-4">
+          <VSelect
+            v-model="selectedCaregiver"
+            :items="caregiverList"
+            item-title="user.userName"
+            item-value="caregiverNO"
+            label="選擇看護師"
+            class="caregiver-select mr-4"
+          />
+          <VSelect
+            v-model="selectedYear"
+            :items="availableYears"
+            label="選擇年份"
+            class="year-select"
+          />
+        </div>
+        <canvas id="caregiverStatsChart"></canvas>
+      </v-col>
+    </v-row>
+  </v-tab-item>
 
     <!-- Dialog for adding new reservation -->
     <v-dialog v-model="dialog" max-width="500px">
@@ -133,6 +147,8 @@ export default {
         status: '待確認',
       },
       statusOptions: ['待確認', '已接受','已拒絕','已過期'],
+      selectedYear: new Date().getFullYear(), // 預設顯示當前年份
+      availableYears: [], // 將從預約數據中提取可用的年份
     };
   },
   created() {
@@ -154,6 +170,11 @@ export default {
         });
       }
     },
+    selectedYear() {
+      if (this.selectedCaregiver) {
+        this.updateChart();
+      }
+    },
   },
   mounted() {
     // 頁面加載時初始化第一位看護師 這是我需要設定圖表是預設第一位看護師
@@ -162,12 +183,13 @@ export default {
     }
   },
   methods: {
-     fetchReservations() {
+      fetchReservations() {
       axios
         .get('http://localhost:8080/reserve')
         .then((response) => {
           this.reservations = response.data;
-          this.updateChart(); // Update chart after fetching reservations
+          this.updateAvailableYears(); // 更新可用年份列表
+          this.updateChart();
         })
         .catch((error) => {
           console.error('Error fetching reservations:', error);
@@ -188,12 +210,11 @@ export default {
     //更新圖表 同樣可以做初始化
     updateChart() {
       const caregiverStats = this.getCaregiverStats(this.selectedCaregiver);
-      //圖表的資料
       const chartData = {
-        labels: Object.keys(caregiverStats),
+        labels: Array.from({length: 12}, (_, i) => `${i + 1}月`), // 固定顯示 1-12 月
         datasets: [
           {
-            label: '每月預約數',
+            label: `${this.selectedYear}年預約數`,
             data: Object.values(caregiverStats),
             borderColor: 'rgb(75, 192, 192)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -208,21 +229,49 @@ export default {
       }
       //生成新的圖表
       this.caregiverStatsChart = new Chart(ctx, {
-        type: 'bar',          //bar=柱狀圖 line=折線圖
+        type: 'line',
         data: chartData,
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: '月份'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '預約數量'
+              }
+            }
+          }
+        }
       });
     },
     //過濾我的訂單資訊 只找選擇的人的那筆資料
     getCaregiverStats(caregiverNO) {
       const stats = {};
+      // 初始化所有月份為 0
+      for (let month = 1; month <= 12; month++) {
+        stats[month] = 0;
+      }
+
+      // 篩選指定年份和看護師的預約
       this.reservations
-        .filter((reservation) => reservation.caregiverBean.caregiverNO === caregiverNO)
-        .forEach((reservation) => {
-          const month = new Date(reservation.startDate).getMonth() + 1; // Get the month (1-12) 對1~12月排序
-          const year = new Date(reservation.startDate).getFullYear();
-          const key = `${year}-${month}`;
-          stats[key] = stats[key] ? stats[key] + 1 : 1;
+        .filter(reservation => {
+          const reserveDate = new Date(reservation.startDate);
+          return (
+            reservation.caregiverBean.caregiverNO === caregiverNO &&
+            reserveDate.getFullYear() === this.selectedYear
+          );
+        })
+        .forEach(reservation => {
+          const month = new Date(reservation.startDate).getMonth() + 1;
+          stats[month]++;
         });
+
       return stats;
     },
     openDialog() {
@@ -259,6 +308,18 @@ export default {
           Swal.fire('錯誤!', error.message, 'error');
         });
     },
+    updateAvailableYears() {
+      const years = new Set(
+        this.reservations.map(reservation => 
+          new Date(reservation.startDate).getFullYear()
+        )
+      );
+      this.availableYears = Array.from(years).sort();
+      if (this.availableYears.length > 0 && !this.availableYears.includes(this.selectedYear)) {
+        this.selectedYear = this.availableYears[0];
+      }
+    },
+    
   },
   computed: {
     filteredReservations() {
@@ -287,5 +348,17 @@ export default {
 
 .date-input {
   width: 100px;
+}
+.chart{
+  width:70%;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+.caregiver-select{
+  width: 150px;
+}
+.year-select {
+  width: 150px;
 }
 </style>

@@ -96,6 +96,7 @@
       getStatusColor(status) {
         if (status === '待確認') return 'orange';
         if (status === '已接受') return 'green';
+        if (status === '已過期') return 'gray';
         return 'red'; // 已拒絕
       }
     }
