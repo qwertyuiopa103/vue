@@ -10,8 +10,9 @@
             <nav id="navmenu" class="navmenu" v-if="isAuthenticated">
                 <ul>
                     <li><router-link to="/home/caregiver/Management" @click="closeMobileNav">尋找看護</router-link></li>
-                    <li  v-if="!userCaregiverPreview"><router-link to="/home/caregiver/Become" @click="closeMobileNav">成為看護</router-link></li>
-                    <li><router-link to="/home/reserve/calendar" @click="closeMobileNav">預約查詢</router-link></li>
+                    <li v-if="!userCaregiverPreview"><router-link to="/home/caregiver/Become"
+                            @click="closeMobileNav">成為看護</router-link></li>
+                    <li><router-link to="/home/reserve/list" @click="closeMobileNav">預約查詢</router-link></li>
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>
                     <!-- <li class="dropdown" :class="{ 'active': dropdownActive }">
@@ -251,7 +252,7 @@ h1 {
 
 .navmenu a {
     text-decoration: none;
-    color: #FF9D6F;
+    color: #FFA042;
     font-size: 25px !important;
     font-weight: bold;
 }
@@ -298,6 +299,7 @@ a {
 .navmenu li:hover>a {
     color: #F75000 !important;
     /* text-decoration: underline !important; */
+    font-size: 28px !important;
 }
 
 

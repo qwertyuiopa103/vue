@@ -16,6 +16,9 @@
               <v-btn color="amber" @click="dialog = true" small>
                 編輯資料
               </v-btn>
+              <v-btn color="deep-orange" small class="ml-2" :to="`/home/caregiver/calendar`">
+                接單行事曆
+              </v-btn>
             </div>
           </v-card-text>
         </v-card>

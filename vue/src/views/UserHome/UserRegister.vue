@@ -350,7 +350,7 @@ function handleFileChange(event) {
     reader.readAsDataURL(file)
 }
 const edit = () => {
-    name.value = '周杰倫';
+    name.value = '王小明';
     email.value = 'eeit19@gmail.com';
     password.value = 'aa12@';
     confirmPassword.value = 'aa12@0';

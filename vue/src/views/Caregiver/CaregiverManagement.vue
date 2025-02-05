@@ -84,7 +84,7 @@
               </v-card-text>
 
               <v-card-actions class="justify-center pb-4">
-                <v-btn color="primary" variant="elevated" :to="`/reserve/calendar/${caregiver.caregiverNO}`">
+                <v-btn color="primary" variant="elevated" :to="`/home/reserve/calendar/${caregiver.caregiverNO}`">
                   立即預約
                 </v-btn>
               </v-card-actions>

@@ -133,11 +133,11 @@ onMounted(async () => {
                     <div class="col-lg-4 ps-lg-5">
                         <span class="content-subtitle"></span>
                         <!-- <h2 class="content-title">選擇心護家</h2> -->
-                        <strong style="font-size: 28px;">專業媒合，安心無憂</strong>
+                        <strong style="font-size: 28px; color:#FF8F59;">專業媒合，安心無憂</strong>
                         <p class="lead mb-5" style="font-size: 23px; text-align: justify;">
                             提供經過審核的專業看護，快速匹配您的需求，輕鬆找到適合的照護服務。
                         </p>
-                        <strong style=" font-size: 28px;">靈活預約，隨時支援</strong>
+                        <strong style=" font-size: 28px; color:#FF8F59;">靈活預約，隨時支援</strong>
                         <p class="lead mb-5" style="font-size: 23px; text-align: justify;">
                             支援彈性預約與即時服務，滿足各種看護需求，確保您的使用體驗更順暢。
                         </p>
@@ -185,10 +185,11 @@ onMounted(async () => {
 
 <style lang="css" scoped>
 h1 {
-    color: #FF8000 !important;
+    color: #FF8F59 !important;
 }
 
-/* p {
-    color: #FF8F59 !important;
-} */
+p {
+    color: #FFAD86 !important;
+    font-weight: 550 !important;
+}
 </style>

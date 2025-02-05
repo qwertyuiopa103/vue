@@ -37,8 +37,10 @@
           <p>訂單總金額: {{ reserve.totalPrice }}</p>
           <!-- 每一筆預約有獨立的新增與刪除按鈕 -->
           <div class="reserve-actions">
-            <i class="fas fa-check-circle" @click="createOrder(reserve)" style="font-size: 36px; color: green; cursor: pointer;"></i>
-            <i class="fas fa-times-circle" @click="deleteReserve(reserve, index)" style="font-size: 36px; color: red; cursor: pointer;"></i>
+            <i class="fas fa-check-circle" @click="createOrder(reserve)"
+              style="font-size: 36px; color: green; cursor: pointer;"></i>
+            <i class="fas fa-times-circle" @click="deleteReserve(reserve, index)"
+              style="font-size: 36px; color: red; cursor: pointer;"></i>
           </div>
         </div>
       </div>
@@ -66,16 +68,16 @@ export default {
     reserves: [],        // 預約資料 (右邊的預約列表)
     orders: [],
     caregiverNO: 1,      // 預設的看護師 ID (caregiverNO)
-    userId:'',
+    userId: '',
   }),
 
   async mounted() {
     const adapter = useDate();
     const startOfMonth = adapter.startOfDay(adapter.startOfMonth(new Date()));
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
-    // await this.fetchLoginUser();
+    await this.fetchLoginUser();
     console.log(this.caregiverNO);
-    
+
     this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth }); // 用於行事曆的訂單資料
     this.fetchReservesByCaregiver(this.caregiverNO); // 用於右邊預約列表的資料
   },
@@ -104,6 +106,7 @@ export default {
 
         // 篩選出 status 為 "待確認" 的預約
         this.reserves = response.data.filter(reserve => reserve.status === "待確認");
+        console.log(this.reserves);
 
         // 將篩選後的預約資料映射到行事曆事件
         this.mapReservesToEvents(this.reserves);
@@ -117,18 +120,18 @@ export default {
           `http://localhost:8080/api/user/profile`
         );
         this.userId = userResponse.data.id;
-        
+
         const userBean = {
-            userID: userResponse.data.id,
-            userName: userResponse.data.name,
-            userEmail: userResponse.data.email,
-          }
+          userID: userResponse.data.id,
+          userName: userResponse.data.name,
+          userEmail: userResponse.data.email,
+        }
         const caregiverResponse = await axios.get(
-          `http://localhost:8080/api/caregiver/FindByUserID/${this.userId}`
+          `http://localhost:8080/api/caregiver/findByUserId/${this.userId}`
         )
         this.caregiverNO = caregiverResponse.data.caregiverNO;
-        console.log("caregiverGet:"+this.caregiverNO);
-        
+        console.log("caregiverGet:" + this.caregiverNO);
+
       } catch (error) {
         console.error("Error fetching reserves:", error);
       }
@@ -209,16 +212,26 @@ export default {
     async createOrder(reserve) {
       try {
         const reserveId = reserve.reserveId;
+
+        // 創建一個乾淨的 `user` 和 `caregiver` 物件，不包含圖片
+        const userWithoutImage = { ...reserve.userBean };
+        delete userWithoutImage.userPhoto; // 假設圖片欄位是 profilePicture
+
+        const caregiverWithoutImage = { ...reserve.caregiverBean };
+        delete caregiverWithoutImage.certifiPhoto;
         const order = {
           orderId: 0, // 由後端自動生成
-          user: reserve.userBean,
-          caregiver: reserve.caregiverBean,
-          cancellationId:null,
-          orderDate: reserve.orderDate,
+          user: userWithoutImage,   // 使用沒有圖片的 `userBean`
+          caregiver: caregiverWithoutImage,  // 使用沒有圖片的 `caregiverBean`
+          cancellationId: null,
+          orderDate: new Date(),
           startDate: reserve.startDate,
           endDate: reserve.endDate,
-          status: "進行中",
-          totalPrice: 0,
+          status: "未付款",
+          totalPrice: reserve.totalPrice,
+          paymentMethod: null,
+          TradeNo: null,
+          MerchantTradeNo: null,
         };
 
         // 1. 新增訂單
@@ -279,7 +292,7 @@ export default {
         });
       }
     }
-,
+    ,
 
     // 刪除預約（每一筆獨立操作）
     // 刪除預約（每一筆獨立操作）
@@ -298,7 +311,7 @@ export default {
             const response = await axios.put(`http://localhost:8080/reserve/${reserve.reserveId}`);
 
             // 成功處理
-            if(response.status===200){
+            if (response.status === 200) {
               Swal.fire("成功!", "資料已刪除", "success");
             }
 
@@ -338,9 +351,12 @@ export default {
   flex-direction: row;
   width: 90%;
   height: 100%;
-  justify-content: center; /* 水平居中 */
-  align-items: center;     /* 垂直居中 */
-  margin: 0 auto;          /* 確保容器本身在其父容器中居中 */
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
+  margin: 0 auto;
+  /* 確保容器本身在其父容器中居中 */
 }
 
 /* 行事曆區塊 */
@@ -369,10 +385,12 @@ export default {
   font-weight: bold;
   color: #333;
 }
+
 .reserve-items {
   height: 800px;
   overflow-y: auto;
 }
+
 /* 預約列表中的每一項 */
 .reserve-item {
   background-color: #f9f9f9;
@@ -413,18 +431,21 @@ export default {
 
 /* 滾動條背景 */
 ::-webkit-scrollbar-track {
-  background: #ffffff;  /* 白色背景 */
+  background: #ffffff;
+  /* 白色背景 */
   border-radius: 10px;
 }
 
 /* 滾動條滑塊 */
 ::-webkit-scrollbar-thumb {
-  background: #f0f0f0;  /* 非常淺的灰色滑塊 */
+  background: #f0f0f0;
+  /* 非常淺的灰色滑塊 */
   border-radius: 10px;
 }
 
 /* 滾動條滑塊在滑動時顯示的顏色 */
 ::-webkit-scrollbar-thumb:hover {
-  background: #e0e0e0;  /* 略深的灰色 */
+  background: #e0e0e0;
+  /* 略深的灰色 */
 }
 </style>

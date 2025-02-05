@@ -22,12 +22,13 @@
           <div class="d-flex align-center mb-4">
             <v-avatar size="80">
               <img :src="selectedCaregiver.user.userPhoto || '/user/img/user3.png'" alt="Avatar"
-                                style="width: 100%; height: auto; object-fit: cover;" />
+                style="width: 100%; height: auto; object-fit: cover;" />
             </v-avatar>
             <div class="ml-4">
               <h4 class="mb-2">{{ selectedCaregiver.user.userName }}</h4>
               <p class="text-caption">聯絡方式: {{ selectedCaregiver.user.userPhone }}</p>
-              <p class="text-caption">專長: {{ selectedCaregiver.eduExperience }}</p>
+              <p class="text-caption">服務等級: {{ selectedCaregiver.services }}</p>
+              <p class="text-caption">每日薪水: {{ selectedCaregiver.daylyRate }}</p>
             </div>
           </div>
 
@@ -69,29 +70,30 @@ export default {
   },
 
   data() {
-  return {
-    focus: [new Date()],
-    events: [],
-    selectedCaregiver: {
-      caregiverNO:'',
-      user: {
-        userName: '',
-        userPhoto: '',
-        userPhone:'',
-        userEmail:'',
-      },
-      caregiverPhone: '',
-      eduExperience: '',
-      hourlyRate:'',
-    }, // 初始化selectedCaregiver的属性
-    caregiverNO: this.$route.params.caregiverNO,
-    startDate: null,
-    endDate: null,
-    formValid: false,
-    minDate: new Date().toISOString().substr(0, 10),
-    maxDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-  };
-},
+    return {
+      focus: [new Date()],
+      events: [],
+      selectedCaregiver: {
+        caregiverNO: '',
+        user: {
+          userName: '',
+          userPhoto: '',
+          userPhone: '',
+          userEmail: '',
+        },
+        caregiverPhone: '',
+        eduExperience: '',
+        daylyRate: '',
+        services: '',
+      }, // 初始化selectedCaregiver的属性
+      caregiverNO: this.$route.params.caregiverNO,
+      startDate: null,
+      endDate: null,
+      formValid: false,
+      minDate: new Date().toISOString().substr(0, 10),
+      maxDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+    };
+  },
 
   mounted() {
     const adapter = useDate();
@@ -105,10 +107,11 @@ export default {
     async fetchCaregiver() {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/caregiver/FindCaregiver?caregiverNO=${this.caregiverNO}`
+          `http://localhost:8080/api/caregiver/findCaregiver/${this.caregiverNO}`
         );
         const caregiver = response.data;
-        
+        console.log(caregiver);
+
         // **動態設置 selectedCaregiver**
         this.selectedCaregiver.caregiverNO = caregiver.caregiverNO || null;
         this.selectedCaregiver.user.userName = caregiver.user.userName || "未指定";
@@ -116,7 +119,8 @@ export default {
         this.selectedCaregiver.user.userPhone = caregiver.user.userPhone || "未知";
         this.selectedCaregiver.user.userEmail = caregiver.user.userEmail || "未知";
         this.selectedCaregiver.eduExperience = caregiver.eduExperience || "未提供";
-        this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
+        this.selectedCaregiver.daylyRate = caregiver.daylyRate || "未提供";
+        this.selectedCaregiver.services = caregiver.services || "未提供";
       } catch (error) {
         console.error("Error fetching caregiver info:", error);
         this.selectedCaregiver = {
@@ -128,7 +132,7 @@ export default {
             userEmail: "未知",
           },
           eduExperience: "未提供",
-          hourlyRate: "未提供",
+          daylyRate: "未提供",
         };
       }
     },
@@ -138,7 +142,7 @@ export default {
           `http://localhost:8080/orders/OrderByCaregiver/${this.caregiverNO}`
         );
         const orders = response.data;
-        
+
         // 動態設置看護師資料（直接賦值完整物件）
         // if (orders.length > 0 && orders[0].caregiver) {
         //   const caregiver = orders[0].caregiver;
@@ -156,7 +160,7 @@ export default {
         //   this.selectedCaregiver.eduExperience = "未提供";
         //   this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
         // }
-        
+
         this.mapOrdersToEvents(orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -186,7 +190,7 @@ export default {
 
     async submitReservation() {
       const today = new Date();
-      
+
       if (!this.startDate) {
         Swal.fire({
           icon: "warning",
@@ -219,53 +223,53 @@ export default {
         });
         return;
       }
-        try {
-          const userResponse = await axios.get("http://localhost:8080/api/user/profile");
-    
-          const data = userResponse.data;
-      
-          const userBean = {
-            userID: data.id,
-            userName: data.name,
-            userEmail: data.email,
-          };
-          const start = new Date(this.startDate);
-          const end = new Date(this.endDate);
+      try {
+        const userResponse = await axios.get("http://localhost:8080/api/user/profile");
 
-          // 計算天數（包含開始與結束當天）
-          const timeDiff = end.getTime() - start.getTime();
-          const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-          const dailyPrice = this.selectedCaregiver.hourlyRate || 0;
-          const totalPrice = days * dailyPrice;
+        const data = userResponse.data;
 
-          const reservation = {
-            userBean:userBean,
-            caregiverBean: this.selectedCaregiver, // 包含看護師完整資料
-            startDate: this.startDate,
-            endDate: this.endDate,
-            orderDate:today,
-            totalPrice:totalPrice,
-            status:"待確認",
-          };
-          
-          const response = await axios.post(
-            `http://localhost:8080/reserve`,
-            reservation
-          );
-          Swal.fire({
-            icon: "success",
-            title: "預約成功",
-            text: "您的預約已提交！",
-            confirmButtonText: "確定"
-          });
-        } catch (error) {
-          Swal.fire({
-            icon: "error",
-            title: "預約失敗",
-            text: "發生錯誤，請稍後再試！",
-            confirmButtonText: "確定"
-          });
-        }
+        const userBean = {
+          userID: data.id,
+          userName: data.name,
+          userEmail: data.email,
+        };
+        const start = new Date(this.startDate);
+        const end = new Date(this.endDate);
+
+        // 計算天數（包含開始與結束當天）
+        const timeDiff = end.getTime() - start.getTime();
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+        const dailyPrice = this.selectedCaregiver.daylyRate || 0;
+        const totalPrice = days * dailyPrice;
+
+        const reservation = {
+          userBean: userBean,
+          caregiverBean: this.selectedCaregiver, // 包含看護師完整資料
+          startDate: this.startDate,
+          endDate: this.endDate,
+          orderDate: today,
+          totalPrice: totalPrice,
+          status: "待確認",
+        };
+
+        const response = await axios.post(
+          `http://localhost:8080/reserve`,
+          reservation
+        );
+        Swal.fire({
+          icon: "success",
+          title: "預約成功",
+          text: "您的預約已提交！",
+          confirmButtonText: "確定"
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "預約失敗",
+          text: "發生錯誤，請稍後再試！",
+          confirmButtonText: "確定"
+        });
+      }
     },
   },
 };
@@ -278,9 +282,12 @@ export default {
   padding: 16px;
   width: 90%;
   height: 100%;
-  justify-content: center; /* 水平居中 */
-  align-items: center;     /* 垂直居中 */
-  margin: 0 auto;          /* 確保容器本身在其父容器中居中 */
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
+  margin: 0 auto;
+  /* 確保容器本身在其父容器中居中 */
 }
 
 .v-sheet {
@@ -300,6 +307,7 @@ export default {
 .text-center {
   text-align: center;
 }
+
 .event-btn {
   position: absolute;
   /* 使用絕對定位 */
