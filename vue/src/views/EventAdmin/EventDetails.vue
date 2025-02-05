@@ -211,7 +211,7 @@ export default {
       const day = String(d.getDate()).padStart(2, "0");
       const hours = String(d.getHours()).padStart(2, "0");
       const minutes = String(d.getMinutes()).padStart(2, "0");
-      const seconds = String(d.getSeconds()).padStart(2, "0");
+      // const seconds = String(d.getSeconds()).padStart(2, "0");
 
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
@@ -374,17 +374,10 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .v-data-table__wrapper {
   overflow-x: auto;
 }
 
-/* 針對表格的自定義樣式 */
-.v-data-table-header th {
-  background-color: #f5f5f5; /* 灰色背景 */
-}
-
-.v-data-table-header th:nth-child(1), .v-data-table-header th:nth-child(2) {
-  background-color: #dcdcdc; /* 改變事件ID和事件名稱的背景顏色 */
-}
 </style>
