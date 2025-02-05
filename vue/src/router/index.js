@@ -137,9 +137,16 @@ const router = createRouter({
 
         {
           name: "reserve_calendar",
-          path: "reserve/calendar",
+          path: "reserve/calendar/:caregiverNO",
           component: () => import("@/views/Reserve/ReserveCalendar.vue"),
         },
+
+        {
+          name: "reserve_list",
+          path: "reserve/list",
+          component: () => import("@/views/Reserve/ReserveList.vue"),
+        },
+
         {
           name: "caregiver_calendar",
           path: "caregiver/calendar",

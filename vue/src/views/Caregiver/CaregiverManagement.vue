@@ -7,27 +7,16 @@
           <v-card-title>搜尋條件</v-card-title>
           <v-card-text>
             <!-- 關鍵字搜尋 -->
-            <v-text-field
-              v-model="searchKeyword"
-              label="搜尋關鍵字"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              density="comfortable"
-            ></v-text-field>
+            <v-text-field v-model="searchKeyword" label="搜尋關鍵字" prepend-inner-icon="mdi-magnify" variant="outlined"
+              density="comfortable"></v-text-field>
 
             <v-expansion-panels variant="accordion">
               <!-- 性別篩選 -->
               <v-expansion-panel>
                 <v-expansion-panel-title>性別</v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <v-checkbox
-                    v-for="gender in genderOptions"
-                    :key="gender.value"
-                    v-model="selectedGender"
-                    :label="gender.label"
-                    :value="gender.value"
-                    density="comfortable"
-                  ></v-checkbox>
+                  <v-checkbox v-for="gender in genderOptions" :key="gender.value" v-model="selectedGender"
+                    :label="gender.label" :value="gender.value" density="comfortable"></v-checkbox>
                 </v-expansion-panel-text>
               </v-expansion-panel>
 
@@ -35,14 +24,8 @@
               <v-expansion-panel>
                 <v-expansion-panel-title>日薪範圍</v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <v-checkbox
-                    v-for="range in salaryRanges"
-                    :key="range.value"
-                    v-model="selectedSalaryRanges"
-                    :label="range.label"
-                    :value="range.value"
-                    density="comfortable"
-                  ></v-checkbox>
+                  <v-checkbox v-for="range in salaryRanges" :key="range.value" v-model="selectedSalaryRanges"
+                    :label="range.label" :value="range.value" density="comfortable"></v-checkbox>
                 </v-expansion-panel-text>
               </v-expansion-panel>
 
@@ -50,14 +33,8 @@
               <v-expansion-panel>
                 <v-expansion-panel-title>服務區域</v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <v-checkbox
-                    v-for="area in serviceAreas"
-                    :key="area.value"
-                    v-model="selectedServiceAreas"
-                    :label="area.label"
-                    :value="area.value"
-                    density="comfortable"
-                  ></v-checkbox>
+                  <v-checkbox v-for="area in serviceAreas" :key="area.value" v-model="selectedServiceAreas"
+                    :label="area.label" :value="area.value" density="comfortable"></v-checkbox>
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -75,26 +52,13 @@
           </v-col>
 
           <!-- 護理人員卡片 -->
-          <v-col
-            v-for="caregiver in paginatedCaregivers"
-            :key="caregiver.caregiverNO"
-            cols="12"
-            sm="6"
-            md="4"
-          >
+          <v-col v-for="caregiver in paginatedCaregivers" :key="caregiver.caregiverNO" cols="12" sm="6" md="4">
             <v-card class="h-100">
               <div class="text-center pt-4">
                 <!-- 點擊照片開啟詳細資料 -->
-                <v-avatar
-                  size="150"
-                  @click="showDetails(caregiver)"
-                  style="cursor: pointer"
-                >
-                  <v-img
-                    :src="caregiver.user?.userPhoto || '/api/placeholder/150/150'"
-                    :alt="caregiver.user?.userName"
-                    cover
-                  ></v-img>
+                <v-avatar size="150" @click="showDetails(caregiver)" style="cursor: pointer">
+                  <v-img :src="caregiver.user?.userPhoto || '/api/placeholder/150/150'" :alt="caregiver.user?.userName"
+                    cover></v-img>
                 </v-avatar>
               </div>
 
@@ -103,28 +67,24 @@
               </v-card-title>
 
               <v-card-text>
-  <div class="d-flex flex-column gap-2">
-    <div>
-      <v-icon icon="mdi-account" class="mr-2"></v-icon>
-      年齡：{{ caregiver.caregiverAge }} 歲
-    </div>
-    <div>
-      <v-icon icon="mdi-currency-usd" class="mr-2"></v-icon>
-      日薪：{{ caregiver.daylyRate }}元/日
-    </div>
-    <div>
-      <v-icon icon="mdi-map-marker" class="mr-2"></v-icon>
-      服務地區：{{ getServiceAreas(caregiver.serviceArea) }}
-    </div>
-  </div>
-</v-card-text>
+                <div class="d-flex flex-column gap-2">
+                  <div>
+                    <v-icon icon="mdi-account" class="mr-2"></v-icon>
+                    年齡：{{ caregiver.caregiverAge }} 歲
+                  </div>
+                  <div>
+                    <v-icon icon="mdi-currency-usd" class="mr-2"></v-icon>
+                    日薪：{{ caregiver.daylyRate }}元/日
+                  </div>
+                  <div>
+                    <v-icon icon="mdi-map-marker" class="mr-2"></v-icon>
+                    服務地區：{{ getServiceAreas(caregiver.serviceArea) }}
+                  </div>
+                </div>
+              </v-card-text>
 
               <v-card-actions class="justify-center pb-4">
-                <v-btn 
-                  color="primary" 
-                  variant="elevated"
-                  :to="`/reserve/calendar/${caregiver.caregiverNO}`"
-                >
+                <v-btn color="primary" variant="elevated" :to="`/reserve/calendar/${caregiver.caregiverNO}`">
                   立即預約
                 </v-btn>
               </v-card-actions>
@@ -135,11 +95,7 @@
         <!-- 分頁 -->
         <v-row>
           <v-col cols="12" class="d-flex justify-center mt-4">
-            <v-pagination
-              v-model="currentPage"
-              :length="totalPages"
-              :total-visible="7"
-            ></v-pagination>
+            <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7"></v-pagination>
           </v-col>
         </v-row>
       </v-col>
@@ -147,115 +103,91 @@
 
     <!-- 詳細資料對話框 -->
     <v-dialog v-model="detailDialog" max-width="600px">
-  <v-card v-if="selectedCaregiver">
-    <v-card-title class="text-h5">
-      護理人員詳細資料
-      <v-btn icon="mdi-close" variant="text" @click="detailDialog = false" class="float-right"></v-btn>
-    </v-card-title>
+      <v-card v-if="selectedCaregiver">
+        <v-card-title class="text-h5">
+          護理人員詳細資料
+          <v-btn icon="mdi-close" variant="text" @click="detailDialog = false" class="float-right"></v-btn>
+        </v-card-title>
 
-    <v-card-text>
-      <v-row>
-        <!-- 主要照片：獨占一行 -->
-        <v-col cols="12" class="text-center">
-          <v-avatar size="200">
-            <v-img
-              :src="selectedCaregiver.user?.userPhoto || '/api/placeholder/200/200'"
-              :alt="selectedCaregiver.user?.userName"
-              cover
-            ></v-img>
-          </v-avatar>
-        </v-col>
-
-        <!-- 基本資料：每行兩個 -->
-        <v-col cols="12">
+        <v-card-text>
           <v-row>
-            <v-col cols="6">
-              <strong>姓名:</strong> {{ selectedCaregiver.user?.userName }}
+            <!-- 主要照片：獨占一行 -->
+            <v-col cols="12" class="text-center">
+              <v-avatar size="200">
+                <v-img :src="selectedCaregiver.user?.userPhoto || '/api/placeholder/200/200'"
+                  :alt="selectedCaregiver.user?.userName" cover></v-img>
+              </v-avatar>
             </v-col>
-            <v-col cols="6">
-              <strong>性別:</strong> {{ selectedCaregiver.caregiverGender }}
+
+            <!-- 基本資料：每行兩個 -->
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="6">
+                  <strong>姓名:</strong> {{ selectedCaregiver.user?.userName }}
+                </v-col>
+                <v-col cols="6">
+                  <strong>性別:</strong> {{ selectedCaregiver.caregiverGender }}
+                </v-col>
+                <v-col cols="6">
+                  <strong>年齡:</strong> {{ selectedCaregiver.caregiverAge }} 歲
+                </v-col>
+                <v-col cols="6">
+                  <strong>工作經驗:</strong> {{ selectedCaregiver.expYears }} 年
+                </v-col>
+                <v-col cols="6">
+                  <strong>學歷:</strong> {{ selectedCaregiver.education }}
+                </v-col>
+                <v-col cols="6">
+                  <strong>日薪:</strong> {{ selectedCaregiver.daylyRate }} 元/日
+                </v-col>
+                <v-col cols="6">
+                  <strong>服務類型:</strong> {{ selectedCaregiver.services }}
+                </v-col>
+                <v-col cols="6">
+                  <strong>服務區域:</strong> {{ getServiceAreas(selectedCaregiver.serviceArea) }}
+                </v-col>
+              </v-row>
             </v-col>
-            <v-col cols="6">
-              <strong>年齡:</strong> {{ selectedCaregiver.caregiverAge }} 歲
-            </v-col>
-            <v-col cols="6">
-              <strong>工作經驗:</strong> {{ selectedCaregiver.expYears }} 年
-            </v-col>
-            <v-col cols="6">
-              <strong>學歷:</strong> {{ selectedCaregiver.education }}
-            </v-col>
-            <v-col cols="6">
-              <strong>日薪:</strong> {{ selectedCaregiver.daylyRate }} 元/日
-            </v-col>
-            <v-col cols="6">
-              <strong>服務類型:</strong> {{ selectedCaregiver.services }}
-            </v-col>
-            <v-col cols="6">
-              <strong>服務區域:</strong> {{ getServiceAreas(selectedCaregiver.serviceArea) }}
+
+            <!-- 證書照片：獨占一行 -->
+            <v-col cols="12" class="text-center mt-4">
+              <div class="text-subtitle-2 mb-2">證書照片</div>
+              <v-carousel v-if="selectedCaregiver.certifiPhoto" hide-delimiter-background show-arrows="hover"
+                height="300">
+                <v-carousel-item v-for="(photo, index) in getCertifiPhotos(selectedCaregiver.certifiPhoto)" :key="index"
+                  @click="showLargeImage(photo)">
+                  <v-img :src="photo" :alt="`證書照片 ${index + 1}`" height="300" class="mx-auto" cover
+                    style="cursor: pointer" />
+                </v-carousel-item>
+              </v-carousel>
             </v-col>
           </v-row>
-        </v-col>
+        </v-card-text>
 
-        <!-- 證書照片：獨占一行 -->
-        <v-col cols="12" class="text-center mt-4">
-          <div class="text-subtitle-2 mb-2">證書照片</div>
-          <v-carousel
-            v-if="selectedCaregiver.certifiPhoto"
-            hide-delimiter-background
-            show-arrows="hover"
-            height="300"
-          >
-            <v-carousel-item
-              v-for="(photo, index) in getCertifiPhotos(selectedCaregiver.certifiPhoto)"
-              :key="index"
-              @click="showLargeImage(photo)"
-            >
-              <v-img
-                :src="photo"
-                :alt="`證書照片 ${index + 1}`"
-                height="300"
-                class="mx-auto"
-                cover
-                style="cursor: pointer"
-              />
-            </v-carousel-item>
-          </v-carousel>
-        </v-col>
-      </v-row>
-    </v-card-text>
-
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn
-        color="primary"
-        variant="elevated"
-        :to="`/reserve/calendar/${selectedCaregiver.caregiverNO}`"
-      >
-        立即預約
-      </v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" variant="elevated" :to="`/reserve/calendar/${selectedCaregiver.caregiverNO}`">
+            立即預約
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog v-model="largeImageDialog" max-width="90vw">
-  <v-card>
-    <v-img
-      :src="selectedImage"
-      max-height="90vh"
-      contain
-    >
-      <template v-slot:placeholder>
-        <v-row class="fill-height ma-0" align="center" justify="center">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </v-row>
-      </template>
-    </v-img>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn icon="mdi-close" @click="largeImageDialog = false"></v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
+      <v-card>
+        <v-img :src="selectedImage" max-height="90vh" contain>
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            </v-row>
+          </template>
+        </v-img>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn icon="mdi-close" @click="largeImageDialog = false"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -352,7 +284,7 @@ const filteredCaregivers = computed(() => {
   if (selectedServiceAreas.value.length > 0) {
     filtered = filtered.filter(c => {
       // 假設 c.serviceArea 為一物件，key 為 serviceAreas 的 value 值，且值為布林型態
-      return selectedServiceAreas.value.some(area => 
+      return selectedServiceAreas.value.some(area =>
         c.serviceArea && c.serviceArea[area] === true
       );
     });
@@ -406,7 +338,7 @@ onMounted(() => {
 });
 const getCertifiPhotos = (certifiPhoto) => {
   if (!certifiPhoto) return [];
-  
+
   // 直接使用後端返回的 Base64 格式照片
   return [
     certifiPhoto.photo1,
@@ -448,6 +380,7 @@ const showLargeImage = (photo) => {
 .v-avatar {
   transition: transform 0.2s;
 }
+
 .v-avatar:hover {
   transform: scale(1.05);
 }
