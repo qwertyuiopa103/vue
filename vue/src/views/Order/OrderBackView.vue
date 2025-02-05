@@ -1,7 +1,7 @@
 <!-- http://localhost:5173/#/admin/orderView -->
 <template>
   <v-container>
-    <v-tabs v-model="activeTab" background-color="primary" dark>
+    <v-tabs v-model="activeTab" color="#8E8E8E" dark>
       <v-tab value="orders">訂單管理</v-tab>
       <v-tab value="analysis">訂單分析</v-tab>
     </v-tabs>
