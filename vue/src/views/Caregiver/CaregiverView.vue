@@ -594,20 +594,35 @@ const close = () => {
 // 修改保存方法
 const save = async () => {
   try {
-    // 深拷貝編輯物件
-    const sendData = { ...editedItem.value };
-    
-    // 如果有照片資料，需要清理 base64 字串前綴
+    // 驗證年齡
+    if (editedItem.value.caregiverAge < 18 || editedItem.value.caregiverAge > 65) {
+      await Swal.fire('錯誤', '護工年齡必須在18-65歲之間', 'error');
+      return;
+    }
+
+    // 準備更新資料，深拷貝避免直接修改原對象
+    const sendData = JSON.parse(JSON.stringify(editedItem.value));
+
+    // 處理照片資料，移除所有照片的 DataURL 前綴
     if (sendData.certifiPhoto) {
-      const photos = sendData.certifiPhoto;
-      for (const key in photos) {
-        if (photos[key] && typeof photos[key] === 'string' && photos[key].includes('base64,')) {
-          // 只保留 base64 字串部分
-          photos[key] = photos[key].split('base64,')[1];
-        }
+      if (sendData.certifiPhoto.photo1) {
+        sendData.certifiPhoto.photo1 = removeDataUrlPrefix(sendData.certifiPhoto.photo1);
+      }
+      if (sendData.certifiPhoto.photo2) {
+        sendData.certifiPhoto.photo2 = removeDataUrlPrefix(sendData.certifiPhoto.photo2);
+      }
+      if (sendData.certifiPhoto.photo3) {
+        sendData.certifiPhoto.photo3 = removeDataUrlPrefix(sendData.certifiPhoto.photo3);
+      }
+      if (sendData.certifiPhoto.photo4) {
+        sendData.certifiPhoto.photo4 = removeDataUrlPrefix(sendData.certifiPhoto.photo4);
+      }
+      if (sendData.certifiPhoto.photo5) {
+        sendData.certifiPhoto.photo5 = removeDataUrlPrefix(sendData.certifiPhoto.photo5);
       }
     }
 
+    // 更新護工資料
     const response = await axios.put(
       'http://localhost:8080/api/caregiver/update',
       sendData,
@@ -621,14 +636,12 @@ const save = async () => {
 
     await Swal.fire('成功', '更新成功', 'success');
     dialog.value = false;
-    // await fetchCaregiverData();
+    await fetchCaregivers();
   } catch (error) {
     console.error('更新失敗:', error);
-    Swal.fire('錯誤', '更新失敗: ' + (error.response?.data || error.message), 'error');
+    await Swal.fire('錯誤', error.response?.data || '更新失敗', 'error');
   }
 };
-
-
 const approveApplication = async () => {
   try {
     const response = await axios.post(
@@ -771,13 +784,54 @@ const getMaxNewPhotos = () => {
 };
 
 // 處理照片選擇
-const handlePhotoSelection = (files) => {
+const handlePhotoSelection = async (files) => {
   if (!files) return;
   
   const maxAllowed = getMaxNewPhotos();
   if (files.length > maxAllowed) {
-    Swal.fire('警告', `最多只能上傳 ${maxAllowed} 張新照片`, 'warning');
+    await Swal.fire('警告', `最多只能上傳 ${maxAllowed} 張新照片`, 'warning');
     newPhotos.value = files.slice(0, maxAllowed);
+    return;
+  }
+
+  try {
+    const photoFormData = new FormData();
+    files.forEach(file => {
+      photoFormData.append('files', file);
+    });
+
+    // 上傳新照片
+    const response = await axios.post(
+      'http://localhost:8080/api/certifiPhoto/upload',
+      photoFormData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+
+    if (response.data) {
+      // 更新 editedItem 中的證照資料，處理每一張照片的 base64 字串
+      const processedPhotos = {
+        certifiPhotoID: response.data.certifiPhotoID,
+        photo1: response.data.photo1 ? removeDataUrlPrefix(response.data.photo1) : null,
+        photo2: response.data.photo2 ? removeDataUrlPrefix(response.data.photo2) : null,
+        photo3: response.data.photo3 ? removeDataUrlPrefix(response.data.photo3) : null,
+        photo4: response.data.photo4 ? removeDataUrlPrefix(response.data.photo4) : null,
+        photo5: response.data.photo5 ? removeDataUrlPrefix(response.data.photo5) : null
+      };
+
+      editedItem.value.certifiPhoto = {
+        ...editedItem.value.certifiPhoto,
+        ...processedPhotos
+      };
+    }
+
+  } catch (error) {
+    console.error('照片上傳失敗:', error);
+    await Swal.fire('錯誤', '照片上傳失敗', 'error');
   }
 };
 
@@ -791,6 +845,9 @@ const showLargeImage = (photo) => {
 onMounted(() => {
   fetchCaregivers()
 })
+function removeDataUrlPrefix(dataUrl) {
+  return dataUrl.replace(/^data:image\/\w+;base64,/, '');
+}
 </script>
 
 <style scoped>
