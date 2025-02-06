@@ -394,7 +394,7 @@ export default {
   /* 確保表格寬度佔滿 */
 }
 
-::v-deep .v-data-table-header__content {
+:deep(.v-data-table-header__content) {
   font-weight: bold !important;
 }
 </style>

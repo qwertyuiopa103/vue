@@ -62,7 +62,7 @@ const handleverify = async () => {
 };
 const startCountdown = () => {
     isResendDisabled.value = true;
-    timer.value = 10;
+    timer.value = 3;
 
     const interval = setInterval(() => {
         timer.value--;

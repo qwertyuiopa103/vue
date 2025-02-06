@@ -3,7 +3,7 @@
     <v-card class="mx-auto" max-width="800">
       <v-card-title class="d-flex align-center justify-space-between">
         <span>申請成為看護</span>
-        <v-btn color="info" variant="outlined" size="small" @click="quickFill" class="ml-2">
+        <v-btn color="orange" variant="outlined" size="small" @click="quickFill" class="ml-2">
           一鍵輸入範例
         </v-btn>
       </v-card-title>
@@ -255,6 +255,7 @@ async function submitForm() {
       title: '申請已送出',
       text: '您的申請我們已收到，將在三個工作日內進行審查，將與您電子郵件通知，謝謝您的申請!',
       icon: 'success',
+      confirmButtonColor: '#FFC78E',
       confirmButtonText: '確定'
     });
 
@@ -322,6 +323,8 @@ const quickFill = async () => {
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: '確定',
+    confirmButtonColor: '#FFB5B5',
+    cancelButtonColor: '#95CACA',
     cancelButtonText: '取消'
   });
 

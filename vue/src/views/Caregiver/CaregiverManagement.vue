@@ -40,6 +40,60 @@
             </v-expansion-panels>
           </v-card-text>
         </v-card>
+        <v-card class="mt-4">
+          <v-card-title>服務等級說明</v-card-title>
+          <v-card-text>
+            <!-- 初階看護人員 -->
+            <div class="mb-4">
+              <div class="text-primary font-weight-medium mb-2">初階看護人員:</div>
+              <v-list density="compact">
+                <v-list-item prepend-icon="mdi-check-circle-outline">提供基本身體清潔</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">基本日常照顧</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">協助進食/管灌餵食</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">簡單的生命徵象測量</v-list-item>
+              </v-list>
+            </div>
+
+            <!-- 中階看護人員 -->
+            <div class="mb-4">
+              <div class="text-primary font-weight-medium mb-2">中階看護人員</div>
+              <div class="text-subtitle-2 font-italic mb-2">(包含初階所有服務，另加以下項目)</div>
+              <v-list density="compact">
+                <v-list-item prepend-icon="mdi-check-circle-outline">協助使用輔具及復健器材</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">足部照護</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">促進肌力訓練</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">肢體關節活動</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">陪同外出與就醫</v-list-item>
+              </v-list>
+            </div>
+
+            <!-- 高階看護人員 -->
+            <div class="mb-4">
+              <div class="text-primary font-weight-medium mb-2">高階看護人員</div>
+              <div class="text-subtitle-2 font-italic mb-2">(包含前兩級所有服務，另加以下項目)</div>
+              <v-list density="compact">
+                <v-list-item prepend-icon="mdi-check-circle-outline">專業照護計畫制定與執行</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">到宅沐浴車服務-第1型</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">特殊照護（如人工氣道管內分泌物抽吸）</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">管路與引流裝置照護</v-list-item>
+              </v-list>
+            </div>
+
+            <!-- 專業護理師 -->
+            <div>
+              <div class="text-primary font-weight-medium mb-2">專業護理師</div>
+              <div class="text-subtitle-2 font-italic mb-2">(包含前述所有服務，另加以下項目)</div>
+              <v-list density="compact">
+                <v-list-item prepend-icon="mdi-check-circle-outline">進階醫療器材操作與照護</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">處理導管、傷口、三管（氣切、鼻胃管、導尿管）等醫療照護</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">緊急狀況處理</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">專業臨床照護指導與個案管理</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">可執行較複雜的醫療照護程序</v-list-item>
+                <v-list-item prepend-icon="mdi-check-circle-outline">需接受特殊訓練的醫療照護項目</v-list-item>
+              </v-list>
+            </div>
+          </v-card-text>
+        </v-card>
       </v-col>
 
       <!-- 右側護理人員列表 -->
@@ -84,7 +138,7 @@
               </v-card-text>
 
               <v-card-actions class="justify-center pb-4">
-                <v-btn color="primary" variant="elevated" :to="`/home/reserve/calendar/${caregiver.caregiverNO}`">
+                <v-btn color="amber" variant="elevated" :to="`/home/reserve/calendar/${caregiver.caregiverNO}`">
                   立即預約
                 </v-btn>
               </v-card-actions>
