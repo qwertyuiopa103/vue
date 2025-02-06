@@ -320,7 +320,13 @@ const save = async () => {
       }
     );
 
-    await Swal.fire('成功', '更新成功', 'success');
+    await Swal.fire({
+      title: '成功',
+      text: '更新成功',
+      icon: 'success',
+      confirmButtonText: '確定',
+      confirmButtonColor: '#FFC78E',
+    });
     dialog.value = false;
     await fetchCaregiverData();
   } catch (error) {

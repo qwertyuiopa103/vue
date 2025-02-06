@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="text-h5 d-flex justify-space-between align-center">
         事件資料表
-        <v-btn color="primary" @click="openDialog()">新增事件</v-btn>
+        <v-btn color="blue-grey" @click="openDialog()">新增事件</v-btn>
       </v-card-title>
 
       <v-card-text>
@@ -291,8 +291,8 @@ export default {
         text: "此操作無法復原！",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         confirmButtonText: "確認刪除",
         cancelButtonText: "取消",
       });

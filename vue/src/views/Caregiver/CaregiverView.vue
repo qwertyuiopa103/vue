@@ -455,7 +455,13 @@ const save = async () => {
       }
     );
 
-    await Swal.fire('成功', '更新成功', 'success');
+    await Swal.fire({
+      title: '成功',
+      text: '更新成功',
+      icon: 'success',
+      confirmButtonText: '確定',
+      confirmButtonColor: '#FFC78E',
+    });
     dialog.value = false;
     // await fetchCaregiverData();
   } catch (error) {
@@ -479,7 +485,13 @@ const approveApplication = async () => {
     );
 
     if (response.data) {
-      await Swal.fire('成功', '審核通過', 'success');
+      await Swal.fire({
+        title: '成功',
+        text: '審核通過',
+        icon: 'success',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#FFC78E',
+      });
       closeDetailDialog();
       fetchCaregivers();
     }
@@ -502,7 +514,13 @@ const rejectApplication = async () => {
         headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
       }
     )
-    Swal.fire('成功', '已退件', 'success')
+    Swal.fire({
+      title: '成功',
+      text: '已退件',
+      icon: 'success',
+      confirmButtonText: '確定',
+      confirmButtonColor: '#FFC78E',  // 綠色按鈕
+    });
     closeDetailDialog()
     fetchCaregivers()
   } catch (error) {
@@ -517,6 +535,8 @@ const deleteItem = async (item) => {
     text: '此操作不會刪除會員資料',
     icon: 'warning',
     showCancelButton: true,
+    confirmButtonColor: '#FFB5B5',
+    cancelButtonColor: '#95CACA',
     confirmButtonText: '確定',
     cancelButtonText: '取消'
   })
@@ -529,7 +549,13 @@ const deleteItem = async (item) => {
           headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
         }
       )
-      Swal.fire('成功', '刪除成功', 'success')
+      Swal.fire({
+        title: '成功',
+        text: '刪除成功',
+        icon: 'success',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#FFC78E',  // 綠色按鈕
+      });
       fetchCaregivers()
     } catch (error) {
       console.error('刪除失敗:', error)
@@ -636,7 +662,9 @@ onMounted(() => {
   /* 確保表格寬度佔滿 */
 }
 
-
+:deep(.v-data-table-header__content) {
+  font-weight: bold !important;
+}
 
 .cursor-pointer {
   cursor: pointer;

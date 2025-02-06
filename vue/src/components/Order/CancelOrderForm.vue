@@ -161,7 +161,8 @@ const handleCancel = async () => {
         await Swal.fire({
           title: '成功',
           text: '訂單已成功取消',
-          icon: 'success'
+          icon: 'success',
+          confirmButtonColor: '#FFC78E',
         });
         closeDialog();
         emit('order-cancelled');

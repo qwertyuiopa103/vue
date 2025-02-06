@@ -15,18 +15,6 @@
                     <li><router-link to="/home/reserve/list" @click="closeMobileNav">預約查詢</router-link></li>
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>
-                    <!-- <li class="dropdown" :class="{ 'active': dropdownActive }">
-                        <a href="#" @click.prevent="toggleDropdown"><span>Dropdown</span> <i
-                                class="bi bi-chevron-down toggle-dropdown"></i></a>
-                        <transition name="fade">
-                            <ul v-if="dropdownActive" class="dropdown-active">
-                                <li><a href="#" @click="closeMobileNav">Dropdown 1</a></li>
-                                <li><a href="#" @click="closeMobileNav">Dropdown 2</a></li>
-                                <li><a href="#" @click="closeMobileNav">Dropdown 3</a></li>
-                                <li><a href="#" @click="closeMobileNav">Dropdown 4</a></li>
-                            </ul>
-                        </transition>
-                    </li> -->
 
                     <div class="mr-2" style="font-size:20px;">歡迎，<strong>{{ username }}</strong></div>
                     <li class="dropdown" :class="{ 'active': userDropdownActive }">

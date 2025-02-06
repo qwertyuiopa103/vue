@@ -4,30 +4,15 @@
 
         <v-card>
             <v-card-title>
-                <v-text-field
-                    v-model="search"
-                    append-icon="mdi-magnify"
-                    label="搜尋"
-                    single-line
-                    hide-details
-                    density="compact"
-                ></v-text-field>
+                <v-text-field v-model="search" append-icon="mdi-magnify" label="搜尋" single-line hide-details
+                    density="compact"></v-text-field>
             </v-card-title>
 
-            <v-data-table
-                :headers="headers"
-                :items="users"
-                :search="search"
-                class="elevation-1"
-            >
+            <v-data-table :headers="headers" :items="users" :search="search" class="elevation-1">
                 <!-- 自訂欄位 -->
                 <template v-slot:item.roles="{ item }">
-                    <v-select
-                        v-model="item.userRole"
-                        :items="availableRoles"
-                        density="compact"
-                        @update:model-value="updateRole(item)"
-                    ></v-select>
+                    <v-select v-model="item.userRole" :items="availableRoles" density="compact"
+                        @update:model-value="updateRole(item)"></v-select>
                 </template>
 
                 <template v-slot:item.caregiverNO="{ item }">
@@ -82,6 +67,8 @@ const updateRole = async (user) => {
             text: `確定要將 ${user.userName} 的角色更改為 ${user.userRole}？`,
             icon: 'warning',
             showCancelButton: true,
+            confirmButtonColor: '#FFB5B5',
+            cancelButtonColor: '#95CACA',
             confirmButtonText: '確定',
             cancelButtonText: '取消'
         })

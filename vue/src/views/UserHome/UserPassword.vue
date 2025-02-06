@@ -16,6 +16,7 @@ const sendPasswordRequest = async () => {
             title: '錯誤',
             text: '請輸入您的信箱',
             icon: 'error',
+            confirmButtonColor: '#FFC78E',
             confirmButtonText: '確定',
         });
         return;
@@ -39,7 +40,7 @@ const sendPasswordRequest = async () => {
                 title: '發送成功！',
                 text: '即將導向登入畫面',
                 icon: 'success',
-                confirmButtonColor: '#E0E0E0',
+                confirmButtonColor: '#FFC78E',
                 confirmButtonText: '確定',
             }).then(() => {
                 // 按下確定後跳轉至登入頁面
@@ -51,6 +52,7 @@ const sendPasswordRequest = async () => {
                 title: '錯誤',
                 text: response.statusText,
                 icon: 'error',
+                confirmButtonColor: '#FFC78E',
                 confirmButtonText: '確定',
             });
             loading.value = false;
@@ -60,6 +62,7 @@ const sendPasswordRequest = async () => {
             title: '錯誤',
             text: error.response ? error.response.data : '發送失敗，請稍後再試',
             icon: 'error',
+            confirmButtonColor: '#FFC78E',
             confirmButtonText: '確定',
         });
         loading.value = false;

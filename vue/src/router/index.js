@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore';
 import jwtDecode from 'jwt-decode';
+import Home from '@/views/Home/Home.vue';
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
@@ -79,9 +80,9 @@ const router = createRouter({
       component: () => import("@/layouts/HomeLayout.vue"),
       children: [
         {
-          name: "default_view", // 預設的子頁面名稱
-          path: "", // 默認子路由，當訪問 `/home` 時自動加載
-          component: () => import("@/views/Home/Home.vue"),
+          name: "default_view",
+          path: "",
+          component: Home,
         },
         {
           name: "home_error",
@@ -189,7 +190,10 @@ const router = createRouter({
       component: () => import("@/layouts/AdminLoginLayout.vue")
     },
   ],
-})
+  scrollBehavior() {
+    return { top: 0 };
+  }
+});
 
 
 router.beforeEach(async (to, from, next) => {

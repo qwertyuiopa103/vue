@@ -8,10 +8,10 @@
     <!-- 預約資料表 -->
     <v-tab-item v-if="tab === 0">
       <v-data-table :headers="headers" :items="filteredReservations" :items-per-page="10"
-        class="elevation-1 fixed-table mt-5" dense>
+        class="elevation-1 fixed-table" dense>
         <template v-slot:top>
           <v-toolbar flat>
-            <v-text-field v-model="search" label="搜尋" class="mx-4 mt-5" clearable
+            <v-text-field v-model="search" label="搜尋" class="mx-4 mt-3" clearable
               append-icon="mdi-magnify"></v-text-field>
             <v-spacer></v-spacer>
             <v-btn color="primary" @click="openDialog">
@@ -314,7 +314,13 @@ export default {
 
       axios.put('http://localhost:8080/api/ReserveAdmin', cleanItem)
         .then(() => {
-          Swal.fire('成功!', '資料已更新', 'success');
+          Swal.fire({
+            title: '成功',
+            text: '資料已更新',
+            icon: 'success',
+            confirmButtonText: '確定',
+            confirmButtonColor: '#FFC78E',
+          });
           this.fetchReservations();
         })
         .catch((error) => {
@@ -324,7 +330,13 @@ export default {
     deleteReserve(reserveId) {
       axios.delete(`http://localhost:8080/api/ReserveAdmin/${reserveId}`)
         .then(() => {
-          Swal.fire('成功!', '資料已刪除', 'success');
+          Swal.fire({
+            title: '成功',
+            text: '資料已刪除',
+            icon: 'success',
+            confirmButtonText: '確定',
+            confirmButtonColor: '#FFC78E',
+          });
           this.fetchReservations();
         })
         .catch((error) => {
@@ -394,7 +406,7 @@ export default {
   /* 確保表格寬度佔滿 */
 }
 
-:deep(.v-data-table-header__content) {
+th {
   font-weight: bold !important;
 }
 </style>

@@ -363,12 +363,14 @@ const fetchCaregivers = async () => {
   try {
     const response = await axios.get('http://localhost:8080/api/caregiver/findAllCaregiver');
     console.log('API Response:', response.data);
-    caregivers.value = response.data;
+    //caregivers.value = response.data;
+    caregivers.value = response.data.filter(caregiver =>
+      caregiver.cgstatus === "APPROVED"
+    );
   } catch (error) {
     console.error('Error fetching caregivers:', error);
   }
 };
-
 
 
 // 依據 serviceArea 物件轉換成可讀字串，使用 serviceAreas 陣列來對應

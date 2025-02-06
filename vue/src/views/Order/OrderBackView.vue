@@ -13,8 +13,8 @@
           <v-card-title class="d-flex justify-space-between align-center">
 
             <div>
-              <v-btn color="primary" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
-              <v-btn color="primary" @click="openCreateDialog" class="mr-2">新增訂單</v-btn>
+              <v-btn color="blue-grey" @click="quickAddOrder" class="mr-2">快速新增</v-btn>
+              <v-btn color="blue-grey" @click="openCreateDialog" class="mr-2">新增訂單</v-btn>
 
             </div>
           </v-card-title>
@@ -254,6 +254,8 @@ const deleteOrder = async (orderId) => {
     text: "此操作將無法復原!",
     icon: "warning",
     showCancelButton: true,
+    confirmButtonColor: '#FFB5B5',
+    cancelButtonColor: '#95CACA',
     confirmButtonText: "刪除",
     cancelButtonText: "取消",
   });
@@ -261,7 +263,13 @@ const deleteOrder = async (orderId) => {
   if (confirmed.isConfirmed) {
     try {
       await axios.delete(`http://localhost:8080/api/ordersAdmin/deleteOrder/${orderId}`);
-      Swal.fire("成功", "訂單已刪除", "success");
+      Swal.fire({
+        title: '成功',
+        text: '訂單已刪除',
+        icon: 'success',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#FFC78E',
+      });
       fetchOrders(); // 重新獲取訂單列表
     } catch (error) {
       Swal.fire("錯誤", "刪除失敗", "error");
@@ -295,7 +303,13 @@ const saveOrder = async () => {
       Swal.fire("成功", "訂單已更新", "success");
     } else {
       await axios.post("http://localhost:8080/api/ordersAdmin/createOrder", orderData);
-      Swal.fire("成功", "訂單已新增", "success");
+      Swal.fire({
+        title: '成功',
+        text: '訂單已新增',
+        icon: 'success',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#FFC78E',
+      });
     }
     await fetchOrders(); // 重新獲取訂單列表
     closeDialog(); // 關閉 Dialog

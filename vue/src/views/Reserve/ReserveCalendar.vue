@@ -15,20 +15,20 @@
       <!-- 右側預約表單 -->
       <v-col cols="5" style="margin-top: 50px;">
         <v-sheet class="pa-4 elevation-2">
-          <h3 class="text-center">預約服務</h3>
+          <h3 class="text-center mt-4"><strong>預約服務</strong></h3>
           <v-divider class="my-4"></v-divider>
 
           <!-- 看護師資訊 -->
-          <div class="d-flex align-center mb-4">
+          <div class="d-flex align-center mb-4 ml-16">
             <v-avatar size="80">
               <img :src="selectedCaregiver.user.userPhoto || '/user/img/user3.png'" alt="Avatar"
                 style="width: 100%; height: auto; object-fit: cover;" />
             </v-avatar>
-            <div class="ml-4">
-              <h4 class="mb-2">{{ selectedCaregiver.user.userName }}</h4>
-              <p class="text-caption">聯絡方式: {{ selectedCaregiver.user.userPhone }}</p>
-              <p class="text-caption">服務等級: {{ selectedCaregiver.services }}</p>
-              <p class="text-caption">每日薪水: {{ selectedCaregiver.daylyRate }}</p>
+            <div class="ml-10">
+              <h4 class="mb-2"><strong>{{ selectedCaregiver.user.userName }}</strong></h4>
+              <p class="text-caption"><strong> 聯絡方式 : </strong>{{ selectedCaregiver.user.userPhone }}</p>
+              <p class="text-caption"><strong>服務等級 : </strong>{{ selectedCaregiver.services }}</p>
+              <p class="text-caption"><strong>每日薪水 : </strong>{{ selectedCaregiver.daylyRate }}</p>
             </div>
           </div>
 
@@ -40,7 +40,7 @@
             <v-text-field v-model="endDate" label="結束日期" type="date" required></v-text-field>
 
             <!-- 預約按鈕 -->
-            <v-btn :disabled="!formValid" @click="submitReservation" color="primary" block>
+            <v-btn :disabled="!formValid" @click="submitReservation" color="warning" block>
               提交預約
             </v-btn>
           </v-form>
@@ -196,6 +196,7 @@ export default {
           icon: "warning",
           title: "欄位未填",
           text: "請選擇開始日期",
+          confirmButtonColor: '#FFC78E',
         });
         return;
       }
@@ -204,6 +205,7 @@ export default {
           icon: "warning",
           title: "欄位未填",
           text: "請選擇結束日期",
+          confirmButtonColor: '#FFC78E',
         });
         return;
       }
@@ -212,6 +214,7 @@ export default {
           icon: "error",
           title: "日期錯誤",
           text: "結束日期必須大於等於開始日期",
+          confirmButtonColor: '#FFC78E',
         });
         return;
       }
@@ -220,6 +223,7 @@ export default {
           icon: "error",
           title: "日期錯誤",
           text: "只能預約當日以後的服務",
+          confirmButtonColor: '#FFC78E',
         });
         return;
       }
@@ -260,6 +264,7 @@ export default {
           icon: "success",
           title: "預約成功",
           text: "您的預約已提交！",
+          confirmButtonColor: '#FFC78E',
           confirmButtonText: "確定"
         });
       } catch (error) {
@@ -327,5 +332,9 @@ export default {
   /* 增加圖標大小，使其覆蓋整個區域 */
   color: red;
   /* 將 "X" 圖示顯示為紅色 */
+}
+
+.text-caption {
+  font-size: small !important;
 }
 </style>

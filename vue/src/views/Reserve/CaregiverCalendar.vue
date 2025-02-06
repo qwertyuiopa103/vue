@@ -273,6 +273,7 @@ export default {
               icon: "success",
               title: "成功",
               text: "訂單新增成功，預約已轉為訂單",
+              confirmButtonColor: '#FFC78E',
               confirmButtonText: "確定",
             });
           } else {
@@ -302,6 +303,8 @@ export default {
         text: `你確定要刪除預約 ID: ${reserve.reserveId} 嗎?`,
         icon: "warning",
         showCancelButton: true,
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         confirmButtonText: "確定",
         cancelButtonText: "取消",
       }).then(async (result) => {
@@ -312,7 +315,13 @@ export default {
 
             // 成功處理
             if (response.status === 200) {
-              Swal.fire("成功!", "資料已刪除", "success");
+              Swal.fire({
+                title: '成功',
+                text: '資料已刪除',
+                icon: 'success',
+                confirmButtonText: '確定',
+                confirmButtonColor: '#FFC78E',
+              });
             }
 
             // 從 reserves 陣列中移除該預約

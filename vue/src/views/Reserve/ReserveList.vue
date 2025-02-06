@@ -13,7 +13,7 @@
                 <v-col cols="8">
                   <v-list-item-title>
                     <strong>預約編號:</strong> {{ item.reserveId }} - <strong>看護師編號:</strong> {{
-                      item.caregiverBean.caregiverNO }}
+                      item.caregiverBean.user.userName }}
                   </v-list-item-title>
                   <v-list-item-subtitle>
                     <strong>開始日期:</strong> {{ item.startDate }} - <strong>結束日期:</strong> {{ item.endDate }}
@@ -70,8 +70,8 @@ export default {
         text: '此操作無法還原!',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        confirmButtonColor: '#FFB5B5',
+        cancelButtonColor: '#95CACA',
         confirmButtonText: '是, 取消預約!',
         cancelButtonText: '否'
       }).then((result) => {
