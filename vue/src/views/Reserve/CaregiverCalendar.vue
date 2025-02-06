@@ -73,7 +73,7 @@ export default {
     const adapter = useDate();
     const startOfMonth = adapter.startOfDay(adapter.startOfMonth(new Date()));
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
-    // await this.fetchLoginUser();
+    await this.fetchLoginUser();
     console.log(this.caregiverNO);
     
     this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth }); // 用於行事曆的訂單資料
@@ -104,7 +104,8 @@ export default {
 
         // 篩選出 status 為 "待確認" 的預約
         this.reserves = response.data.filter(reserve => reserve.status === "待確認");
-
+        console.log(this.reserves);
+        
         // 將篩選後的預約資料映射到行事曆事件
         this.mapReservesToEvents(this.reserves);
       } catch (error) {
@@ -127,7 +128,6 @@ export default {
           `http://localhost:8080/api/caregiver/FindByUserID/${this.userId}`
         )
         this.caregiverNO = caregiverResponse.data.caregiverNO;
-        console.log("caregiverGet:"+this.caregiverNO);
         
       } catch (error) {
         console.error("Error fetching reserves:", error);
