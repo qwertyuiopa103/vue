@@ -107,12 +107,15 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div class="col-lg-4 order-lg-1">
-                        <h1 class="mb-4" data-aos="fade-up" style="font-size: 30px; font-weight: bolder;">
+                        <h1 class="mb-4 t1" data-aos="fade-up" style="font-size: 30px; font-weight: bolder;">
                             心護家 用心守護您的家
                         </h1>
-                        <p data-aos="fade-up" style="font-size: 25px; text-align: justify;">
-                            用心打造看護挑選平台，嚴選專業貼心看護，匹配每位使用者的需求，以愛與專業守護每個家庭的安心與幸福，讓照護更溫暖、更安心。
-                        </p>
+                        <div data-aos="fade-up" style="font-size: 25px; text-align: justify;">
+                            <p class="p1"><i class="fa-solid fa-heart mr-2"></i>用心打造看護挑選平台</p>
+                            <p class="p1"><i class="fa-regular fa-face-smile mr-2"></i>嚴選專業貼心看護</p>
+                            <p class="p1"><i class="fa-regular fa-handshake mr-2"></i>精準匹配使用者需求</p>
+                            <p class="p1"><i class="fa-solid fa-house mr-2"></i>以愛與專業守護家庭</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,12 +136,12 @@ onMounted(async () => {
                     <div class="col-lg-4 ps-lg-5">
                         <span class="content-subtitle"></span>
                         <!-- <h2 class="content-title">選擇心護家</h2> -->
-                        <strong style="font-size: 28px; color:#FF8F59;">專業媒合，安心無憂</strong>
-                        <p class="lead mb-5" style="font-size: 23px; text-align: justify;">
+                        <strong style="font-size: 28px; color: #37474F;">專業媒合，安心無憂</strong>
+                        <p class="lead mb-5 p2" style="font-size: 23px; text-align: justify; ">
                             提供經過審核的專業看護，快速匹配您的需求，輕鬆找到適合的照護服務。
                         </p>
-                        <strong style=" font-size: 28px; color:#FF8F59;">靈活預約，隨時支援</strong>
-                        <p class="lead mb-5" style="font-size: 23px; text-align: justify;">
+                        <strong style=" font-size: 28px;color: #37474F">靈活預約，隨時支援</strong>
+                        <p class="lead mb-5 p2" style="font-size: 23px; text-align: justify;">
                             支援彈性預約與即時服務，滿足各種看護需求，確保您的使用體驗更順暢。
                         </p>
 
@@ -148,8 +151,8 @@ onMounted(async () => {
                             <div class="col-4 counter" data-aos="fade-up" data-aos-delay="100">
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="memberCount" data-purecounter-duration="1"
-                                    class="purecounter number"></span>
-                                <span class="d-block">會員人數</span>
+                                    class="purecounter number" style="color: #37474F;"></span>
+                                <span class="d-block" style="color: #37474F;"><strong>會員人數</strong></span>
                             </div>
                             <!-- End Stats Item -->
 
@@ -157,8 +160,8 @@ onMounted(async () => {
                             <div class="col-4 counter" data-aos="fade-up" data-aos-delay="200">
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="CaregiverCount" data-purecounter-duration="1"
-                                    class="purecounter number"></span>
-                                <span class="d-block">專業看護</span>
+                                    class="purecounter number" style="color: #37474F;"></span>
+                                <span class="d-block" style="color: #37474F;"><strong>專業看護</strong></span>
                             </div>
                             <!-- End Stats Item -->
 
@@ -166,8 +169,8 @@ onMounted(async () => {
                             <div class="col-4 counter" data-aos="fade-up" data-aos-delay="300">
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="OrderCount" data-purecounter-duration="1"
-                                    class="purecounter number"></span>
-                                <span class="d-block">媒合案件</span>
+                                    class="purecounter number" style="color: #37474F;"></span>
+                                <span class="d-block" style="color: #37474F;"><strong>媒合案件</strong></span>
                             </div>
                             <!-- End Stats Item -->
 
@@ -184,12 +187,21 @@ onMounted(async () => {
 
 
 <style lang="css" scoped>
-h1 {
+.t1 {
     color: #FF8F59 !important;
 }
 
-p {
+.p1 {
     color: #FFAD86 !important;
     font-weight: 550 !important;
+}
+
+.p2 {
+    font-weight: 550 !important;
+    color: #546E7A !important;
+}
+
+.stats .count-numbers .number:after {
+    background-color: #455A64;
 }
 </style>
