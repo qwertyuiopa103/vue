@@ -26,7 +26,8 @@
 
             <!-- 右側功能按鈕 -->
             <template #append>
-                <div class="mr-2" style="font-size: small;">歡迎，<strong>{{ username }}</strong></div>
+                <div class="mr-2" style="font-size: small;">歡迎，<strong style="font-size:medium;">{{ username }}</strong>
+                </div>
                 <VBtn class="text-none me-2" height="48" icon slim>
                     <VAvatar>
                         <img :src="avatarUrl || '/user/img/user3.png'" alt="Avatar"

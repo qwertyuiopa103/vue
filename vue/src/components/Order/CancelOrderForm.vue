@@ -56,8 +56,8 @@ const formData = ref({
 const emit = defineEmits(['order-cancelled']);
 
 const cancelReasonOptions = [
-  { text: '關你屁事', value: 'A' },
-  { text: '家裡死人', value: 'B' }
+  { text: '個人因素', value: 'A' },
+  { text: '家人已過世', value: 'B' }
 ];
 
 const canCancel = computed(() => {
@@ -131,7 +131,7 @@ const handleCancel = async () => {
       cancelDate: formatDate(new Date()), // 只傳遞年月日
       cancellationReason: formData.value.cancelReason,
       refundAmount: calculatedRefund.value,
-      reason: formData.value.cancelReason === 'A' ? '關你屁事' : '家裡死人',
+      reason: formData.value.cancelReason === 'A' ? '個人因素' : '家人已過世',
       proofReceived: false
     };
 

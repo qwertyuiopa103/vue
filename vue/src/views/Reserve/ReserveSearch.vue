@@ -180,18 +180,17 @@ export default {
     edit() {
       this.newReservation = {
         userBean: {
-          userID: "USR0002",
+          userID: "USR0006",
         },
         caregiverBean: {
           caregiverNO: "3",
         },
-        startDate: new Date().toISOString().split("T")[0], // 當天日期
-        endDate: new Date(new Date().getTime() + 86400000).toISOString().split("T")[0], // 隔天日期
-        orderDate: new Date().toISOString().split("T")[0], // 當天日期
+        startDate: "2025-01-01",
+        endDate: "2025-01-01",
+        orderDate: "2025-01-01", // 當天日期
         totalPrice: 3000,
         status: "待確認",
       };
-
     },
 
     fetchReservations() {

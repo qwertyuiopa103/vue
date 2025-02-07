@@ -152,7 +152,7 @@ onMounted(async () => {
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="memberCount" data-purecounter-duration="1"
                                     class="purecounter number" style="color: #37474F;"></span>
-                                <span class="d-block" style="color: #37474F;"><strong>會員人數</strong></span>
+                                <span class="d-block" style="color: #546E7A;"><strong>會員人數</strong></span>
                             </div>
                             <!-- End Stats Item -->
 
@@ -161,7 +161,7 @@ onMounted(async () => {
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="CaregiverCount" data-purecounter-duration="1"
                                     class="purecounter number" style="color: #37474F;"></span>
-                                <span class="d-block" style="color: #37474F;"><strong>專業看護</strong></span>
+                                <span class="d-block" style="color: #546E7A;"><strong>專業看護</strong></span>
                             </div>
                             <!-- End Stats Item -->
 
@@ -170,7 +170,7 @@ onMounted(async () => {
                                 <span data-purecounter-separator="true" data-purecounter-start="0"
                                     :data-purecounter-end="OrderCount" data-purecounter-duration="1"
                                     class="purecounter number" style="color: #37474F;"></span>
-                                <span class="d-block" style="color: #37474F;"><strong>媒合案件</strong></span>
+                                <span class="d-block" style="color: #546E7A;"><strong>媒合案件</strong></span>
                             </div>
                             <!-- End Stats Item -->
 

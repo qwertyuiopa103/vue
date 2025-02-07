@@ -2,7 +2,7 @@
   <v-container>
     <v-card>
       <v-card-title class="text-h5 d-flex justify-space-between align-center">
-        事件資料表
+        <strong>事件資料表</strong>
         <v-btn color="blue-grey" @click="openDialog()">新增事件</v-btn>
       </v-card-title>
 

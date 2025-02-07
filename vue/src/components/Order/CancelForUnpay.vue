@@ -16,7 +16,7 @@
             item-value="value" :rules="[v => !!v || '請選擇取消原因']" outlined></v-select>
 
           <v-alert v-if="!canCancel" type="error" class="mt-3">
-            已超過七天退款日，無法取消訂單
+            距離服務開始少於7天，請先完成訂單後再取消(退還50%金額)
           </v-alert>
 
           <v-alert v-else type="info" class="mt-3">
@@ -55,8 +55,8 @@ const formData = ref({
 const emit = defineEmits(['order-cancelled']);
 
 const cancelReasonOptions = [
-  { text: '關你屁事', value: 'A' },
-  { text: '家裡死人', value: 'B' }
+  { text: '個人因素', value: 'A' },
+  { text: '家人已過世', value: 'B' }
 ];
 
 const canCancel = computed(() => {
@@ -119,7 +119,7 @@ const handleCancel = async () => {
         cancelDate: formatDate(new Date()), // 只傳遞年月日
         cancellationReason: formData.value.cancelReason,
         refundAmount: formData.value.totalPrice,
-        reason: formData.value.cancelReason === 'A' ? '關你屁事' : '家裡死人',
+        reason: formData.value.cancelReason === 'A' ? '個人因素' : '家人已過世',
         proofReceived: false
       };
 
@@ -136,7 +136,7 @@ const handleCancel = async () => {
         };
 
         const orderResponse = await axios.put(
-          `http://localhost:8080/api/ordersAdmin/updateStatus/${formData.value.orderId}`,
+          `http://localhost:8080/orders/updateStatus/${formData.value.orderId}`,
           updateOrderData
         );
 

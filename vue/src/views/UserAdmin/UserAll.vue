@@ -8,13 +8,23 @@
             <!-- 會員管理頁籤 -->
             <v-tabs-window-item value="1">
                 <v-row class="mt-4">
-                    <v-col cols="2" class="mr-3 ">
+                    <v-col cols="2" class="mr-2 ">
                         <v-select v-model="searchField" :items="searchFields" label="搜尋欄位" variant="outlined"
                             density="compact" single-line item-title="text" item-value="value"></v-select>
                     </v-col>
                     <v-col cols="0">
                         <v-text-field v-model="search" label="輸入關鍵字" prepend-inner-icon="mdi-magnify" variant="outlined"
                             hide-details single-line density="compact" clearable="true"></v-text-field>
+                    </v-col>
+                    <v-col cols="1">
+                        <v-btn @click="editemail" class="ml-2 pa-1" size="large" color="blue-grey">
+                            信箱
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="1">
+                        <v-btn @click="editrole" class="ml-2 pa-1" size="large" color="blue-grey">
+                            角色
+                        </v-btn>
                     </v-col>
                 </v-row>
                 <v-data-table :headers="headers" :items="filteredUsers" item-key="userID" :loading="loading"
@@ -235,6 +245,13 @@ const filteredUsers = computed(() => {
 onMounted(() => {
     fetchUsers()
 })
+
+const editemail = () => {
+    search.value = 'anningyu943@gmail.com';
+};
+const editrole = () => {
+    search.value = '管理員';
+};
 </script>
 
 <style scoped>

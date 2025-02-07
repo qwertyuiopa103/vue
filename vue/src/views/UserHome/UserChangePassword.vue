@@ -101,7 +101,7 @@ const handleSubmit = async (e) => {
 
 };
 const edit = () => {
-    password.value = 'aaa123@0';
+    password.value = 'aaa123@';
     passwordCheck.value = 'aaa123@'
 };
 </script>

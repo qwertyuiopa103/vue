@@ -352,7 +352,7 @@ function handleFileChange(event) {
 const edit = () => {
     name.value = '王小明';
     email.value = 'eeit19@gmail.com';
-    password.value = 'aa12@';
+    password.value = 'aa12@0';
     confirmPassword.value = 'aa12@0';
     phone.value = '0912345678';
     city.value = '桃園市';

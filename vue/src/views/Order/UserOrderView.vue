@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>我的訂單</v-card-title>
+      <v-card-title><strong>我的訂單</strong></v-card-title>
 
       <v-card-text>
         <v-tabs v-model="currentTab" color="primary" align-tabs="center">

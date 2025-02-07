@@ -89,8 +89,8 @@ export default {
         const response = await axios.get(
           `http://localhost:8080/orders/OrderByCaregiver/${this.caregiverNO}`
         );
-        this.orders = response.data; // 儲存完整訂單資料
-
+        //this.orders = response.data; // 儲存完整訂單資料
+        this.orders = response.data.filter(order => order.status != "已取消");
         this.mapOrdersToEvents(this.orders); // 將數據映射為事件
       } catch (error) {
         console.error("Error fetching orders:", error);

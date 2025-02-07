@@ -41,7 +41,7 @@ const loading = ref(false);
 const users = ref([]);
 const years = ref([]);
 const counties = ref([]);
-const selectedYear = ref(null);
+const selectedYear = ref(2025);
 const selectedCounty = ref("臺中市");
 
 let lineChart = null;

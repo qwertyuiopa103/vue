@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>訂單分析</v-card-title>
+      <!-- <v-card-title>訂單分析</v-card-title> -->
       <v-card-text>
         <v-row>
           <v-col cols="12" md="4">
@@ -10,7 +10,7 @@
         </v-row>
 
         <v-card class="mt-4">
-          <v-card-title>月度訂單數量趨勢</v-card-title>
+          <v-card-title><strong>月度訂單數量趨勢</strong></v-card-title>
           <v-card-text>
             <div style="position: relative; height: 300px;">
               <canvas ref="chartCanvas"></canvas>
@@ -22,7 +22,7 @@
           <v-col cols="12" md="3">
             <v-card class="stat-card" color="primary">
               <v-card-text class="white--text">
-                <div class="text-subtitle-1 mb-2">總訂單數</div>
+                <div class="text-subtitle-1 mb-2"><strong>總訂單數</strong></div>
                 <div class="text-h4">{{ totalOrders }}</div>
               </v-card-text>
             </v-card>
@@ -30,7 +30,7 @@
           <v-col cols="12" md="3">
             <v-card class="stat-card" color="info">
               <v-card-text class="white--text">
-                <div class="text-subtitle-1 mb-2">平均每月訂單</div>
+                <div class="text-subtitle-1 mb-2"><strong>平均每月訂單</strong></div>
                 <div class="text-h4">{{ averageOrdersPerMonth }}</div>
               </v-card-text>
             </v-card>
@@ -38,7 +38,7 @@
           <v-col cols="12" md="3">
             <v-card class="stat-card" color="success">
               <v-card-text class="white--text">
-                <div class="text-subtitle-1 mb-2">最高訂單月份</div>
+                <div class="text-subtitle-1 mb-2"><strong>最高訂單月份</strong></div>
                 <div class="text-h4">{{ peakOrderMonth }}</div>
               </v-card-text>
             </v-card>
@@ -46,7 +46,7 @@
           <v-col cols="12" md="3">
             <v-card class="stat-card" color="warning">
               <v-card-text class="white--text">
-                <div class="text-subtitle-1 mb-2">總營業額</div>
+                <div class="text-subtitle-1 mb-2"><strong>總營業額</strong></div>
                 <div class="text-h4">{{ totalPrice }}</div>
               </v-card-text>
             </v-card>
@@ -185,24 +185,24 @@ const updateChart = () => {
 const exportToCSV = () => {
   // 統計數據表頭
   const statisticsHeaders = [
-    "總訂單數", 
-    "平均每月訂單數", 
-    "最高訂單月份", 
+    "總訂單數",
+    "平均每月訂單數",
+    "最高訂單月份",
     "總營業額"
   ];
 
   // 統計數據
   const statisticsRow = [
-    totalOrders.value, 
-    averageOrdersPerMonth.value, 
-    peakOrderMonth.value, 
+    totalOrders.value,
+    averageOrdersPerMonth.value,
+    peakOrderMonth.value,
     totalPrice.value
   ];
 
   // 訂單明細表頭
   const orderHeaders = [
-    "訂單編號", 
-    "訂單日期", 
+    "訂單編號",
+    "訂單日期",
     "總金額"
   ];
 
@@ -210,8 +210,8 @@ const exportToCSV = () => {
   const orderRows = orders.value
     .filter(order => new Date(order.orderDate).getFullYear() === selectedYear.value)
     .map(order => [
-      order.orderId, 
-      order.orderDate.toLocaleDateString(), 
+      order.orderId,
+      order.orderDate.toLocaleDateString(),
       order.totalPrice || 0
     ]);
 

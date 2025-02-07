@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 align="center">預約列表</h2>
+    <h2 align="center"><strong>預約列表</strong></h2>
     <v-container>
       <v-row justify="center">
         <v-col cols="12" md="8">

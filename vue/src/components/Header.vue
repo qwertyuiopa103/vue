@@ -16,7 +16,8 @@
                     <li><router-link to="/home/UserOrderView" @click="closeMobileNav">訂單查詢</router-link></li>
                     <li><router-link to="/home/events" @click="closeMobileNav">活動總覽</router-link></li>
 
-                    <div class="mr-2" style="font-size:20px;">歡迎，<strong>{{ username }}</strong></div>
+                    <div class="mr-1" style="font-size:20px; color: #F57C00"><strong>{{ username }}</strong>
+                    </div>
                     <li class="dropdown" :class="{ 'active': userDropdownActive }">
                         <a href="#" @click.prevent="toggleUserDropdown">
                             <img v-if="profileLoaded" :src="avatarUrl || '/user/img/user3.png'" alt="mdo" width="50"
