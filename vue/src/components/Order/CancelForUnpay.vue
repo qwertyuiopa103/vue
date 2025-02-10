@@ -16,11 +16,11 @@
             item-value="value" :rules="[v => !!v || '請選擇取消原因']" outlined></v-select>
 
           <v-alert v-if="!canCancel" type="error" class="mt-3">
-            距離服務開始少於7天，請先完成訂單後再取消(退還50%金額)
+            訂單建立後未付款七天會自動取消
           </v-alert>
 
           <v-alert v-else type="info" class="mt-3">
-            {{ refundMessage }}
+            距離服務開始7天以上，可取消訂單
           </v-alert>
         </v-form>
       </v-card-text>
@@ -46,7 +46,7 @@ import Swal from 'sweetalert2';
 const dialog = ref(false);
 const formData = ref({
   orderId: '',
-  caregiver: '',
+  caregiverName: '',
   startDate: '',
   totalPrice: 0,
   cancelReason: null
@@ -64,25 +64,9 @@ const canCancel = computed(() => {
 
   const startDate = new Date(formData.value.startDate);
   const today = new Date();
-
-  startDate.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-
-  return startDate > today;
-});
-
-const refundMessage = computed(() => {
-  if (!formData.value.startDate) return '';
-
-  const startDate = new Date(formData.value.startDate);
-  const today = new Date();
   const diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
 
-  if (diffDays >= 7) {
-    return '距離服務開始7天以上，可全額退款';
-  } else {
-    return '距離服務開始少於7天，請先完成訂單後再取消(退還50%金額)';
-  }
+  return diffDays > 7;
 });
 
 const formatPrice = (price) => {
@@ -108,28 +92,22 @@ const closeDialog = () => {
 
 const handleCancel = async () => {
   try {
-    // 計算距離服務開始的天數
     const startDate = new Date(formData.value.startDate);
     const today = new Date();
     const diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
 
-    // 1. 距離服務開始7天以上，可全額退款
-    if (diffDays >= 7) {
+    if (diffDays > 7) {
       const cancelData = {
-        cancelDate: formatDate(new Date()), // 只傳遞年月日
+        cancelDate: formatDate(new Date()),
         cancellationReason: formData.value.cancelReason,
         refundAmount: formData.value.totalPrice,
         reason: formData.value.cancelReason === 'A' ? '個人因素' : '家人已過世',
         proofReceived: false
       };
 
-      console.log('Creating cancellation record:', cancelData);
-
       const cancelResponse = await axios.post('http://localhost:8080/api/ordercancel/createcancel', cancelData);
-      console.log('Cancellation response:', cancelResponse);
 
       if (cancelResponse.status === 201) {
-        // 更新訂單狀態為已取消
         const updateOrderData = {
           status: '已取消',
           cancellationId: cancelResponse.data.cancellationId
@@ -142,25 +120,15 @@ const handleCancel = async () => {
 
         if (orderResponse.status === 200) {
           closeDialog();
-
           await Swal.fire({
             title: '成功',
             text: '訂單已成功取消',
-            icon: 'success'
+            icon: 'success',
+            confirmButtonColor: '#FFC78E',
           });
-          closeDialog();
           emit('order-cancelled');
         }
       }
-    } else {
-      // 2. 距離服務開始少於7天，顯示提示訊息
-      closeDialog();
-
-      Swal.fire({
-        title: '注意',
-        text: '請先完成訂單後再取消(退還50%金額)',
-        icon: 'warning'
-      });
     }
   } catch (error) {
     console.error('取消訂單失敗:', error);
@@ -183,7 +151,6 @@ const formatDate = (date) => {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
-
   return `${year}-${month}-${day}`;
 };
 

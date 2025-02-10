@@ -73,6 +73,7 @@ export default {
     return {
       focus: [new Date()],
       events: [],
+      orders: [],
       selectedCaregiver: {
         caregiverNO: '',
         user: {
@@ -141,7 +142,8 @@ export default {
         const response = await axios.get(
           `http://localhost:8080/orders/OrderByCaregiver/${this.caregiverNO}`
         );
-        const orders = response.data;
+        this.orders = response.data.filter(order => order.status != "已取消");;
+
 
         // 動態設置看護師資料（直接賦值完整物件）
         // if (orders.length > 0 && orders[0].caregiver) {
@@ -161,7 +163,8 @@ export default {
         //   this.selectedCaregiver.hourlyRate = caregiver.hourlyRate || "未提供";
         // }
 
-        this.mapOrdersToEvents(orders);
+        this.mapOrdersToEvents(this.orders);
+
       } catch (error) {
         console.error("Error fetching orders:", error);
       }

@@ -2,40 +2,62 @@
   <div class="main-container">
     <!-- 左邊的行事曆區塊：顯示訂單 -->
     <v-sheet class="calendar-container">
-      <v-calendar ref="calendar" v-model="focus" :events="events" color="primary" type="month">
-        <!-- 使用插槽自定義事件顯示 -->
-        <template v-slot:event="{ event }">
-          <div v-if="event" class="event-btn" :style="{
-            backgroundColor:
-              event.color === 'blue'
-                ? '#A3C8FF'      // 淺藍色（進行中）
-                : event.color === 'red'
-                  ? '#FFA3A3'      // 淺紅色（已取消）
-                  : event.color === 'yellow'
-                    ? '#FFF4A3'      // 淺黃色（即將開始的預約）
-                    : event.color === 'green'
-                      ? '#A3FFB3'      // 淺灰色（已完成）
-                      : '#FFFFFF'      // 其他顏色為白色
-          }">
-            <span>{{ event.title }}</span> <!-- 顯示 caregiverName 或 userName -->
-          </div>
-        </template>
-      </v-calendar>
+      <div class="calendar-header">
+        <v-calendar ref="calendar" v-model="focus" :events="events" color="primary" type="month"
+          @click:event="showEventDetails">
+          <!-- 使用插槽自定義事件顯示 -->
+          <template v-slot:event="{ event }">
+            <div v-if="event" class="event-btn" @click="showEventDetails(event)" :style="{
+              backgroundColor:
+                event.color === 'blue'
+                  ? '#A3C8FF'
+                  : event.color === 'red'
+                    ? '#FFA3A3'
+                    : event.color === 'yellow'
+                      ? '#FFF4A3'
+                      : event.color === 'green'
+                        ? '#A3FFB3'
+                        : '#FFFFFF'
+            }">
+              <span>{{ event.title }}</span>
+            </div>
+          </template>
+        </v-calendar>
+      </div>
     </v-sheet>
 
     <!-- 右邊的預約列表 -->
     <div class="reserve-list">
+      <!-- 狀態圖例放在預約列表上方 -->
+      <div class="status-legend">
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #A3C8FF"></div>
+          <span>進行中</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #A3FFB3"></div>
+          <span>已完成</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #FFA3A3"></div>
+          <span>已取消</span>
+        </div>
+        <div class="legend-item">
+          <div class="color-box" style="background-color: #FFF4A3"></div>
+          <span>待確認預約</span>
+        </div>
+      </div>
       <div class="reserve-list-header">
         <h3>預約列表</h3>
       </div>
 
       <div class="reserve-items">
         <div v-for="(reserve, index) in reserves" :key="index" class="reserve-item">
-          <p>使用者: {{ reserve.userBean.userName }}</p>
+          <p>顧客: {{ reserve.userBean.userName }}</p>
           <p>開始時間: {{ formatDate(reserve.startDate) }}</p>
           <p>結束時間: {{ formatDate(reserve.endDate) }}</p>
           <p>訂單總金額: {{ reserve.totalPrice }}</p>
-          <!-- 每一筆預約有獨立的新增與刪除按鈕 -->
+          <p>顧客地址: {{ reserve.userBean.userCity + reserve.userBean.userDistrict + reserve.userBean.userAddress }}</p>
           <div class="reserve-actions">
             <i class="fas fa-check-circle" @click="createOrder(reserve)"
               style="font-size: 36px; color: green; cursor: pointer;"></i>
@@ -45,12 +67,137 @@
         </div>
       </div>
     </div>
+
+    <!-- 訂單詳細資訊對話框 -->
+    <v-dialog v-model="showDialog" max-width="600">
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          {{ dialogTitle }}
+        </v-card-title>
+
+        <v-card-text class="mt-4">
+          <template v-if="selectedEvent">
+            <div v-if="selectedEvent.type === 'order' && selectedEvent.order" class="detail-container">
+              <div class="photo-container" v-if="selectedEvent.order.user.userPhoto">
+                <img :src="selectedEvent.order.user.userPhoto" alt="User Photo" class="user-photo" />
+              </div>
+              <div class="info-container">
+                <v-list>
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>顧客姓名</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.order.user.userName }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>開始時間</v-list-item-title>
+                      <v-list-item-subtitle>{{ formatDate(selectedEvent.order.startDate) }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>結束時間</v-list-item-title>
+                      <v-list-item-subtitle>{{ formatDate(selectedEvent.order.endDate) }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>訂單金額</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.order.totalPrice }} 元</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>顧客地址</v-list-item-title>
+                      <v-list-item-subtitle>{{
+                        selectedEvent.order.user.userCity + selectedEvent.order.user.userDistrict + selectedEvent.order.user.userAddress
+                        || '未提供地址' }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>連絡電話</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.order.user.userPhone || '未提供電話' }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                </v-list>
+              </div>
+            </div>
+            <div v-else-if="selectedEvent.type === 'reserve' && selectedEvent.reserve" class="detail-container">
+              <div class="photo-container" v-if="selectedEvent.reserve.userBean.userPhoto">
+                <img :src="selectedEvent.reserve.userBean.userPhoto" alt="User Photo" class="user-photo" />
+              </div>
+              <div class="info-container">
+                <v-list>
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>預約顧客</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.reserve.userBean.userName }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>開始時間</v-list-item-title>
+                      <v-list-item-subtitle>{{ formatDate(selectedEvent.reserve.startDate) }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>結束時間</v-list-item-title>
+                      <v-list-item-subtitle>{{ formatDate(selectedEvent.reserve.endDate) }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>預約金額</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.reserve.totalPrice }} 元</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>顧客地址</v-list-item-title>
+                      <v-list-item-subtitle>{{
+                        selectedEvent.reserve.userBean.userCity + selectedEvent.reserve.userBean.userDistrict + selectedEvent.reserve.userBean.userAddress
+                        || '未提供地址' }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item two-line>
+                    <v-list-item-content>
+                      <v-list-item-title>連絡電話</v-list-item-title>
+                      <v-list-item-subtitle>{{ selectedEvent.reserve.userBean.userPhone || '未提供電話'
+                        }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </div>
+            </div>
+          </template>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="showDialog = false">
+            關閉
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import Swal from "sweetalert2";  // 引入 SweetAlert2
+import Swal from "sweetalert2";
 import { useDate } from "vuetify";
 import { VSheet, VBtn } from "vuetify/components";
 import { VCalendar } from "vuetify/labs/VCalendar";
@@ -63,57 +210,61 @@ export default {
   },
 
   data: () => ({
-    focus: [new Date()], // 當前焦點日期
-    events: [],          // 儲存事件的陣列 (訂單與預約)
-    reserves: [],        // 預約資料 (右邊的預約列表)
+    focus: [new Date()],
+    events: [],
+    reserves: [],
     orders: [],
-    caregiverNO: 1,      // 預設的看護師 ID (caregiverNO)
+    caregiverNO: 1,
     userId: '',
+    showDialog: false,
+    selectedEvent: null,
+
   }),
+
+  computed: {
+    dialogTitle() {
+      if (this.selectedEvent) {
+        return this.selectedEvent.type === 'order' ? '訂單詳細資訊' : '預約詳細資訊';
+      }
+      return '';
+    },
+  },
 
   async mounted() {
     const adapter = useDate();
     const startOfMonth = adapter.startOfDay(adapter.startOfMonth(new Date()));
     const endOfMonth = adapter.endOfDay(adapter.endOfMonth(new Date()));
     await this.fetchLoginUser();
-    console.log(this.caregiverNO);
 
-    this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth }); // 用於行事曆的訂單資料
-    this.fetchReservesByCaregiver(this.caregiverNO); // 用於右邊預約列表的資料
+    this.fetchOrdersByCaregiver({ start: startOfMonth, end: endOfMonth });
+    this.fetchReservesByCaregiver(this.caregiverNO);
   },
 
   methods: {
-    // 從 API 獲取看護師的訂單數據（左邊行事曆顯示）
     async fetchOrdersByCaregiver({ start, end }) {
       try {
         const response = await axios.get(
           `http://localhost:8080/orders/OrderByCaregiver/${this.caregiverNO}`
         );
-        //this.orders = response.data; // 儲存完整訂單資料
-        this.orders = response.data.filter(order => order.status != "已取消");
-        this.mapOrdersToEvents(this.orders); // 將數據映射為事件
+        this.orders = response.data;
+        this.mapOrdersToEvents(this.orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     },
 
-    // 從 API 獲取預約資料（右邊的預約列表）
     async fetchReservesByCaregiver(caregiverNO) {
       try {
         const response = await axios.get(
           `http://localhost:8080/reserve/search/caregiver/${caregiverNO}`
         );
-
-        // 篩選出 status 為 "待確認" 的預約
         this.reserves = response.data.filter(reserve => reserve.status === "待確認");
-        console.log(this.reserves);
-
-        // 將篩選後的預約資料映射到行事曆事件
         this.mapReservesToEvents(this.reserves);
       } catch (error) {
         console.error("Error fetching reserves:", error);
       }
     },
+
     async fetchLoginUser() {
       try {
         const userResponse = await axios.get(
@@ -121,108 +272,115 @@ export default {
         );
         this.userId = userResponse.data.id;
 
-        const userBean = {
-          userID: userResponse.data.id,
-          userName: userResponse.data.name,
-          userEmail: userResponse.data.email,
-        }
         const caregiverResponse = await axios.get(
           `http://localhost:8080/api/caregiver/findByUserId/${this.userId}`
-        )
+        );
         this.caregiverNO = caregiverResponse.data.caregiverNO;
-        console.log("caregiverGet:" + this.caregiverNO);
-
       } catch (error) {
-        console.error("Error fetching reserves:", error);
+        console.error("Error fetching user:", error);
       }
     },
 
-    // 將獲取的訂單數據映射到行事曆事件 (訂單行事曆)
-    mapOrdersToEvents(orders) {
-      orders.forEach(order => {
-        const caregiverName = order.user ? order.user.userName : "Unknown Caregiver";
+    getUserPhotoUrl(photoData) {
+      if (photoData) {
+        return `data:image/jpeg;base64,${photoData}`;
+      }
+      return null;
+    },
 
+    showEventDetails(event) {
+      this.selectedEvent = event;
+      this.showDialog = true;
+    },
+
+    formatDate(date) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      };
+      return new Date(date).toLocaleString('zh-TW', options);
+    },
+
+    mapOrdersToEvents(orders) {
+      this.events = this.events.filter(event => event.type !== 'order');
+
+      orders.forEach(order => {
+        const userName = order.user ? order.user.userName : "Unknown User";
         const startDate = new Date(order.startDate);
         const endDate = new Date(order.endDate);
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
-          let eventColor = 'blue'; // 預設為藍色（進行中）
+          let eventColor = 'blue';
 
-          // 如果訂單被取消，改為紅色
-          if (order.cancellation && order.cancellation.cancellationId !== null) {
+          if (order.status === '已取消') {
             eventColor = 'red';
-          }
-          // 如果已經完成，設為灰色
-          else if (endDate < new Date()) {
+          } else if (new Date(endDate) < new Date()) {
             eventColor = 'green';
-          }
-          // 如果結束日期大於今天，表示進行中，保持藍色
-          else if (endDate >= new Date()) {
+          } else if (new Date(endDate) >= new Date()) {
             eventColor = 'blue';
           }
 
           this.events.push({
-            title: caregiverName,         // 事件的標題顯示看護師名字
-            start: new Date(currentDate), // 事件的開始日期
-            end: new Date(currentDate),   // 事件的結束日期
-            color: eventColor,            // 根據邏輯設定顏色
-            allDay: true,                 // 全日事件
-            type: "order"                 // 標識這個事件為訂單
+            title: userName,
+            start: new Date(currentDate),
+            end: new Date(currentDate),
+            color: eventColor,
+            allDay: true,
+            type: "order",
+            orderId: order.orderId,
+            order: order  // 存储完整订单信息
           });
 
-          // 增加一天
           currentDate.setDate(currentDate.getDate() + 1);
         }
       });
     },
 
-    // 將預約資料映射到行事曆事件 (預約行事曆)
     mapReservesToEvents(reserves) {
+      this.events = this.events.filter(event => event.type !== 'reserve');
+
       reserves.forEach(reserve => {
         const userName = reserve.userBean ? reserve.userBean.userName : "Unknown User";
-
         const startDate = new Date(reserve.startDate);
         const endDate = new Date(reserve.endDate);
 
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
           this.events.push({
-            title: userName,             // 事件的標題顯示預約的使用者名稱
-            start: new Date(currentDate), // 事件的開始日期
-            end: new Date(currentDate),   // 事件的結束日期
-            color: "yellow",             // 預約的顏色設定為淡黃色
-            allDay: true,                // 全日事件
-            type: "reserve"              // 標識這個事件為預約
+            title: userName,
+            start: new Date(currentDate),
+            end: new Date(currentDate),
+            color: "yellow",
+            allDay: true,
+            type: "reserve",
+            reserveId: reserve.reserveId,
+            reserve: reserve  // 存储完整预约信息
           });
 
-          // 增加一天
           currentDate.setDate(currentDate.getDate() + 1);
         }
       });
     },
 
-    // 格式化日期
-    formatDate(date) {
-      const options = { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" };
-      return new Date(date).toLocaleDateString(undefined, options);
-    },
-
-    // 新增預約（每一筆獨立操作）
     async createOrder(reserve) {
       try {
         const reserveId = reserve.reserveId;
 
-        // 創建一個乾淨的 `user` 和 `caregiver` 物件，不包含圖片
         const userWithoutImage = { ...reserve.userBean };
-        delete userWithoutImage.userPhoto; // 假設圖片欄位是 profilePicture
+        delete userWithoutImage.userPhoto;
 
         const caregiverWithoutImage = { ...reserve.caregiverBean };
         delete caregiverWithoutImage.certifiPhoto;
+
         const order = {
-          orderId: 0, // 由後端自動生成
-          user: userWithoutImage,   // 使用沒有圖片的 `userBean`
-          caregiver: caregiverWithoutImage,  // 使用沒有圖片的 `caregiverBean`
+          orderId: 0,
+          user: userWithoutImage,
+          caregiver: caregiverWithoutImage,
           cancellationId: null,
           orderDate: new Date(),
           startDate: reserve.startDate,
@@ -234,41 +392,28 @@ export default {
           MerchantTradeNo: null,
         };
 
-        // 1. 新增訂單
         const response = await axios.post("http://localhost:8080/orders/createOrder", order);
 
         if (response.status === 201) {
-          // 2. 刪除對應的預約
           const deleteResponse = await axios.put(`http://localhost:8080/reserve/order/${reserveId}`);
 
           if (deleteResponse.status === 200) {
-            // 3. 更新 reserves
             this.reserves = this.reserves.filter(reserve => reserve.reserveId !== reserveId);
 
-            // 4. 更新行事曆事件
-            const startDate = new Date(reserve.startDate).toISOString();
-            const endDate = new Date(reserve.endDate).toISOString();
-
-            this.events = this.events.map(event => {
-              const eventStart = new Date(event.start).toISOString();
-              const eventEnd = new Date(event.end).toISOString();
-
-              if (
-                event.color === "yellow" && // 確保是黃色事件
-                event.title === reserve.userBean.userName &&
-                eventStart >= startDate &&
-                eventEnd <= endDate
-              ) {
-                return {
-                  ...event,
-                  color: "blue", // 修改顏色為藍色
-                  type: "order", // 更新事件類型為訂單
-                };
+            // 更新行事曆事件
+            this.events = this.events.filter(event => {
+              if (event.type === 'reserve' && event.reserveId === reserveId) {
+                return false;
               }
-              return event; // 保留其他事件不變
+              return true;
             });
 
-            // 5. 顯示成功提示
+            // 重新獲取訂單並更新行事曆
+            await this.fetchOrdersByCaregiver({
+              start: this.focus[0],
+              end: this.focus[0]
+            });
+
             Swal.fire({
               icon: "success",
               title: "成功",
@@ -276,14 +421,9 @@ export default {
               confirmButtonColor: '#FFC78E',
               confirmButtonText: "確定",
             });
-          } else {
-            throw new Error("刪除預約失敗");
           }
-        } else {
-          throw new Error(response.data.message || "新增訂單失敗");
         }
       } catch (error) {
-        // 顯示錯誤提示
         console.error(error);
         Swal.fire({
           icon: "error",
@@ -292,11 +432,8 @@ export default {
           confirmButtonText: "確定",
         });
       }
-    }
-    ,
+    },
 
-    // 刪除預約（每一筆獨立操作）
-    // 刪除預約（每一筆獨立操作）
     async deleteReserve(reserve, index) {
       Swal.fire({
         title: "刪除預約",
@@ -310,10 +447,8 @@ export default {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            // 使用 axios 發送 DELETE 請求
             const response = await axios.put(`http://localhost:8080/reserve/${reserve.reserveId}`);
 
-            // 成功處理
             if (response.status === 200) {
               Swal.fire({
                 title: '成功',
@@ -322,28 +457,19 @@ export default {
                 confirmButtonText: '確定',
                 confirmButtonColor: '#FFC78E',
               });
+
+              // 從預約列表中移除
+              this.reserves.splice(index, 1);
+
+              // 從行事曆事件中移除
+              this.events = this.events.filter(event => {
+                if (event.type === 'reserve' && event.reserveId === reserve.reserveId) {
+                  return false;
+                }
+                return true;
+              });
             }
-
-            // 從 reserves 陣列中移除該預約
-            this.reserves.splice(index, 1);
-
-            // 從 events 陣列中移除對應的事件
-            const startDate = new Date(reserve.startDate).toISOString();
-            const endDate = new Date(reserve.endDate).toISOString();
-
-            this.events = this.events.filter((event) => {
-              const eventStart = new Date(event.start).toISOString();
-              const eventEnd = new Date(event.end).toISOString();
-              const isYellowEvent = event.color === "yellow";
-              return !(
-                isYellowEvent && // 確保只刪除黃色事件
-                event.title === reserve.userBean.userName &&
-                eventStart >= startDate &&
-                eventEnd <= endDate
-              );
-            });
           } catch (error) {
-            // 捕捉錯誤並顯示錯誤訊息
             Swal.fire("錯誤!", error.response?.data?.message || "刪除失敗", "error");
           }
         }
@@ -354,39 +480,61 @@ export default {
 </script>
 
 <style scoped>
-/* 主容器：水平佈局 */
 .main-container {
   display: flex;
   flex-direction: row;
   width: 90%;
   height: 100%;
   justify-content: center;
-  /* 水平居中 */
-  align-items: center;
-  /* 垂直居中 */
+  align-items: flex-start;
   margin: 0 auto;
-  /* 確保容器本身在其父容器中居中 */
+  padding-top: 20px;
 }
 
-/* 行事曆區塊 */
+.calendar-header {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.status-legend {
+  display: flex;
+  /* justify-content: flex-end; */
+  gap: 20px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
 .calendar-container {
   width: 60%;
-  /* 左側佔 50% */
-  padding-right: 10px;
+  padding-right: 20px;
 }
 
-/* 預約列表區塊 */
 .reserve-list {
   width: 40%;
-  /* 右側佔 50% */
-  padding-left: 10px;
+  padding-left: 20px;
   border-left: 1px solid #ddd;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
-/* 預約列表標題 */
 .reserve-list-header {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .reserve-list-header h3 {
@@ -400,61 +548,78 @@ export default {
   overflow-y: auto;
 }
 
-/* 預約列表中的每一項 */
 .reserve-item {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
 }
 
-/* 每一筆預約的按鈕區域 */
 .reserve-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 15px;
   margin-top: 10px;
 }
 
-/* 事件顯示區域 */
 .event-btn {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 123, 255, 0.2);
-  /* 淡藍色背景 */
   border-radius: 4px;
   padding: 4px;
   color: #000;
   font-size: 14px;
   font-weight: bold;
   text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 
-/* 設定滾動條背景顏色 */
+.event-btn:hover {
+  transform: scale(1.05);
+}
+
+.detail-container {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+}
+
+.photo-container {
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+}
+
+.user-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.info-container {
+  flex-grow: 1;
+}
+
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
-/* 滾動條背景 */
 ::-webkit-scrollbar-track {
   background: #ffffff;
-  /* 白色背景 */
   border-radius: 10px;
 }
 
-/* 滾動條滑塊 */
 ::-webkit-scrollbar-thumb {
   background: #f0f0f0;
-  /* 非常淺的灰色滑塊 */
   border-radius: 10px;
 }
 
-/* 滾動條滑塊在滑動時顯示的顏色 */
 ::-webkit-scrollbar-thumb:hover {
   background: #e0e0e0;
-  /* 略深的灰色 */
 }
 </style>

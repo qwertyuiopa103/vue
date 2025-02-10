@@ -136,9 +136,16 @@ const peakOrderMonth = computed(() => {
 // 總營業額計算
 const totalPrice = computed(() => {
   return orders.value
-    .filter(order => new Date(order.orderDate).getFullYear() === selectedYear.value)
+    .filter(order =>
+      // 過濾年份
+      new Date(order.orderDate).getFullYear() === selectedYear.value &&
+      // 只計算付款成功的訂單
+      order.status === '付款完成'
+    )
     .reduce((sum, order) => sum + (order.totalPrice || 0), 0);
 });
+
+
 
 // 更新圖表
 const updateChart = () => {
@@ -203,6 +210,7 @@ const exportToCSV = () => {
   const orderHeaders = [
     "訂單編號",
     "訂單日期",
+    "訂單狀態",
     "總金額"
   ];
 
@@ -212,6 +220,7 @@ const exportToCSV = () => {
     .map(order => [
       order.orderId,
       order.orderDate.toLocaleDateString(),
+      order.status,
       order.totalPrice || 0
     ]);
 

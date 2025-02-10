@@ -22,13 +22,13 @@
 
         <!-- Define each column with inputs -->
         <template v-slot:[`item.reserveId`]="{ item }">
-          <input type="number" class="short-input" readonly :value="item.reserveId" />
+          <input type="number" class="long-input" readonly :value="item.reserveId" />
         </template>
         <template v-slot:[`item.userId`]="{ item }">
-          <input type="text" class="date-input" v-model="item.userBean.userID" />
+          <input type="text" class="long-input" v-model="item.userBean.userID" />
         </template>
         <template v-slot:[`item.caregiverId`]="{ item }">
-          <input type="number" class="date-input" v-model="item.caregiverBean.caregiverNO" />
+          <input type="number" class="long-input" v-model="item.caregiverBean.caregiverNO" />
         </template>
         <template v-slot:[`item.startDate`]="{ item }">
           <input type="date" class="date-input" v-model="item.startDate" />
@@ -87,7 +87,7 @@
           <v-text-field v-model="newReservation.startDate" label="開始日期" type="date" required></v-text-field>
           <v-text-field v-model="newReservation.endDate" label="結束日期" type="date" required></v-text-field>
           <v-text-field v-model="newReservation.orderDate" label="訂單日期" type="date" required></v-text-field>
-          <v-text-field v-model="newReservation.totalPrice" label="總價格" type="number" required></v-text-field>
+          <v-text-field v-model="newReservation.totalPrice" label="價格" type="number" required></v-text-field>
           <v-select v-model="newReservation.status" :items="statusOptions" label="狀態" required></v-select>
         </v-card-text>
         <v-card-actions>
@@ -111,15 +111,15 @@ export default {
       tab: 0, // 默認顯示「預約資料表」tab
       search: '',
       headers: [
-        { title: '預約編號', value: 'reserveId', sortable: true, width: '110px' },
-        { title: '會員編號', value: 'userId', sortable: true, width: '100px' },
-        { title: '看護編號', value: 'caregiverId', sortable: true, width: '100px' },
+        { title: '預約編號', value: 'reserveId', sortable: true, width: '70px' },
+        { title: '會員編號', value: 'userId', sortable: true, width: '70px' },
+        { title: '看護編號', value: 'caregiverId', sortable: true, width: '70px' },
         { title: '開始日期', value: 'startDate', sortable: true, width: '120px' },
-        { title: '結束日期', value: 'endDate', sortable: true, width: '120px' },
-        { title: '訂單日期', value: 'orderDate', sortable: true, width: '120px' },
-        { title: '總價格', value: 'totalPrice', sortable: true, width: '80px' },
-        { title: '狀態', value: 'status', sortable: true, width: '100px' },
-        { title: '操作', value: 'actions', sortable: false, width: '120px' },
+        { title: '結束日期', value: 'endDate', sortable: true, width: '100px' },
+        { title: '訂單日期', value: 'orderDate', sortable: true, width: '100px' },
+        { title: '價格', value: 'totalPrice', sortable: true, width: '65px' },
+        { title: '狀態', value: 'status', sortable: true, width: '65px' },
+        { title: '操作', value: 'actions', sortable: false, width: '100px' },
       ],
       reservations: [],
       caregiverList: [],
@@ -377,11 +377,15 @@ export default {
 
 <style>
 .short-input {
-  width: 100px;
+  width: 62px;
+}
+
+.long-input {
+  width: 74px;
 }
 
 .date-input {
-  width: 120px;
+  width: 118px;
 }
 
 .chart {

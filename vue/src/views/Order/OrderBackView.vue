@@ -236,7 +236,9 @@ const editOrder = (item) => {
       endDate: formatDateToLocalDate(item.endDate),
       status: item.status || '',
       paymentMethod: item.paymentMethod || '',
-      totalPrice: item.totalPrice || 0
+      totalPrice: typeof item.totalPrice === 'string' ?
+        parseFloat(item.totalPrice.replace(/,/g, '')) :
+        item.totalPrice || 0
     });
 
     console.log('Formatted currentOrder:', currentOrder);
@@ -300,7 +302,13 @@ const saveOrder = async () => {
       await axios.put(`http://localhost:8080/api/ordersAdmin/UpdateOrder/${currentOrder.orderId}`,
         orderData
       );
-      Swal.fire("成功", "訂單已更新", "success");
+      Swal.fire({
+        title: '成功',
+        text: '訂單已更新',
+        icon: 'success',
+        confirmButtonText: '確定',
+        confirmButtonColor: '#FFC78E',
+      });
     } else {
       await axios.post("http://localhost:8080/api/ordersAdmin/createOrder", orderData);
       Swal.fire({
